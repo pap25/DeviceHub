@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="DeviceHub.Abstractions/DeviceHub.Abstractions.csproj" />
+  <Project Path="DeviceHub.Base/DeviceHub.Base.csproj" />
+  <Project Path="DeviceHub.Lis/DeviceHub.Lis.csproj" />
+  <Project Path="DeviceHub.Win/DeviceHub.Win.csproj" />
+  <Project Path="DeviceHub.Yhlo/DeviceHub.Yhlo.csproj" />
+</Solution>
