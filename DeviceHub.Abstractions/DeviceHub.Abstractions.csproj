@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Folder Include="Vo\" />
-    <Folder Include="ListDto\" />
   </ItemGroup>
 
 </Project>

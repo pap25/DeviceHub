@@ -19,7 +19,9 @@ namespace DeviceHub.Win
         private void button1_Click(object sender, EventArgs e)
         {
             IDeviceDriver d = DriverFactory.create();
+            d.Test();
             button1.Text = "fff";
+
         }
     }
 }

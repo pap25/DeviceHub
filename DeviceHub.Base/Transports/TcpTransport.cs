@@ -6,5 +6,9 @@ namespace DeviceHub.Base.Transports
 {
     public class TcpTransport
     {
+        public void d()
+        {
+            
+        }
     }
 }

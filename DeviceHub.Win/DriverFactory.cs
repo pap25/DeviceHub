@@ -1,8 +1,6 @@
 ﻿using DeviceHub.Abstractions;
-using System;
-using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
 using System.Reflection;
-using System.Text;
 
 namespace DeviceHub.Win
 {
@@ -10,14 +8,22 @@ namespace DeviceHub.Win
     {
         public static IDeviceDriver create()
         {
-            String dll = "DeviceHub.Yhlo.dll";
+            var config = new ConfigurationBuilder()
+                .SetBasePath(AppContext.BaseDirectory)
+                .AddJsonFile("appsettings.json", optional: false)
+                .Build();
+
+            var dll = config["Driver:Assembly"]
+                ?? throw new InvalidOperationException("Driver:Assembly is not configured.");
+            var typeName = config["Driver:Type"]
+                ?? throw new InvalidOperationException("Driver:Type is not configured.");
 
             Assembly asm = Assembly.LoadFrom(dll);
 
-            var type = asm.GetType("DeviceHub.Yhlo.TestDriver");
+            var type = asm.GetType(typeName)
+                ?? throw new InvalidOperationException($"Type '{typeName}' not found in assembly '{dll}'.");
 
-            return (IDeviceDriver)Activator.CreateInstance(type);
+            return (IDeviceDriver)Activator.CreateInstance(type)!;
         }
-
     }
 }

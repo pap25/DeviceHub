@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DeviceHub.Abstractions
+namespace DeviceHub.Base.Models
 {
-    public interface ILisClient
+    public class HL7Response
     {
     }
 }
