@@ -2,6 +2,6 @@
 {
     public interface IDeviceDriver
     {
-        public void Test();
+        public string Test();
     }
 }

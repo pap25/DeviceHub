@@ -1,6 +1,7 @@
 ﻿using DeviceHub.Base.Common;
 using System.IO.Ports;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DeviceHub.Base.Transports
 {
@@ -22,6 +23,9 @@ namespace DeviceHub.Base.Transports
 
             this._serialPort.DataReceived += SerialPort_DataReceived;
             this._endSymbols = endSymbols;
+            Logger.Info(
+                $"初始化串口: portName={portName}, baudRate={baudRate}, parity={parity}, " +
+                $"dataBits={dataBits}, stopBits={stopBits}, endSymbols=[{string.Join(", ", endSymbols)}]");
         }
 
         private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
@@ -32,8 +36,7 @@ namespace DeviceHub.Base.Transports
 
                 _buffer.Append(data);
 
-                Console.WriteLine("======= RECEIVE =======");
-                Console.WriteLine(data);
+                Logger.Debug($"串口DataReceived事件: {data}");
 
                 if (isEnd(data))
                 {
@@ -45,11 +48,11 @@ namespace DeviceHub.Base.Transports
             }
             catch (Exception ex)
             {
-                Console.WriteLine("异常：" + ex.Message);
+                Logger.Error("串口DataReceived事件异常", ex);
             }
         }
 
-        private bool isEnd(String data)
+        private bool isEnd(string data)
         {
             if (_endSymbols.Length == 0)
             {
@@ -71,7 +74,7 @@ namespace DeviceHub.Base.Transports
             {
                 _serialPort.Open();
 
-                Logger.Info("串口已打开" + _serialPort.PortName);
+                Logger.Info($"串口已打开: {_serialPort.PortName}");
             }
         }
 
@@ -81,7 +84,7 @@ namespace DeviceHub.Base.Transports
             {
                 _serialPort.Close();
 
-                Console.WriteLine("串口已关闭");
+                Logger.Info($"串口已关闭: {_serialPort.PortName}");
             }
         }
 
