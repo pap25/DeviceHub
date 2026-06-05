@@ -87,56 +87,5 @@ namespace DeviceHub.Base.Transports
                 Logger.Info($"串口已关闭: {_serialPort.PortName}");
             }
         }
-
-        //private void ParseMessage(string msg)
-        //{
-        //    // 去掉MLLP
-        //    msg = msg.TrimStart((char)0x0B)
-        //             .TrimEnd((char)0x1C, (char)0x0D);
-
-        //    Console.WriteLine("======= FULL HL7 =======");
-        //    Console.WriteLine(msg);
-
-        //    /*HL7Parser parser = new();
-
-        //    parser.Parse(msg);*/
-        //}
-
-        //private void SendACK()
-        //{
-        //    // ASTM ACK
-        //    byte[] ack = { 0x06 };
-
-        //    _serialPort.Write(ack, 0, ack.Length);
-
-        //    Console.WriteLine("======= SEND ACK =======");
-        //}
-
-        //public void Send(string msg)
-        //{
-        //    if (!_serialPort.IsOpen)
-        //        return;
-
-        //    byte[] data = BuildMLLP(msg);
-
-        //    _serialPort.Write(data, 0, data.Length);
-
-        //    Console.WriteLine("======= SEND =======");
-        //    Console.WriteLine(msg);
-        //}
-
-        //private byte[] BuildMLLP(string msg)
-        //{
-        //    List<byte> bytes = new();
-
-        //    bytes.Add(0x0B);
-
-        //    bytes.AddRange(Encoding.UTF8.GetBytes(msg));
-
-        //    bytes.Add(0x1C);
-        //    bytes.Add(0x0D);
-
-        //    return bytes.ToArray();
-        //}
     }
 }
