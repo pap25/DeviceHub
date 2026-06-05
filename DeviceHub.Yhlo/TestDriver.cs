@@ -3,12 +3,14 @@ using DeviceHub.Base.Common;
 using DeviceHub.Base.Transports;
 using DeviceHub.Lis;
 using System.IO.Ports;
+using System.Text;
 
 namespace DeviceHub.Yhlo
 {
     public class TestDriver : IDeviceDriver
     {
         private readonly LisClient lisClient = new();
+        private readonly StringBuilder _buffer = new();
         public string Test()
         {
             SerialPortTransport serialPort;
@@ -20,8 +22,7 @@ namespace DeviceHub.Yhlo
                     serialPortConfig.BaudRate,
                     (Parity)serialPortConfig.Parity,
                     serialPortConfig.DataBits,
-                    (StopBits)serialPortConfig.StopBits,
-                    "\r"
+                    (StopBits)serialPortConfig.StopBits
                 );
             }
             catch (Exception ex)
@@ -31,8 +32,8 @@ namespace DeviceHub.Yhlo
             }
             try
             {
-                serialPort.DataReceived += SerialPort_DataReceived;
-                serialPort.Open();
+                serialPort.DataReceived += OnDataReceived;
+                serialPort.OpenAsync();
             }
             catch (Exception ex)
             {
@@ -42,9 +43,12 @@ namespace DeviceHub.Yhlo
             return "";
         }
 
-        private void SerialPort_DataReceived(string data)
+        private void OnDataReceived(byte[] data)
         {
-            Logger.Info($"串口接收数据: {data}");
+            string text = Encoding.ASCII.GetString(data);
+            Logger.Info($"串口接收数据: {text}");
+            Logger.Info($"串口接收数据: {Encoding.UTF8.GetString(data)}");
+            _buffer.Append(text);
         }
     }
 }
