@@ -1,50 +1,99 @@
 ﻿using DeviceHub.Base.Common;
 using System.IO.Ports;
 using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DeviceHub.Base.Transports
 {
-    public delegate void SerialDataReceivedEventHandler(string data);
-    public class SerialPortTransport
+    public class SerialPortTransport : IDisposable
     {
         private readonly SerialPort _serialPort;
-        private readonly StringBuilder _buffer = new();
-        private readonly string[] _endSymbols;
-        public event SerialDataReceivedEventHandler DataReceived;
 
-        public SerialPortTransport(string portName, int baudRate = 9600, Parity parity = Parity.None,
-            int dataBits = 8, StopBits stopBits = StopBits.One, params string[] endSymbols)
+        public event Action<byte[]>? DataReceived;
+
+        public bool IsOpen => _serialPort.IsOpen;
+
+        public SerialPortTransport(string portName, int baudRate = 9600, Parity parity = Parity.None, int dataBits = 8, StopBits stopBits = StopBits.One)
         {
-            this._serialPort = new SerialPort(portName, baudRate, parity, dataBits, stopBits)
-            {
-                Encoding = Encoding.UTF8
-            };
+            _serialPort = new SerialPort(portName, baudRate, parity, dataBits, stopBits);
 
-            this._serialPort.DataReceived += SerialPort_DataReceived;
-            this._endSymbols = endSymbols;
-            Logger.Info(
-                $"初始化串口: portName={portName}, baudRate={baudRate}, parity={parity}, " +
-                $"dataBits={dataBits}, stopBits={stopBits}, endSymbols=[{string.Join(", ", endSymbols)}]");
+            _serialPort.DataReceived += SerialPort_DataReceived;
+
+            Logger.Info($"初始化串口: portName={portName}, baudRate={baudRate}, parity={parity}, " +
+                $"dataBits={dataBits}, stopBits={stopBits}");
+        }
+
+        /// <summary>
+        /// 打开串口
+        /// </summary>
+        public Task OpenAsync()
+        {
+            if (!_serialPort.IsOpen)
+            {
+                _serialPort.Open();
+                Logger.Info($"串口已打开: {_serialPort.PortName}");
+            }
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// 关闭串口
+        /// </summary>
+        public Task CloseAsync()
+        {
+            if (_serialPort.IsOpen)
+            {
+                _serialPort.Close();
+                Logger.Info($"串口已关闭: {_serialPort.PortName}");
+            }
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// 发送字节
+        /// </summary>
+        public Task SendAsync(byte[] data)
+        {
+            if (!_serialPort.IsOpen)
+            {
+                throw new InvalidOperationException("串口未打开");
+            }
+
+            _serialPort.Write(data, 0, data.Length);
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// 发送字符串
+        /// </summary>
+        public Task SendAsync(string message, Encoding? encoding = null)
+        {
+            encoding ??= Encoding.ASCII;
+
+            return SendAsync(encoding.GetBytes(message));
         }
 
         private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             try
             {
-                string data = _serialPort.ReadExisting();
+                int length = _serialPort.BytesToRead;
 
-                _buffer.Append(data);
-
-                Logger.Debug($"串口DataReceived事件: {data}");
-
-                if (isEnd(data))
+                if (length <= 0)
                 {
-
-                    DataReceived(_buffer.ToString());
-
-                    _buffer.Clear();
+                    return;
                 }
+
+                byte[] buffer = new byte[length];
+
+                _serialPort.Read(
+                    buffer,
+                    0,
+                    length);
+
+                DataReceived?.Invoke(buffer);
             }
             catch (Exception ex)
             {
@@ -52,40 +101,18 @@ namespace DeviceHub.Base.Transports
             }
         }
 
-        private bool isEnd(string data)
+        public void Dispose()
         {
-            if (_endSymbols.Length == 0)
-            {
-                return true;
-            }
-            foreach (var item in _endSymbols)
-            {
-                if (data.Contains(item))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
+            _serialPort.DataReceived -= SerialPort_DataReceived;
 
-        public void Open()
-        {
-            if (!_serialPort.IsOpen)
-            {
-                _serialPort.Open();
-
-                Logger.Info($"串口已打开: {_serialPort.PortName}");
-            }
-        }
-
-        public void Close()
-        {
             if (_serialPort.IsOpen)
             {
                 _serialPort.Close();
-
-                Logger.Info($"串口已关闭: {_serialPort.PortName}");
             }
+
+            _serialPort.Dispose();
+
+            Logger.Info($"串口 Dispose: {_serialPort.PortName}");
         }
     }
 }
