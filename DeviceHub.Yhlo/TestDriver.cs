@@ -45,9 +45,9 @@ namespace DeviceHub.Yhlo
 
         private void OnDataReceived(byte[] data)
         {
-            string text = Encoding.ASCII.GetString(data);
+            // 国产仪器GBK  新设备UTF8
+            string text = TextEncodings.Gbk.GetString(data);
             Logger.Info($"串口接收数据: {text}");
-            Logger.Info($"串口接收数据: {Encoding.UTF8.GetString(data)}");
             _buffer.Append(text);
         }
     }
