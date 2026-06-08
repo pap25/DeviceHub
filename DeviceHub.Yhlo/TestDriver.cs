@@ -2,6 +2,7 @@
 using DeviceHub.Base.Common;
 using DeviceHub.Base.Transports;
 using DeviceHub.Lis;
+using DeviceHub.Lis.Impl;
 using System.IO.Ports;
 using System.Text;
 
@@ -9,7 +10,7 @@ namespace DeviceHub.Yhlo
 {
     public class TestDriver : IDeviceDriver
     {
-        private readonly LisClient lisClient = new();
+        private readonly ILisClient lisClient = new LisClient();
         private readonly StringBuilder _buffer = new();
         public string Test()
         {

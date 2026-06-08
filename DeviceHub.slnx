@@ -1,4 +1,8 @@
 <Solution>
+  <Folder Name="/doc/">
+    <File Path="../../download/LIS_V1_Schema_ChineseComment.sql" />
+    <File Path="DeviceHub.Lis/通信服务与LIS对接.pdf" />
+  </Folder>
   <Project Path="DeviceHub.Abstractions/DeviceHub.Abstractions.csproj" />
   <Project Path="DeviceHub.Base/DeviceHub.Base.csproj" />
   <Project Path="DeviceHub.Lis/DeviceHub.Lis.csproj" />

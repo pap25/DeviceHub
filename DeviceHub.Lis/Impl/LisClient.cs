@@ -1,8 +1,8 @@
 ﻿using DeviceHub.Lis.Dto;
 
-namespace DeviceHub.Lis
+namespace DeviceHub.Lis.Impl
 {
-    public class LisClient
+    public class LisClient : ILisClient
     {
         public SerialPortConfig querySerialPortConfigById(int id)
         {
