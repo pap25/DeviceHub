@@ -1,7 +1,9 @@
-﻿namespace DeviceHub.Abstractions
+﻿using DeviceHub.Abstractions.Vo;
+
+namespace DeviceHub.Abstractions
 {
     public interface IDeviceDriver
     {
-        public string Test();
+        Task<Resp> Start(int driverId);
     }
 }

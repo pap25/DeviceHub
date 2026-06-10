@@ -28,44 +28,34 @@
         /// </summary>
         private void InitializeComponent()
         {
-            button1 = new Button();
-            label1 = new Label();
+            lblMessage = new Label();
             SuspendLayout();
             // 
-            // button1
+            // lblMessage
             // 
-            button1.Location = new Point(400, 182);
-            button1.Name = "button1";
-            button1.Size = new Size(75, 23);
-            button1.TabIndex = 0;
-            button1.Text = "button1";
-            button1.UseVisualStyleBackColor = true;
-            button1.Click += button1_Click;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(174, 182);
-            label1.Name = "label1";
-            label1.Size = new Size(43, 17);
-            label1.TabIndex = 1;
-            label1.Text = "label1";
+            lblMessage.AutoSize = true;
+            lblMessage.Location = new Point(47, 35);
+            lblMessage.Name = "lblMessage";
+            lblMessage.Size = new Size(53, 17);
+            lblMessage.TabIndex = 2;
+            lblMessage.Text = "加载中...";
             // 
             // DeviceStatus
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
-            Controls.Add(label1);
-            Controls.Add(button1);
+            Controls.Add(lblMessage);
             Name = "DeviceStatus";
             Text = "DeviceStatus";
+            Shown += DeviceStatus_Shown;
             ResumeLayout(false);
             PerformLayout();
         }
 
         #endregion
 
+        private Label lblMessage;
         private Button button1;
         private Label label1;
     }

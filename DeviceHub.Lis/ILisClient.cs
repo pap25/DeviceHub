@@ -21,7 +21,8 @@ namespace DeviceHub.Lis
     public interface ILisClient
     {
         // 查询设备配置
-        public SerialPortConfig querySerialPortConfigById(int id);
+        Task<DriverConfig> queryDriverConfig(int id);
+        //Task<SerialPortConfig> querySerialPortConfigById(int id);
 
         // 上传结果
         //Task UploadResultAsync(TestResult result);
