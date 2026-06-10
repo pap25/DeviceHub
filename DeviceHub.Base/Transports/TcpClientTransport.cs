@@ -8,7 +8,7 @@ namespace DeviceHub.Base.Transports
 {
     namespace DeviceHub.Base.Transports
     {
-        public class TcpTransport1 : IDisposable
+        public class TcpClientTransport : IDisposable
         {
             private readonly string _host;
             private readonly int _port;
@@ -20,11 +20,11 @@ namespace DeviceHub.Base.Transports
 
             public bool IsConnected => _client?.Connected ?? false;
 
-            public TcpTransport1(string host, int port)
+            public TcpClientTransport(string host, int port)
             {
                 _host = host;
                 _port = port;
-                Logger.Info($"初始化网口TCP: host={host}, port={port}");
+                Logger.Info($"初始化TCP客户端: host={host}, port={port}");
             }
 
             public async Task ConnectAsync()
@@ -33,7 +33,7 @@ namespace DeviceHub.Base.Transports
 
                 await _client.ConnectAsync(_host, _port);
 
-                Logger.Info($"网口TCP已连接: host={_host}, port={_port}");
+                Logger.Info($"TCP客户端已连接: host={_host}, port={_port}");
 
                 _stream = _client.GetStream();
 
@@ -45,7 +45,7 @@ namespace DeviceHub.Base.Transports
                 _stream?.Close();
                 _client?.Close();
 
-                Logger.Info($"网口TCP断开连接: host={_host}, port={_port}");
+                Logger.Info($"TCP客户端断开连接: host={_host}, port={_port}");
 
                 return Task.CompletedTask;
             }
@@ -53,7 +53,7 @@ namespace DeviceHub.Base.Transports
             public async Task SendAsync(byte[] data)
             {
                 if (_stream == null)
-                    throw new InvalidOperationException("网口TCP未连接");
+                    throw new InvalidOperationException("TCP客户端未连接");
 
                 await _stream.WriteAsync(data);
             }
@@ -85,15 +85,15 @@ namespace DeviceHub.Base.Transports
                 }
                 catch (ObjectDisposedException ex)
                 {
-                    Logger.Error("网口TCP ObjectDisposedException 异常", ex);
+                    Logger.Error("TCP客户端 ObjectDisposedException 异常", ex);
                 }
                 catch (IOException ex)
                 {
-                    Logger.Error("网口TCP IOException 异常", ex);
+                    Logger.Error("TCP客户端 IOException 异常", ex);
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error("网口TCP Exception 异常", ex);
+                    Logger.Error("TCP客户端 Exception 异常", ex);
                 }
             }
 
@@ -102,7 +102,7 @@ namespace DeviceHub.Base.Transports
                 _stream?.Dispose();
                 _client?.Dispose();
 
-                Logger.Info($"网口TCP Dispose: host={_host}, port={_port}");
+                Logger.Info($"TCP客户端 Dispose: host={_host}, port={_port}");
             }
         }
     }
