@@ -8,7 +8,7 @@ namespace DeviceHub.Base.Transports
 {
     namespace DeviceHub.Base.Transports
     {
-        public class TcpTransport : IDisposable
+        public class TcpTransport1 : IDisposable
         {
             private readonly string _host;
             private readonly int _port;
@@ -20,7 +20,7 @@ namespace DeviceHub.Base.Transports
 
             public bool IsConnected => _client?.Connected ?? false;
 
-            public TcpTransport(string host, int port)
+            public TcpTransport1(string host, int port)
             {
                 _host = host;
                 _port = port;
