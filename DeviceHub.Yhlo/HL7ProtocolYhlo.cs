@@ -1,6 +1,7 @@
 ﻿using DeviceHub.Abstractions;
 using DeviceHub.Abstractions.Vo;
 using DeviceHub.Base.Common;
+using DeviceHub.Base.Constant;
 using DeviceHub.Base.Transports;
 using DeviceHub.Base.Transports.DeviceHub.Base.Transports;
 using DeviceHub.Lis;
@@ -50,13 +51,9 @@ namespace DeviceHub.Yhlo
 
         private void TcpTransport_DataReceived(byte[] data)
         {
-            string text = TextEncodings.Gbk.GetString(data);
-            Logger.Info($"TcpServer接收数据: {text}");
+            
 
-            byte[] result = data[1..data.Length];
-            var d = TextEncodings.Gbk.GetString(result);
-
-            buffer.Append(text);
+            
         }
     }
 }
