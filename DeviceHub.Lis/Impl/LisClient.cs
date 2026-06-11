@@ -37,7 +37,7 @@ namespace DeviceHub.Lis.Impl
             DriverConfig config = new DriverConfig
             {
                 TcpConfig = tcpConfig,
-                SerialPortConfig = serialPortConfig
+                //SerialPortConfig = serialPortConfig
             };
 
             return config;

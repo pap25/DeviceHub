@@ -38,10 +38,12 @@ namespace DeviceHub.Yhlo.yhloTest
             {
                 buffer.AddRange(data);
 
-                while (TryExtractMessage(out byte[] message))
+                while (TryExtractMessage(out List<byte> message))
                 {
-                    string text = Encoding.UTF8.GetString(message);
-                    Logger.Info($"TCP接收完整消息: {text}");
+                    Logger.Info($"TCP接收完整消息: {Encoding.UTF8.GetString(message.ToArray())}");
+
+                    string text = Encoding.UTF8.GetString(message.GetRange(1, message.Count - 1).ToArray());
+                    
                 }
             }
             catch (Exception ex)
@@ -51,9 +53,9 @@ namespace DeviceHub.Yhlo.yhloTest
             }
         }
 
-        private bool TryExtractMessage(out byte[] message)
+        private bool TryExtractMessage(out List<byte> message)
         {
-            message = Array.Empty<byte>();
+            message = new List<byte>(0);
 
             int startIndex = IndexOfByte(Protocols.VT);
             if (startIndex < 0)
@@ -81,7 +83,7 @@ namespace DeviceHub.Yhlo.yhloTest
             }
 
             // 完整消息：VT + 正文 + EB
-            message = buffer.GetRange(0, endIndex + 1).ToArray();
+            message = buffer.GetRange(0, endIndex + 1);
 
             int consumed = endIndex + 1;
             if (consumed < buffer.Count && buffer[consumed] == Protocols.CR)

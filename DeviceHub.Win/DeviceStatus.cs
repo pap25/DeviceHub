@@ -21,11 +21,11 @@ namespace DeviceHub.Win
             Resp<DriverConfig> respConfig = await LoadDriverConfig(1);
             if (!respConfig.IsSuccess())
             {
-                lblMessage.Text = respConfig.GetErrorMsg();
+                lblConfig.Text = respConfig.GetErrorMsg();
                 return;
             }
             DriverConfig? config = respConfig.GetData();
-            ShowUI(config);
+            lblConfig.Text = FormatString(config);
 
             try
             {
@@ -33,16 +33,23 @@ namespace DeviceHub.Win
                 Resp resp = await yhloTestDriver.Start(config);
                 if (!resp.IsSuccess())
                 {
-                    lblMessage.Text = resp.GetErrorMsg();
+                    // 由于是异步线程，需Invoke在UI线程操作控件
+                    lblErrorMsg.Invoke(new Action(() =>
+                    {
+                        lblErrorMsg.Text = resp.GetErrorMsg();
+                    }));
                 }
             }
             catch (Exception ex)
             {
-                lblMessage.Text = ex.Message;
+                lblErrorMsg.Invoke(new Action(() =>
+                {
+                    lblErrorMsg.Text = ex.Message;
+                }));
             }
         }
 
-        private static string ShowUI(DriverConfig config)
+        private static string FormatString(DriverConfig config)
         {
             var sb = new StringBuilder();
             AppendVoFields(sb, config.SerialPortConfig);

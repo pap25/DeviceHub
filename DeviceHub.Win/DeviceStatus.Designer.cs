@@ -28,24 +28,35 @@
         /// </summary>
         private void InitializeComponent()
         {
-            lblMessage = new Label();
+            lblConfig = new Label();
+            lblErrorMsg = new Label();
             SuspendLayout();
             // 
-            // lblMessage
+            // lblConfig
             // 
-            lblMessage.AutoSize = true;
-            lblMessage.Location = new Point(47, 35);
-            lblMessage.Name = "lblMessage";
-            lblMessage.Size = new Size(53, 17);
-            lblMessage.TabIndex = 2;
-            lblMessage.Text = "加载中...";
+            lblConfig.AutoSize = true;
+            lblConfig.Location = new Point(47, 35);
+            lblConfig.Name = "lblConfig";
+            lblConfig.Size = new Size(53, 17);
+            lblConfig.TabIndex = 2;
+            lblConfig.Text = "加载中...";
+            // 
+            // lblErrorMsg
+            // 
+            lblErrorMsg.AutoSize = true;
+            lblErrorMsg.ForeColor = Color.Red;
+            lblErrorMsg.Location = new Point(244, 35);
+            lblErrorMsg.Name = "lblErrorMsg";
+            lblErrorMsg.Size = new Size(0, 17);
+            lblErrorMsg.TabIndex = 3;
             // 
             // DeviceStatus
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
-            Controls.Add(lblMessage);
+            Controls.Add(lblErrorMsg);
+            Controls.Add(lblConfig);
             Name = "DeviceStatus";
             Text = "DeviceStatus";
             Shown += DeviceStatus_Shown;
@@ -55,8 +66,10 @@
 
         #endregion
 
-        private Label lblMessage;
+        private Label lblConfig;
         private Button button1;
         private Label label1;
+        private Label lbllblMessage;
+        private Label lblErrorMsg;
     }
 }
