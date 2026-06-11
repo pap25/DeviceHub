@@ -18,8 +18,8 @@ namespace DeviceHub.Base.Transports
 
             _serialPort.DataReceived += SerialPort_DataReceived;
 
-            Logger.Info($"初始化串口: portName={portName}, baudRate={baudRate}, parity={parity}, " +
-                $"dataBits={dataBits}, stopBits={stopBits}");
+            Logger.Info($"初始化串口 portName:{portName}, baudRate:{baudRate}, parity:{parity}, " +
+                $"dataBits:{dataBits}, stopBits:{stopBits}");
         }
 
         /// <summary>

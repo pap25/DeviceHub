@@ -24,7 +24,7 @@ namespace DeviceHub.Base.Transports
             {
                 _host = host;
                 _port = port;
-                Logger.Info($"初始化TCP客户端: host={host}, port={port}");
+                Logger.Info($"初始化TCP客户端 host:{host}, port:{port}");
             }
 
             public async Task ConnectAsync()
@@ -33,7 +33,7 @@ namespace DeviceHub.Base.Transports
 
                 await _client.ConnectAsync(_host, _port);
 
-                Logger.Info($"TCP客户端已连接: host={_host}, port={_port}");
+                Logger.Info($"TCP客户端已连接 host:{_host}, port:{_port}");
 
                 _stream = _client.GetStream();
 
@@ -45,7 +45,7 @@ namespace DeviceHub.Base.Transports
                 _stream?.Close();
                 _client?.Close();
 
-                Logger.Info($"TCP客户端断开连接: host={_host}, port={_port}");
+                Logger.Info($"TCP客户端断开连接 host:{_host}, port:{_port}");
 
                 return Task.CompletedTask;
             }
@@ -102,7 +102,7 @@ namespace DeviceHub.Base.Transports
                 _stream?.Dispose();
                 _client?.Dispose();
 
-                Logger.Info($"TCP客户端 Dispose: host={_host}, port={_port}");
+                Logger.Info($"TCP客户端 Dispose host:{_host}, port:{_port}");
             }
         }
     }

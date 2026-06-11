@@ -22,7 +22,7 @@ namespace DeviceHub.Base.Transports
         {
             _host = host;
             _port = port;
-            Logger.Info($"初始化TCP服务端: host={host}, port={port}");
+            Logger.Info($"初始化TCP服务端 host:{host}, port:{port}");
         }
 
         public async Task StartAsync()
@@ -37,7 +37,7 @@ namespace DeviceHub.Base.Transports
 
             _client = await _listener.AcceptTcpClientAsync();
 
-            Logger.Info($"客户端已连接: {_client.Client.RemoteEndPoint}, host={_host}, port={_port}");
+            Logger.Info($"客户端已连接: {_client.Client.RemoteEndPoint}, host:{_host}, port:{_port}");
 
             _stream = _client.GetStream();
 
@@ -50,7 +50,7 @@ namespace DeviceHub.Base.Transports
             _client?.Close();
             _listener?.Stop();
 
-            Logger.Info($"TCP服务端已停止: host={_host}, port={_port}");
+            Logger.Info($"TCP服务端已停止 host:{_host}, port:{_port}");
 
             return Task.CompletedTask;
         }
@@ -82,13 +82,13 @@ namespace DeviceHub.Base.Transports
 
                     if (len == 0)
                     {
-                        Logger.Info($"客户端已断开连接: {_client?.Client.RemoteEndPoint}, host={_host}, port={_port}");
+                        Logger.Info($"客户端已断开连接: {_client?.Client.RemoteEndPoint}, host:{_host}, port:{_port}");
                         break;
                     }
 
                     var data = buffer[..len];
 
-                    DataReceived?.Invoke(data);
+                    DataReceived?.Invoke(data); // 事件处理要考虑半包、粘包
                 }
             }
             catch (ObjectDisposedException ex)
@@ -111,7 +111,7 @@ namespace DeviceHub.Base.Transports
             _client?.Dispose();
             _listener?.Stop();
 
-            Logger.Info($"TCP服务端 Dispose: host={_host}, port={_port}");
+            Logger.Info($"TCP服务端 Dispose host:{_host}, port:{_port}");
         }
     }
 }
