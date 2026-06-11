@@ -58,7 +58,7 @@ namespace DeviceHub.Base.Transports
         public async Task SendAsync(byte[] data)
         {
             if (_stream == null)
-                throw new InvalidOperationException("客户端未连接");
+                throw new InvalidOperationException("TCP服务未就绪或客户端尚未连接");
 
             await _stream.WriteAsync(data);
         }
@@ -82,7 +82,7 @@ namespace DeviceHub.Base.Transports
 
                     if (len == 0)
                     {
-                        Logger.Info("客户端已断开连接");
+                        Logger.Info($"客户端已断开连接: {_client?.Client.RemoteEndPoint}, host={_host}, port={_port}");
                         break;
                     }
 
@@ -111,7 +111,7 @@ namespace DeviceHub.Base.Transports
             _client?.Dispose();
             _listener?.Stop();
 
-            Logger.Info($"TCP服务端 Dispose: port={_port}");
+            Logger.Info($"TCP服务端 Dispose: host={_host}, port={_port}");
         }
     }
 }

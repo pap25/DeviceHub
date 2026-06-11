@@ -10,12 +10,15 @@ using System;
 using System.Collections.Generic;
 using System.IO.Ports;
 using System.Text;
+using static System.Net.Mime.MediaTypeNames;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DeviceHub.Yhlo
 {
     public class HL7ProtocolYhlo : IDeviceDriver
     {
         private readonly ILisClient lisClient = new LisClient();
+        private readonly StringBuilder buffer = new();
         public async Task<Resp> Start(int driverId)
         {
             DriverConfig config;
@@ -29,23 +32,31 @@ namespace DeviceHub.Yhlo
                 return Resp.Make($"从LIS拉取配置失败: driverId={driverId}");
             }
 
+            Logger.Info($"从LIS领取配置成功: {config}");
+
             NetworkPortVo networkPortVo = new NetworkPortVo
             {
                 Host = config.TcpConfig.Host,
                 Port = config.TcpConfig.Port
             };
 
-            TcpTransport tcpTransport = new TcpTransport(networkPortVo.Host, networkPortVo.Port);
-            await tcpTransport.ConnectAsync();
+            TcpServerTransport tcpServerTransport = new TcpServerTransport(networkPortVo.Host, networkPortVo.Port);
+            await tcpServerTransport.StartAsync();
 
-            tcpTransport.DataReceived += TcpTransport_DataReceived;
+            tcpServerTransport.DataReceived += TcpTransport_DataReceived;
 
             return Resp.Ok(networkPortVo);
         }
 
-        private void TcpTransport_DataReceived(byte[] obj)
+        private void TcpTransport_DataReceived(byte[] data)
         {
-            throw new NotImplementedException();
+            string text = TextEncodings.Gbk.GetString(data);
+            Logger.Info($"TcpServer接收数据: {text}");
+
+            byte[] result = data[1..data.Length];
+            var d = TextEncodings.Gbk.GetString(result);
+
+            buffer.Append(text);
         }
     }
 }

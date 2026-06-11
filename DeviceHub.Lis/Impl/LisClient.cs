@@ -6,7 +6,7 @@ namespace DeviceHub.Lis.Impl
     {
         public async Task<DriverConfig> queryDriverConfig(int id)
         {
-            await Task.Delay(3000); // 模拟网络IO
+            //await Task.Delay(3000); // 模拟网络IO
             //if (id == 1)
             //{
             //    throw new Exception("调用LIS异常");
@@ -22,7 +22,7 @@ namespace DeviceHub.Lis.Impl
 
             var tcpConfig = new TcpConfig
             {
-                Host = "127.0.0.1",
+                Host = "172.23.0.1",
                 Port = 5000,
             };
 
