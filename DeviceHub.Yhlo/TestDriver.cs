@@ -1,5 +1,4 @@
 ﻿using DeviceHub.Abstractions;
-using DeviceHub.Abstractions.Vo;
 using DeviceHub.Base.Common;
 using DeviceHub.Base.Transports;
 using DeviceHub.Lis;
@@ -11,7 +10,7 @@ namespace DeviceHub.Yhlo
 {
     public class TestDriver
     {
-        private readonly ILisClient lisClient = new LisClient();
+        private readonly ILisClient lisClient = LisClient.Instance;
         private readonly StringBuilder _buffer = new();
         public Resp Start()
         {
@@ -31,7 +30,7 @@ namespace DeviceHub.Yhlo
             catch (Exception ex)
             {
                 Logger.Error("从LIS拉取配置失败", ex);
-                return Resp.Make("从LIS拉取配置失败");
+                return Resp.Fail("从LIS拉取配置失败");
             }
             try
             {
@@ -41,9 +40,9 @@ namespace DeviceHub.Yhlo
             catch (Exception ex)
             {
                 Logger.Error("打开串口失败", ex);
-                return Resp.Make("打开串口失败！串口不存在或已经打开");
+                return Resp.Fail("打开串口失败！串口不存在或已经打开");
             }
-            return Resp.Ok(new SerialPortVo());
+            return Resp.Ok();
         }
 
         private void OnDataReceived(byte[] data)

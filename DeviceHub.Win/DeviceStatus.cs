@@ -1,27 +1,53 @@
 ﻿using DeviceHub.Abstractions;
-using DeviceHub.Abstractions.Vo;
+using DeviceHub.Base.Common;
+using DeviceHub.Lis;
+using DeviceHub.Lis.Dto;
+using DeviceHub.Lis.Impl;
 using System.Reflection;
 using System.Text;
-using System.Windows.Forms;
+using System.Text.Json;
 
 namespace DeviceHub.Win
 {
     public partial class DeviceStatus : Form
     {
+        private readonly ILisClient lisClient = LisClient.Instance;
         public DeviceStatus()
         {
             InitializeComponent();
         }
-
-        private static string FormatResp(Resp resp)
+        private async void DeviceStatus_Shown(object sender, EventArgs e)
         {
-            if (!resp.IsSuccess())
-                return resp.GetErrorMsg();
+            Resp<DriverConfig> respConfig = await LoadDriverConfig(1);
+            if (!respConfig.IsSuccess())
+            {
+                lblMessage.Text = respConfig.GetErrorMsg();
+                return;
+            }
+            DriverConfig? config = respConfig.GetData();
+            ShowUI(config);
 
+            try
+            {
+                IDeviceDriver yhloTestDriver = DriverFactory.create();
+                Resp resp = await yhloTestDriver.Start(config);
+                if (!resp.IsSuccess())
+                {
+                    lblMessage.Text = resp.GetErrorMsg();
+                }
+            }
+            catch (Exception ex)
+            {
+                lblMessage.Text = ex.Message;
+            }
+        }
+
+        private static string ShowUI(DriverConfig config)
+        {
             var sb = new StringBuilder();
-            AppendVoFields(sb, resp.GetSerialPortVo());
-            AppendVoFields(sb, resp.GetNetworkPortVo());
-            return sb.Length > 0 ? sb.ToString().TrimEnd() : "启动成功";
+            AppendVoFields(sb, config.SerialPortConfig);
+            AppendVoFields(sb, config.TcpConfig);
+            return sb.ToString();
         }
 
         private static void AppendVoFields(StringBuilder sb, object? vo)
@@ -35,17 +61,22 @@ namespace DeviceHub.Win
             }
         }
 
-        private async void DeviceStatus_Shown(object sender, EventArgs e)
+        private async Task<Resp<DriverConfig>> LoadDriverConfig(int driverId)
         {
+            Logger.Info($"=====================start driverId:{driverId}======================");
+
             try
             {
-                IDeviceDriver d = DriverFactory.create();
-                Resp resp = await d.Start(1);
-                lblMessage.Text = FormatResp(resp);
+                DriverConfig config = await lisClient.queryDriverConfig(driverId);
+
+                Logger.Info($"从LIS拉取配置成功: {JsonSerializer.Serialize(config)}");
+
+                return Resp<DriverConfig>.Ok(config);
             }
             catch (Exception ex)
             {
-                lblMessage.Text = ex.Message;
+                Logger.Error($"从LIS拉取配置失败 driverId:{driverId}", ex);
+                return Resp<DriverConfig>.Fail($"从LIS拉取配置失败 driverId:{driverId}");
             }
         }
     }

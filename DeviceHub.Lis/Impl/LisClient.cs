@@ -4,6 +4,14 @@ namespace DeviceHub.Lis.Impl
 {
     public class LisClient : ILisClient
     {
+        private static readonly LisClient _instance = new();
+
+        public static LisClient Instance => _instance;
+
+        private LisClient()
+        {
+        }
+
         public async Task<DriverConfig> queryDriverConfig(int id)
         {
             //await Task.Delay(3000); // 模拟网络IO

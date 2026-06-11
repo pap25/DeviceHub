@@ -1,9 +1,9 @@
-﻿using DeviceHub.Abstractions.Vo;
+﻿using DeviceHub.Lis.Dto;
 
 namespace DeviceHub.Abstractions
 {
     public interface IDeviceDriver
     {
-        Task<Resp> Start(int driverId);
+        Task<Resp> Start(DriverConfig driverConfig);
     }
 }
