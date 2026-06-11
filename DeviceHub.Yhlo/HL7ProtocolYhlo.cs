@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.IO.Ports;
 using System.Text;
 using System.Text.Json;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace DeviceHub.Yhlo
 {
@@ -55,10 +56,10 @@ namespace DeviceHub.Yhlo
             // 把收到消息拼上来后面再验证
             buffer.AddRange(data);
 
-            while (TryExtractMessage(out byte[] message))   // 是否有一条完整信息，有的话完整信息返回到message
+            while (TryExtractMessage(out byte[] message))  // 是否有一条完整信息，有的话完整信息返回到message
             {
-                string payload = Encoding.UTF8.GetString(message);
-                Logger.Info($"TCP接收完整消息: {payload}");
+                string text = Encoding.UTF8.GetString(message);
+                Logger.Info($"TCP接收完整消息: {text}");
             }
         }
 
@@ -66,27 +67,34 @@ namespace DeviceHub.Yhlo
         {
             message = Array.Empty<byte>();
 
-            int start = IndexOfByte(Protocols.VT);
-            if (start < 0) // 没有VT数据就有问题了
+            int startIndex = IndexOfByte(Protocols.VT);
+            if (startIndex < 0)
             {
-                Logger.Error($"数据没有VT数据异常了 data:{Encoding.UTF8.GetString(buffer.ToArray())}");
-                buffer.Clear();
-                return false;
+                if (buffer.Count > Constants.MaxReceiveSize)
+                {
+                    Logger.Info($"接收数据没VT异常: {Encoding.UTF8.GetString(buffer.ToArray(), buffer.Count - Constants.OneMB, Constants.OneMB)}");
+                    buffer.Clear();
+                }
+                return false; // 半包或垃圾前缀，继续等
             }
 
-            if (start > 0) // 移除粘包前面数据
-                buffer.RemoveRange(0, start);
+            if (startIndex > 0)
+                buffer.RemoveRange(0, startIndex); // 移除粘包前面数据
 
-            int end = IndexOfByte(Protocols.EB, 1);
-            if (end < 0) // 半包
+            int endIndex = IndexOfByte(Protocols.EB, 1);
+            if (endIndex < 0)
             {
-                return false;
+                return false;  // 半包，继续等
             }
 
-            // 完整一条信息
-            message = buffer.GetRange(1, end).ToArray();
-            // 清理掉已完整信息
-            buffer.RemoveRange(0, end + 1);
+            // 完整消息：VT + 正文 + EB
+            message = buffer.GetRange(0, endIndex + 1).ToArray();
+
+            int consumed = endIndex + 1;
+            if (consumed < buffer.Count && buffer[consumed] == Protocols.CR)
+                consumed++;
+
+            buffer.RemoveRange(0, consumed);
 
             return true;
         }
