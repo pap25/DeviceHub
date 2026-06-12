@@ -1,0 +1,7 @@
+{
+  "PortName": "COM4",
+  "BaudRate": 9600,
+  "Parity": 0,
+  "DataBits": 8,
+  "StopBits": 1
+}

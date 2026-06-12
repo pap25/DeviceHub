@@ -1,4 +1,5 @@
 ﻿using DeviceHub.Lis.Dto;
+using System.Text.Json;
 
 namespace DeviceHub.Lis.Impl
 {
@@ -19,28 +20,44 @@ namespace DeviceHub.Lis.Impl
             //{
             //    throw new Exception("调用LIS异常");
             //}
-            var serialPortConfig = new SerialPortConfig
-            {
-                PortName = "COM4",
-                BaudRate = 9600,
-                Parity = 0,
-                DataBits = 8,
-                StopBits = 1
-            };
 
-            var tcpConfig = new TcpConfig
-            {
-                Host = "172.23.0.1",
-                Port = 5000,
-            };
+            const string serialPortConfigFile = "LIS/serialPortConfig.json";
+            const string tcpConfigFile = "LIS/tcpConfig.json";
 
-            DriverConfig config = new DriverConfig
+            SerialPortConfig? serialPortConfig = null;
+            TcpConfig? tcpConfig = null;
+
+            if (File.Exists(serialPortConfigFile))
+            {
+                try
+                {
+                    string json = await File.ReadAllTextAsync(serialPortConfigFile);
+                    serialPortConfig = JsonSerializer.Deserialize<SerialPortConfig>(json);
+                }
+                catch
+                {
+                    serialPortConfig = null;
+                }
+            }
+
+            if (File.Exists(tcpConfigFile))
+            {
+                try
+                {
+                    string json = await File.ReadAllTextAsync(tcpConfigFile);
+                    tcpConfig = JsonSerializer.Deserialize<TcpConfig>(json);
+                }
+                catch
+                {
+                    tcpConfig = null;
+                }
+            }
+
+            return new DriverConfig
             {
                 TcpConfig = tcpConfig,
-                //SerialPortConfig = serialPortConfig
+                SerialPortConfig = serialPortConfig
             };
-
-            return config;
         }
     }
 }
