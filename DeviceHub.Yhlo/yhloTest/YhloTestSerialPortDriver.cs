@@ -9,7 +9,7 @@ using System.Text;
 
 namespace DeviceHub.Yhlo.yhloTest
 {
-    public class YhloTestDriver : ITcpDeviceDriver
+    public class YhloTestSerialPortDriver : ITcpDeviceDriver
     {
         private readonly ILisClient lisClient = LisClient.Instance;
         private readonly List<byte> buffer = new();

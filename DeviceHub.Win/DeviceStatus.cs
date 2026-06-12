@@ -18,7 +18,8 @@ namespace DeviceHub.Win
         }
         private async void DeviceStatus_Shown(object sender, EventArgs e)
         {
-            Resp<DriverConfig> respConfig = await LoadDriverConfig(1);
+            int driverId = 1;
+            Resp<DriverConfig> respConfig = await LoadDriverConfig(driverId);
             if (!respConfig.IsSuccess())
             {
                 lblConfig.Text = respConfig.GetErrorMsg();
@@ -29,23 +30,30 @@ namespace DeviceHub.Win
 
             try
             {
-                IDeviceDriver yhloTestDriver = DriverFactory.create();
-                Resp resp = await yhloTestDriver.Start(config);
+                Resp resp;
+                if (config.TcpConfig != null)
+                {
+                    ITcpDeviceDriver yhloTestDriver = DriverFactory.create<ITcpDeviceDriver>();
+                    resp = await yhloTestDriver.Start(config.TcpConfig);
+                }
+                else if (config.SerialPortConfig != null)
+                {
+                    resp = Resp.Ok();
+                }
+                else
+                {
+                    lblErrorMsg.Text = $"配置错误driverId:{driverId}";
+                    Logger.Info($"配置错误driverId:{driverId}");
+                    return;
+                }
                 if (!resp.IsSuccess())
                 {
-                    // 由于是异步线程，需Invoke在UI线程操作控件
-                    lblErrorMsg.Invoke(new Action(() =>
-                    {
-                        lblErrorMsg.Text = resp.GetErrorMsg();
-                    }));
+                    lblErrorMsg.Text = resp.GetErrorMsg();
                 }
             }
             catch (Exception ex)
             {
-                lblErrorMsg.Invoke(new Action(() =>
-                {
-                    lblErrorMsg.Text = ex.Message;
-                }));
+                lblErrorMsg.Text = ex.Message;
             }
         }
 

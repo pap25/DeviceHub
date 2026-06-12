@@ -1,12 +1,11 @@
-﻿using DeviceHub.Abstractions;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using System.Reflection;
 
 namespace DeviceHub.Win
 {
     internal class DriverFactory
     {
-        public static IDeviceDriver create()
+        public static T create<T>()
         {
             var config = new ConfigurationBuilder()
                 .SetBasePath(AppContext.BaseDirectory)
@@ -23,7 +22,7 @@ namespace DeviceHub.Win
             var type = asm.GetType(typeName)
                 ?? throw new InvalidOperationException($"Type '{typeName}' not found in assembly '{dll}'.");
 
-            return (IDeviceDriver)Activator.CreateInstance(type)!;
+            return (T)Activator.CreateInstance(type)!;
         }
     }
 }

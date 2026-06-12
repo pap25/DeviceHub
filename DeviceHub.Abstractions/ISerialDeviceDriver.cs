@@ -1,0 +1,9 @@
+﻿using DeviceHub.Lis.Dto;
+
+namespace DeviceHub.Abstractions
+{
+    public interface ISerialDeviceDriver
+    {
+        Task<Resp> Start(SerialPortConfig serialPortConfig);
+    }
+}
