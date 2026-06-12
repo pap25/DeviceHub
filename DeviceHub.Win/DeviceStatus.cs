@@ -38,7 +38,8 @@ namespace DeviceHub.Win
                 }
                 else if (config.SerialPortConfig != null)
                 {
-                    resp = Resp.Ok();
+                    ISerialDeviceDriver serialDeviceDriver = DriverFactory.create<ISerialDeviceDriver>();
+                    resp = await serialDeviceDriver.Start(config.SerialPortConfig);
                 }
                 else
                 {

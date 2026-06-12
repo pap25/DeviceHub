@@ -5,25 +5,32 @@ using DeviceHub.Base.Transports;
 using DeviceHub.Lis;
 using DeviceHub.Lis.Dto;
 using DeviceHub.Lis.Impl;
+using System.IO.Ports;
 using System.Text;
 
 namespace DeviceHub.Yhlo.yhloTest
 {
-    public class YhloTestSerialPortDriver : ITcpDeviceDriver
+    public class YhloTestSerialPortDriver : ISerialDeviceDriver
     {
         private readonly ILisClient lisClient = LisClient.Instance;
         private readonly List<byte> buffer = new();
-        public async Task<Resp> Start(TcpConfig config)
+        public async Task<Resp> Start(SerialPortConfig config)
         {
-            TcpServerTransport tcpServerTransport = new(config.Host, config.Port);
-            await tcpServerTransport.StartAsync();
+            SerialPortTransport transport = new(
+                config.PortName,
+                config.BaudRate,
+                (Parity)config.Parity,
+                config.DataBits,
+                (StopBits)config.StopBits
+            );
+            await transport.OpenAsync();
 
-            tcpServerTransport.DataReceived += TcpTransport_DataReceived;
+            transport.DataReceived += Transport_DataReceived;
 
             return Resp.Ok();
         }
 
-        private void TcpTransport_DataReceived(byte[] data)
+        private void Transport_DataReceived(byte[] data)
         {
             try
             {

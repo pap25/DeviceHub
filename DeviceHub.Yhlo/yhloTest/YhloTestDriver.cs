@@ -15,15 +15,15 @@ namespace DeviceHub.Yhlo.yhloTest
         private readonly List<byte> buffer = new();
         public async Task<Resp> Start(TcpConfig config)
         {
-            TcpServerTransport tcpServerTransport = new(config.Host, config.Port);
-            await tcpServerTransport.StartAsync();
+            TcpServerTransport transport = new(config.Host, config.Port);
+            await transport.StartAsync();
 
-            tcpServerTransport.DataReceived += TcpTransport_DataReceived;
+            transport.DataReceived += Transport_DataReceived;
 
             return Resp.Ok();
         }
 
-        private void TcpTransport_DataReceived(byte[] data)
+        private void Transport_DataReceived(byte[] data)
         {
             try
             {
