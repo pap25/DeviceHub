@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DeviceHub.Base.Constant
 {
-    public static class Protocols
+    public static class HL7Protocols
     {
         /// <summary>
         /// STX (Start of Text)

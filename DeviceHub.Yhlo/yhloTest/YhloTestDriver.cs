@@ -48,7 +48,7 @@ namespace DeviceHub.Yhlo.yhloTest
         {
             message = new List<byte>(0);
 
-            int startIndex = IndexOfByte(Protocols.VT);
+            int startIndex = IndexOfByte(HL7Protocols.VT);
             if (startIndex < 0)
             {
                 if (buffer.Count > Constants.FourMB)
@@ -62,7 +62,7 @@ namespace DeviceHub.Yhlo.yhloTest
             if (startIndex > 0)
                 buffer.RemoveRange(0, startIndex); // 移除粘包前面数据
 
-            int endIndex = IndexOfByte(Protocols.EB, 1);
+            int endIndex = IndexOfByte(HL7Protocols.EB, 1);
             if (endIndex < 0)
             {
                 if (buffer.Count > Constants.FourMB)
@@ -77,7 +77,7 @@ namespace DeviceHub.Yhlo.yhloTest
             message = buffer.GetRange(0, endIndex + 1);
 
             int consumed = endIndex + 1;
-            if (consumed < buffer.Count && buffer[consumed] == Protocols.CR)
+            if (consumed < buffer.Count && buffer[consumed] == HL7Protocols.CR)
                 consumed++;
 
             buffer.RemoveRange(0, consumed);

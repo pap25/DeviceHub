@@ -65,6 +65,11 @@ namespace DeviceHub.Base.Transports
             return Task.CompletedTask;
         }
 
+        public Task SendAsync(byte data)
+        {
+            return SendAsync([data]);
+        }
+
         /// <summary>
         /// 发送字符串
         /// </summary>
