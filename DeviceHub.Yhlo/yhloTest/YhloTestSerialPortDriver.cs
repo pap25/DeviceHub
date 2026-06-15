@@ -28,8 +28,6 @@ namespace DeviceHub.Yhlo.yhloTest
 
             transport.DataReceived += Transport_DataReceived;
 
-            await transport.SendAsync(ASTMProtocols.EOT);
-
             return Resp.Ok();
         }
 
@@ -53,7 +51,7 @@ namespace DeviceHub.Yhlo.yhloTest
             {
                 case ASTMProtocols.ENQ:
                     Console.WriteLine("收到 ENQ");
-                    await transport.SendAsync(ASTMProtocols.EOT);
+                    await transport.SendAsync(ASTMProtocols.ACK);
                     return;
 
                 case ASTMProtocols.ACK:
