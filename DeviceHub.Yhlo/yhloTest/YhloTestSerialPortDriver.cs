@@ -44,6 +44,8 @@ namespace DeviceHub.Yhlo.yhloTest
         //    return Resp.Ok();
         //}
 
+        // LIS 主动推送检验申请单到仪器
+
         private async void Transport_DataReceived(byte[] data)
         {
             Logger.Info($"串口接收消息: {Encoding.UTF8.GetString(data)}");
