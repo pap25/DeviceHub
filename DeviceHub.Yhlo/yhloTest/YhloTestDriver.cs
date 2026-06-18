@@ -5,6 +5,8 @@ using DeviceHub.Base.Transports;
 using DeviceHub.Lis;
 using DeviceHub.Lis.Dto;
 using DeviceHub.Lis.Impl;
+using System.Collections;
+using System.Collections.Concurrent;
 using System.Text;
 
 namespace DeviceHub.Yhlo.yhloTest
@@ -13,6 +15,7 @@ namespace DeviceHub.Yhlo.yhloTest
     {
         private readonly ILisClient lisClient = LisClient.Instance;
         private readonly List<byte> buffer = new();
+        private readonly ConcurrentQueue<byte[]> c = new();
         public async Task<Resp> Start(TcpConfig config)
         {
             TcpServerTransport transport = new(config.Host, config.Port);
@@ -33,8 +36,13 @@ namespace DeviceHub.Yhlo.yhloTest
                 {
                     Logger.Info($"TCP接收完整消息: {Encoding.UTF8.GetString(message.ToArray())}");
 
-                    string text = Encoding.UTF8.GetString(message.GetRange(1, message.Count - 1).ToArray());
+                    //string text = Encoding.UTF8.GetString(message.GetRange(1, message.Count - 1).ToArray());
+                    // add
+                    c.Enqueue(message.GetRange(1, message.Count - 1).ToArray());
 
+                    // 成功 update 
+                    // 失败 update
+                    // 
                 }
             }
             catch (Exception ex)
