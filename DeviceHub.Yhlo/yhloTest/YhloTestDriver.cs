@@ -15,7 +15,7 @@ namespace DeviceHub.Yhlo.yhloTest
     {
         private readonly ILisClient lisClient = LisClient.Instance;
         private readonly List<byte> buffer = new();
-        private readonly ConcurrentQueue<byte[]> c = new();
+        //private readonly ConcurrentQueue<byte[]> c = new();
         public async Task<Resp> Start(TcpConfig config)
         {
             TcpServerTransport transport = new(config.Host, config.Port);
@@ -38,7 +38,8 @@ namespace DeviceHub.Yhlo.yhloTest
 
                     //string text = Encoding.UTF8.GetString(message.GetRange(1, message.Count - 1).ToArray());
                     // add
-                    c.Enqueue(message.GetRange(1, message.Count - 1).ToArray());
+                    //c.Enqueue(message.GetRange(1, message.Count - 1).ToArray());
+                    // 添加队列表 receive_message
 
                     // 成功 update 
                     // 失败 update
