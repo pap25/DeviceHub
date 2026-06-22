@@ -5,23 +5,25 @@ using DeviceHub.Base.Transports;
 using DeviceHub.Lis;
 using DeviceHub.Lis.Dto;
 using DeviceHub.Lis.Impl;
-using System.Collections;
-using System.Collections.Concurrent;
+using DeviceHub.Yhlo.Handler;
 using System.Text;
 
-namespace DeviceHub.Yhlo.yhloTest
+namespace DeviceHub.Yhlo
 {
     public class YhloTestDriver : ITcpDeviceDriver
     {
         private readonly ILisClient lisClient = LisClient.Instance;
         private readonly List<byte> buffer = new();
-        //private readonly ConcurrentQueue<byte[]> c = new();
+        private IConsumeTask receiveTask = new BatchConsumeTask<Object>(new ReceiveHandler());
         public async Task<Resp> Start(TcpConfig config)
         {
             TcpServerTransport transport = new(config.Host, config.Port);
             await transport.StartAsync();
 
             transport.DataReceived += Transport_DataReceived;
+
+            // 启动消费线程
+            receiveTask.StartConsume();
 
             return Resp.Ok();
         }
@@ -37,13 +39,11 @@ namespace DeviceHub.Yhlo.yhloTest
                     Logger.Info($"TCP接收完整消息: {Encoding.UTF8.GetString(message.ToArray())}");
 
                     //string text = Encoding.UTF8.GetString(message.GetRange(1, message.Count - 1).ToArray());
-                    // add
-                    //c.Enqueue(message.GetRange(1, message.Count - 1).ToArray());
-                    // 添加队列表 receive_message
 
-                    // 成功 update 
-                    // 失败 update
-                    // 
+
+                    // 添加队列表 receive_message、receive_message_large
+
+                    receiveTask.NotifyConsume();
                 }
             }
             catch (Exception ex)

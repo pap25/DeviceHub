@@ -8,7 +8,7 @@ using DeviceHub.Lis.Impl;
 using System.IO.Ports;
 using System.Text;
 
-namespace DeviceHub.Yhlo.yhloTest
+namespace DeviceHub.Yhlo
 {
     public class YhloTestSerialPortDriver : ISerialDeviceDriver
     {

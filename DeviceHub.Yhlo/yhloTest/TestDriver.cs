@@ -6,7 +6,7 @@ using DeviceHub.Lis.Impl;
 using System.IO.Ports;
 using System.Text;
 
-namespace DeviceHub.Yhlo
+namespace DeviceHub.Yhlo.yhloTest
 {
     public class TestDriver
     {
