@@ -15,7 +15,7 @@ create table instrument_auth_code (
     id bigint not null auto_increment comment '主键ID',
     instrument_id bigint not null comment '仪器ID（关联仪器基础信息）',
     auth_code varchar(64) not null comment '仪器授权码（用于通信认证）',
-    status tinyint not null comment '状态：1有效 0失效',
+    status tinyint not null comment '状态(1:正常 0:停用)',
     expire_time bigint comment '过期时间（时间戳）',
     --last_active_time bigint comment '最后通信时间',
     create_time bigint not null comment '创建时间',
