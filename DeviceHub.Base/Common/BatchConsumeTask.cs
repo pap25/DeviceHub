@@ -79,7 +79,8 @@ namespace DeviceHub.Base.Common
 
         private void ConsumeLoop()
         {
-            while (_running && !_thread.ThreadState.HasFlag(ThreadState.Stopped))
+            //while (_running && !_thread.ThreadState.HasFlag(ThreadState.Stopped))
+            while (_running)
             {
                 _isNewTask = false;
 
