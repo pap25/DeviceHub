@@ -11,6 +11,17 @@
     unique key uk_instrument_code(instrument_code)
 ) engine=innodb default charset=utf8mb4 comment '仪器基础信息(此表在LIS业务系统)';*/
 
+create table instrument_plugin (
+    id bigint not null auto_increment comment '主键ID',
+    plugin_name varchar(100) not null comment '插件名称（如：迈瑞血球解析DLL）',
+    dll_file_path varchar(500) not null comment 'DLL文件的路径（包含文件名）',
+    ui_file_path varchar(500) not null comment 'UI文件的路径（包含文件名）',
+    remark varchar(255) not null comment '备注',
+    create_time bigint not null comment '创建时间',
+    update_time bigint not null comment '更新时间',
+    primary key (id)
+) engine=innodb default charset=utf8mb4 comment '仪器插件表';
+
 create table instrument_auth_code (
     id bigint not null auto_increment comment '主键ID',
     instrument_id bigint not null comment '仪器ID（关联仪器基础信息）',

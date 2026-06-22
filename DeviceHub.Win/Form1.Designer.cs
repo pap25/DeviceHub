@@ -158,7 +158,7 @@
             tabControl1.Location = new Point(12, 12);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(1058, 574);
+            tabControl1.Size = new Size(1058, 613);
             tabControl1.TabIndex = 1;
             // 
             // tabPage5
@@ -166,7 +166,7 @@
             tabPage5.Controls.Add(pictureBox1);
             tabPage5.Location = new Point(4, 26);
             tabPage5.Name = "tabPage5";
-            tabPage5.Size = new Size(1050, 544);
+            tabPage5.Size = new Size(1050, 583);
             tabPage5.TabIndex = 4;
             tabPage5.Text = "LIS参数配置";
             tabPage5.UseVisualStyleBackColor = true;
@@ -174,9 +174,9 @@
             // pictureBox1
             // 
             pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
-            pictureBox1.Location = new Point(-4, 0);
+            pictureBox1.Location = new Point(0, 0);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(1054, 541);
+            pictureBox1.Size = new Size(1054, 575);
             pictureBox1.TabIndex = 1;
             pictureBox1.TabStop = false;
             // 
@@ -198,7 +198,7 @@
             tabPage1.Location = new Point(4, 26);
             tabPage1.Name = "tabPage1";
             tabPage1.Padding = new Padding(3);
-            tabPage1.Size = new Size(1050, 544);
+            tabPage1.Size = new Size(1050, 583);
             tabPage1.TabIndex = 0;
             tabPage1.Text = "接收仪器数据队列";
             tabPage1.UseVisualStyleBackColor = true;
@@ -323,7 +323,7 @@
             tabPage2.Location = new Point(4, 26);
             tabPage2.Name = "tabPage2";
             tabPage2.Padding = new Padding(3);
-            tabPage2.Size = new Size(1050, 544);
+            tabPage2.Size = new Size(1050, 583);
             tabPage2.TabIndex = 1;
             tabPage2.Text = "发送仪器数据队列";
             tabPage2.UseVisualStyleBackColor = true;
@@ -462,7 +462,7 @@
             tabPage4.Location = new Point(4, 26);
             tabPage4.Name = "tabPage4";
             tabPage4.Padding = new Padding(3);
-            tabPage4.Size = new Size(1050, 544);
+            tabPage4.Size = new Size(1050, 583);
             tabPage4.TabIndex = 3;
             tabPage4.Text = "操作日志";
             tabPage4.UseVisualStyleBackColor = true;
@@ -573,10 +573,10 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1074, 592);
+            ClientSize = new Size(1074, 622);
             Controls.Add(tabControl1);
             Name = "Form1";
-            Text = "DeviceHub v1  AUTOLAS 流水线Autolas 446";
+            Text = "DeviceHub  AUTOLAS 流水线Autolas 446";
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             tabControl1.ResumeLayout(false);
             tabPage5.ResumeLayout(false);
