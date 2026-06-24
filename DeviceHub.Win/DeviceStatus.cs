@@ -3,6 +3,7 @@ using DeviceHub.Base.Common;
 using DeviceHub.Lis;
 using DeviceHub.Lis.Dto;
 using DeviceHub.Lis.Impl;
+using DeviceHub.Win.Utils;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
@@ -18,7 +19,13 @@ namespace DeviceHub.Win
         }
         private async void DeviceStatus_Shown(object sender, EventArgs e)
         {
-            int driverId = 1;
+            string? driverIdStr = AppConfig.Configuration["DeviceId"];
+            if (driverIdStr == null)
+            {
+                MessageBox.Show("没有配置设备ID");
+                return;
+            }
+            int driverId = int.Parse(driverIdStr);
             Resp<DriverConfig> respConfig = await LoadDriverConfig(driverId);
             if (!respConfig.IsSuccess())
             {
@@ -33,12 +40,12 @@ namespace DeviceHub.Win
                 Resp resp;
                 if (config.TcpConfig != null)
                 {
-                    ITcpDeviceDriver yhloTestDriver = DriverFactory.create<ITcpDeviceDriver>();
+                    ITcpDeviceDriver yhloTestDriver = DriverFactory.Create<ITcpDeviceDriver>();
                     resp = await yhloTestDriver.Start(config.TcpConfig);
                 }
                 else if (config.SerialPortConfig != null)
                 {
-                    ISerialDeviceDriver serialDeviceDriver = DriverFactory.create<ISerialDeviceDriver>();
+                    ISerialDeviceDriver serialDeviceDriver = DriverFactory.Create<ISerialDeviceDriver>();
                     resp = await serialDeviceDriver.Start(config.SerialPortConfig);
                 }
                 else

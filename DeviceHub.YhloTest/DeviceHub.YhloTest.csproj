@@ -10,6 +10,7 @@
     <ProjectReference Include="..\DeviceHub.Abstractions\DeviceHub.Abstractions.csproj" />
     <ProjectReference Include="..\DeviceHub.Base\DeviceHub.Base.csproj" />
     <ProjectReference Include="..\DeviceHub.Lis\DeviceHub.Lis.csproj" />
+    <ProjectReference Include="..\DeviceHub.Repository\DeviceHub.Repository.csproj" />
   </ItemGroup>
 
 </Project>

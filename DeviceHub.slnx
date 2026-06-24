@@ -7,6 +7,8 @@
   <Project Path="DeviceHub.Abstractions/DeviceHub.Abstractions.csproj" />
   <Project Path="DeviceHub.Base/DeviceHub.Base.csproj" />
   <Project Path="DeviceHub.Lis/DeviceHub.Lis.csproj" />
+  <Project Path="DeviceHub.Model/DeviceHub.Model.csproj" Id="cd633e08-4fb8-4282-9cde-49dc52fa0eb3" />
+  <Project Path="DeviceHub.Repository/DeviceHub.Repository.csproj" Id="656c7673-edea-470b-980a-a514d1e42e98" />
   <Project Path="DeviceHub.Win/DeviceHub.Win.csproj" />
-  <Project Path="DeviceHub.Yhlo/DeviceHub.Yhlo.csproj" />
+  <Project Path="DeviceHub.YhloTest/DeviceHub.YhloTest.csproj" Id="202277dd-57f7-4429-ba4c-dc92e3f213b8" />
 </Solution>
