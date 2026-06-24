@@ -8,7 +8,7 @@ using System.Text;
 
 namespace DeviceHub.Yhlo
 {
-    public class YhloTestSerialPortDriver : ISerialDeviceDriver
+    public class SerialPortDriver : ISerialDeviceDriver
     {
         private SerialPortTransport transport;
         private readonly List<byte> buffer = new();

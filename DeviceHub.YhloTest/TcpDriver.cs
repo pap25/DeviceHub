@@ -10,7 +10,7 @@ using System.Text;
 
 namespace DeviceHub.Yhlo
 {
-    public class YhloTestDriver : ITcpDeviceDriver
+    public class TcpDriver : ITcpDeviceDriver
     {
         private readonly ILisClient lisClient = LisClient.Instance;
         private readonly List<byte> buffer = new();
