@@ -104,5 +104,10 @@ namespace DeviceHub.Yhlo
 
             return -1;
         }
+
+        public void Stop()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

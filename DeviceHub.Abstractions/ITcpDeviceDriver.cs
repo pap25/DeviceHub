@@ -7,6 +7,7 @@ namespace DeviceHub.Abstractions
 {
     public interface ITcpDeviceDriver
     {
-        Task<Resp> Start(TcpConfig tcpConfig); 
+        Task<Resp> Start(TcpConfig tcpConfig);
+        void Stop();
     }
 }
