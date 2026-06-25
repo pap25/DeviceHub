@@ -10,6 +10,7 @@ namespace DeviceHub.Yhlo
 {
     public class SerialPortDriver : ISerialDeviceDriver
     {
+        private readonly string logType = nameof(SerialPortDriver);
         private SerialPortTransport transport;
         private readonly List<byte> buffer = new();
         public async Task<Resp> Start(SerialPortConfig config)
@@ -51,7 +52,7 @@ namespace DeviceHub.Yhlo
             }
             catch (Exception ex)
             {
-                Logger.Error("串口接收数据处理异常", ex);
+                Logger.Error(logType, "串口接收数据处理异常", ex);
                 buffer.Clear();
             }
         }
@@ -64,22 +65,22 @@ namespace DeviceHub.Yhlo
             switch (controlChar)
             {
                 case ASTMProtocols.ENQ:
-                    Logger.Info("收到 ENQ");
+                    Logger.Info(logType, "收到 ENQ");
                     await transport.SendAsync(ASTMProtocols.ACK);
                     return;
 
                 case ASTMProtocols.ACK:
-                    Logger.Info("收到 ACK");
+                    Logger.Info(logType, "收到 ACK");
                     return;
 
                 case ASTMProtocols.NAK:
-                    Logger.Info("收到 NAK");
+                    Logger.Info(logType, "收到 NAK");
                     await Task.Delay(10000);
                     await transport.SendAsync(ASTMProtocols.EOT);
                     return;
 
                 case ASTMProtocols.EOT:
-                    Logger.Info("收到 EOT");
+                    Logger.Info(logType, "收到 EOT");
                     return;
             }
         }
@@ -97,7 +98,7 @@ namespace DeviceHub.Yhlo
             {
                 if (buffer.Count > Constants.FourMB)
                 {
-                    Logger.Error($"接收数据无STX异常: {Encoding.ASCII.GetString(buffer.ToArray(), buffer.Count - Constants.OneMB, Constants.OneMB)}");
+                    Logger.Error(logType, $"接收数据无STX异常: {Encoding.ASCII.GetString(buffer.ToArray(), buffer.Count - Constants.OneMB, Constants.OneMB)}");
                     buffer.Clear();
                 }
                 return false;
@@ -129,7 +130,7 @@ namespace DeviceHub.Yhlo
 
             if (buffer.Count > Constants.FourMB)
             {
-                Logger.Error($"接收数据无完整结束帧异常: {Encoding.ASCII.GetString(buffer.ToArray(), buffer.Count - Constants.OneMB, Constants.OneMB)}");
+                Logger.Error(logType, $"接收数据无完整结束帧异常: {Encoding.ASCII.GetString(buffer.ToArray(), buffer.Count - Constants.OneMB, Constants.OneMB)}");
                 buffer.Clear();
             }
 
@@ -160,7 +161,7 @@ namespace DeviceHub.Yhlo
         /// </summary>
         private static void LogFrame(List<byte> frame)
         {
-            Logger.Info($"串口接收完整消息 原始={Encoding.ASCII.GetString(frame.ToArray())}");
+            Logger.Info(logType, $"串口接收完整消息 原始={Encoding.ASCII.GetString(frame.ToArray())}");
 
             int offset = 0;
             while (offset < frame.Count)
@@ -197,7 +198,7 @@ namespace DeviceHub.Yhlo
                     ? Encoding.ASCII.GetString(frame.ToArray(), stxIndex + 2, delimiterIndex - stxIndex - 2)
                     : string.Empty;
 
-                Logger.Info($"  └ {frameType} FN={fn} DATA={payload}");
+                Logger.Info(logType, $"  └ {frameType} FN={fn} DATA={payload}");
 
                 offset = delimiterIndex + 5;
             }

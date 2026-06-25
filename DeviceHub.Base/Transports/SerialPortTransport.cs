@@ -18,7 +18,7 @@ namespace DeviceHub.Base.Transports
 
             _serialPort.DataReceived += SerialPort_DataReceived;
 
-            Logger.Info($"初始化串口 portName:{portName}, baudRate:{baudRate}, parity:{parity}, " +
+            Logger.Info(nameof(SerialPortTransport),$"初始化串口 portName:{portName}, baudRate:{baudRate}, parity:{parity}, " +
                 $"dataBits:{dataBits}, stopBits:{stopBits}");
         }
 
@@ -30,7 +30,7 @@ namespace DeviceHub.Base.Transports
             if (!_serialPort.IsOpen)
             {
                 _serialPort.Open();
-                Logger.Info($"串口已打开: {_serialPort.PortName}");
+                Logger.Info(nameof(SerialPortTransport),$"串口已打开: {_serialPort.PortName}");
             }
 
             return Task.CompletedTask;
@@ -44,7 +44,7 @@ namespace DeviceHub.Base.Transports
             if (_serialPort.IsOpen)
             {
                 _serialPort.Close();
-                Logger.Info($"串口已关闭: {_serialPort.PortName}");
+                Logger.Info(nameof(SerialPortTransport),$"串口已关闭: {_serialPort.PortName}");
             }
 
             return Task.CompletedTask;
@@ -102,7 +102,7 @@ namespace DeviceHub.Base.Transports
             }
             catch (Exception ex)
             {
-                Logger.Error("串口DataReceived事件异常", ex);
+                Logger.Error(nameof(SerialPortTransport), "串口DataReceived事件异常", ex);
             }
         }
 
@@ -117,7 +117,7 @@ namespace DeviceHub.Base.Transports
 
             _serialPort.Dispose();
 
-            Logger.Info($"串口 Dispose: {_serialPort.PortName}");
+            Logger.Info(nameof(SerialPortTransport),$"串口 Dispose: {_serialPort.PortName}");
         }
     }
 }

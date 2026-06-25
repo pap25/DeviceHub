@@ -73,7 +73,7 @@ namespace DeviceHub.Base.Common
             }
             catch (Exception ex)
             {
-                Logger.Error($"batch consume handleTask error, thread:{Thread.CurrentThread.ManagedThreadId}, task:{task}", ex);
+                Logger.Error(nameof(BatchConsumeTask<T>),$"batch consume handleTask error, thread:{Thread.CurrentThread.ManagedThreadId}, task:{task}", ex);
             }
         }
 
@@ -92,7 +92,7 @@ namespace DeviceHub.Base.Common
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error("searchTask error", ex);
+                    Logger.Error(nameof(BatchConsumeTask<T>),"searchTask error", ex);
                 }
 
                 if (tasks == null)
@@ -131,7 +131,7 @@ namespace DeviceHub.Base.Common
                 }
                 catch (ThreadInterruptedException)
                 {
-                    Logger.Warn($"batch consume thread interrupted: {_thread.Name}");
+                    Logger.Warn(nameof(BatchConsumeTask<T>),$"batch consume thread interrupted: {_thread.Name}");
                 }
             }
         }

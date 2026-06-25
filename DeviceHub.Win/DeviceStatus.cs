@@ -51,7 +51,7 @@ namespace DeviceHub.Win
                 else
                 {
                     lblErrorMsg.Text = $"配置错误driverId:{driverId}";
-                    Logger.Info($"配置错误driverId:{driverId}");
+                    Logger.Info(nameof(DeviceStatus), $"配置错误driverId:{driverId}");
                     return;
                 }
                 if (!resp.IsSuccess())
@@ -86,19 +86,19 @@ namespace DeviceHub.Win
 
         private async Task<Resp<DriverConfig>> LoadDriverConfig(int driverId)
         {
-            Logger.Info($"=====================start driverId:{driverId}======================");
+            Logger.Info(nameof(DeviceStatus), $"=====================start driverId:{driverId}======================");
 
             try
             {
                 DriverConfig config = await lisClient.queryDriverConfig(driverId);
 
-                Logger.Info($"从LIS拉取配置成功: {JsonSerializer.Serialize(config)}");
+                Logger.Info(nameof(DeviceStatus), $"从LIS拉取配置成功: {JsonSerializer.Serialize(config)}");
 
                 return Resp<DriverConfig>.Ok(config);
             }
             catch (Exception ex)
             {
-                Logger.Error($"从LIS拉取配置失败 driverId:{driverId}", ex);
+                Logger.Error(nameof(DeviceStatus), $"从LIS拉取配置失败 driverId:{driverId}", ex);
                 return Resp<DriverConfig>.Fail($"从LIS拉取配置失败 driverId:{driverId}");
             }
         }

@@ -5,8 +5,9 @@ using System.Text;
 
 namespace DeviceHub.Yhlo
 {
-    public class ScheduledTasks: IDisposable
+    public class ScheduledTasks : IDisposable
     {
+        private readonly string logType = nameof(ScheduledTasks);
         private Timer _heartbeatTimer;
         private Timer _requestOrderTimer;
 
@@ -29,7 +30,7 @@ namespace DeviceHub.Yhlo
                 TimeSpan.FromSeconds(5),
                 TimeSpan.FromSeconds(5));
 
-            Logger.Info("ScheduledTasks started.");
+            Logger.Info(logType, "ScheduledTasks started.");
         }
 
         /// <summary>
@@ -48,7 +49,7 @@ namespace DeviceHub.Yhlo
             }
             catch (Exception ex)
             {
-                Logger.Error("设备心跳任务异常", ex);
+                Logger.Error(logType, "设备心跳任务异常", ex);
             }
         }
 
@@ -62,7 +63,7 @@ namespace DeviceHub.Yhlo
             }
             catch (Exception ex)
             {
-                Logger.Error("异常", ex);
+                Logger.Error(logType, "异常", ex);
             }
         }
 
@@ -74,7 +75,7 @@ namespace DeviceHub.Yhlo
             _heartbeatTimer?.Dispose();
             _requestOrderTimer?.Dispose();
 
-            Logger.Info("ScheduledTasks stopped.");
+            Logger.Info(logType, "ScheduledTasks stopped.");
         }
     }
 }

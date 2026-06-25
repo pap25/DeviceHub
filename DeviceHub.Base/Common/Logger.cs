@@ -6,15 +6,15 @@ namespace DeviceHub.Base.Common
     {
         private static readonly string LogDir = "Logs";
 
-        public static void Debug(string msg) => Write("DEBUG", msg);
+        public static void Debug(string type, string msg) => Write("DEBUG", type, msg);
 
-        public static void Info(string msg) => Write("INFO", msg);
+        public static void Info(string type, string msg) => Write("INFO", type, msg);
 
-        public static void Warn(string msg) => Write("WARN", msg);
+        public static void Warn(string type, string msg) => Write("WARN", type, msg);
 
-        public static void Error(string msg) => Write("ERROR", msg);
+        public static void Error(string type, string msg) => Write("ERROR", type, msg);
 
-        private static void Write(string level, string msg)
+        private static void Write(string level, string type, string msg)
         {
             Directory.CreateDirectory(LogDir);
 
@@ -23,7 +23,7 @@ namespace DeviceHub.Base.Common
                 $"{DateTime.Now:yyyyMMdd}.log");
 
             string line =
-                $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] [{level}] {msg}{Environment.NewLine}";
+                $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] [{level}] [{type}] {msg}{Environment.NewLine}";
 
             File.AppendAllText(
                 file,
@@ -31,7 +31,7 @@ namespace DeviceHub.Base.Common
                 Encoding.UTF8);
         }
 
-        public static void Error(string msg, Exception ex)
+        public static void Error(string type, string msg, Exception ex)
         {
             Directory.CreateDirectory(LogDir);
 
@@ -41,7 +41,7 @@ namespace DeviceHub.Base.Common
 
             File.AppendAllText(
                 file,
-                $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] [ERROR] {msg}{Environment.NewLine}" +
+                $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] [ERROR] [{type}] {msg}{Environment.NewLine}" +
                 $"Exception: {ex}{Environment.NewLine}" +
                 $"----------------------------------------{Environment.NewLine}",
                 Encoding.UTF8);

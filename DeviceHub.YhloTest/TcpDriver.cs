@@ -12,6 +12,7 @@ namespace DeviceHub.Yhlo
 {
     public class TcpDriver : ITcpDeviceDriver
     {
+        private readonly string logType = nameof(TcpDriver);
         private readonly ILisClient lisClient = LisClient.Instance;
         private readonly List<byte> buffer = new();
         private IConsumeTask receiveTask = new BatchConsumeTask<Object>(new ReceiveHandler());
@@ -36,7 +37,7 @@ namespace DeviceHub.Yhlo
 
                 while (TryExtractMessage(out List<byte> message))
                 {
-                    Logger.Info($"TCP接收完整消息: {Encoding.UTF8.GetString(message.ToArray())}");
+                    Logger.Info(logType, $"TCP接收完整消息: {Encoding.UTF8.GetString(message.ToArray())}");
 
                     //string text = Encoding.UTF8.GetString(message.GetRange(1, message.Count - 1).ToArray());
 
@@ -48,7 +49,7 @@ namespace DeviceHub.Yhlo
             }
             catch (Exception ex)
             {
-                Logger.Error($"TCP接收数据处理异常: {Encoding.UTF8.GetString(data)}", ex);
+                Logger.Error(logType, $"TCP接收数据处理异常: {Encoding.UTF8.GetString(data)}", ex);
                 buffer.Clear();
             }
         }
@@ -62,7 +63,7 @@ namespace DeviceHub.Yhlo
             {
                 if (buffer.Count > Constants.FourMB)
                 {
-                    Logger.Error($"接收数据没VT异常: {Encoding.UTF8.GetString(buffer.ToArray(), buffer.Count - Constants.OneMB, Constants.OneMB)}");
+                    Logger.Error(logType, $"接收数据没VT异常: {Encoding.UTF8.GetString(buffer.ToArray(), buffer.Count - Constants.OneMB, Constants.OneMB)}");
                     buffer.Clear();
                 }
                 return false; // 半包或垃圾前缀，继续等
@@ -76,7 +77,7 @@ namespace DeviceHub.Yhlo
             {
                 if (buffer.Count > Constants.FourMB)
                 {
-                    Logger.Error($"接收数据没EB异常: {Encoding.UTF8.GetString(buffer.ToArray(), buffer.Count - Constants.OneMB, Constants.OneMB)}");
+                    Logger.Error(logType, $"接收数据没EB异常: {Encoding.UTF8.GetString(buffer.ToArray(), buffer.Count - Constants.OneMB, Constants.OneMB)}");
                     buffer.Clear();
                 }
                 return false;  // 半包，继续等
