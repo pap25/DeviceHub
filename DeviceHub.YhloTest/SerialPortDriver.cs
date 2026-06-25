@@ -159,7 +159,7 @@ namespace DeviceHub.Yhlo
         /// <summary>
         /// 日志记录完整消息（含中间帧与结束帧）
         /// </summary>
-        private static void LogFrame(List<byte> frame)
+        private void LogFrame(List<byte> frame)
         {
             Logger.Info(logType, $"串口接收完整消息 原始={Encoding.ASCII.GetString(frame.ToArray())}");
 
