@@ -1,9 +1,9 @@
 ﻿using DeviceHub.Abstractions;
+using DeviceHub.Abstractions.Dto;
 using DeviceHub.Base.Common;
 using DeviceHub.Base.Constant;
 using DeviceHub.Base.Transports;
 using DeviceHub.Lis;
-using DeviceHub.Lis.Dto;
 using DeviceHub.Lis.Impl;
 using DeviceHub.Yhlo.Handler;
 using System.Text;

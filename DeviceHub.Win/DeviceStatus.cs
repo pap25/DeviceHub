@@ -1,7 +1,7 @@
 ﻿using DeviceHub.Abstractions;
+using DeviceHub.Abstractions.Dto;
 using DeviceHub.Base.Common;
 using DeviceHub.Lis;
-using DeviceHub.Lis.Dto;
 using DeviceHub.Lis.Impl;
 using DeviceHub.Win.Utils;
 using System.Reflection;
@@ -90,7 +90,7 @@ namespace DeviceHub.Win
 
             try
             {
-                DriverConfig config = await lisClient.queryDriverConfig(driverId);
+                DriverConfig config = await lisClient.GetDriverConfig(driverId);
 
                 Logger.Info(nameof(DeviceStatus), $"从LIS拉取配置成功: {JsonSerializer.Serialize(config)}");
 

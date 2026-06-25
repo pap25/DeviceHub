@@ -1,4 +1,4 @@
-﻿using DeviceHub.Abstractions;
+﻿using DeviceHub.Abstractions.Dto;
 using DeviceHub.Base.Common;
 using DeviceHub.Base.Transports;
 using DeviceHub.Lis;

@@ -1,4 +1,4 @@
-﻿namespace DeviceHub.Abstractions
+﻿namespace DeviceHub.Abstractions.Dto
 {
     public class Resp
     {

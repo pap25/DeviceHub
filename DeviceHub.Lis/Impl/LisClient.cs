@@ -1,4 +1,6 @@
-﻿using DeviceHub.Lis.Dto;
+﻿using DeviceHub.Abstractions.Dto;
+using DeviceHub.Lis.dto;
+using DeviceHub.Lis.Dto;
 using System.Text.Json;
 
 namespace DeviceHub.Lis.Impl
@@ -13,7 +15,12 @@ namespace DeviceHub.Lis.Impl
         {
         }
 
-        public async Task<DriverConfig> queryDriverConfig(int id)
+        public Task<GetInstrument> GetInstrument(long instrumentId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<DriverConfig> GetDriverConfig(long instrumentId)
         {
             //await Task.Delay(3000); // 模拟网络IO
             //if (id == 1)
@@ -58,6 +65,21 @@ namespace DeviceHub.Lis.Impl
                 TcpConfig = tcpConfig,
                 SerialPortConfig = serialPortConfig
             };
+        }
+
+        public Task<Resp<UploadSpecimenTestResultOutput>> UploadSpecimenTestResult(UploadSpecimenTestResultInput uploadSpecimenTestResultInput)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<GetSampleApplyItemOutput> GetSampleApplyItem(string sampleNo, string barcode)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<GetSampleApplyListOutput>> GetSampleApplyList(long instrumentId, long lastId, int pageSize)
+        {
+            throw new NotImplementedException();
         }
     }
 }

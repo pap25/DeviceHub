@@ -1,4 +1,4 @@
-﻿using DeviceHub.Lis.Dto;
+﻿using DeviceHub.Abstractions.Dto;
 using System;
 using System.Collections.Generic;
 using System.Text;

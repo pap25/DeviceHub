@@ -4,9 +4,7 @@ using System.Text;
 
 namespace DeviceHub.Lis.Dto
 {
-    public class TcpConfig
+    public class GetInstrument
     {
-        public string Host { get; set; }
-        public int Port { get; set; }
     }
 }

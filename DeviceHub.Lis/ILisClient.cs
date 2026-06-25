@@ -1,7 +1,6 @@
-﻿using DeviceHub.Lis.Dto;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using DeviceHub.Abstractions.Dto;
+using DeviceHub.Lis.dto;
+using DeviceHub.Lis.Dto;
 
 namespace DeviceHub.Lis
 {
@@ -20,18 +19,21 @@ namespace DeviceHub.Lis
      * **/
     public interface ILisClient
     {
+        // 查询仪器信息
+        Task<GetInstrument> GetInstrument(long instrumentId);
         // 查询设备配置
-        Task<DriverConfig> queryDriverConfig(int id);
-        //Task<SerialPortConfig> querySerialPortConfigById(int id);
+        Task<DriverConfig> GetDriverConfig(long instrumentId);
 
-        // 上传结果
-        //Task UploadResultAsync(TestResult result);
+        // Task<string> queryItemMapping(int instrumentId, string instrumentItemCode); // 这里可以考虑到LIS在转换
 
-        //// 下载申请单
-        //Task<OrderInfo?> GetOrderAsync(string sampleNo);
+        // 上传检验结果
+        Task<Resp<UploadSpecimenTestResultOutput>> UploadSpecimenTestResult(UploadSpecimenTestResultInput uploadSpecimenTestResultInput);
 
-        //// 查询样本信息
-        //Task<SampleInfo?> GetSampleAsync(string sampleNo);
+        // 查询样本信息
+        Task<GetSampleApplyItemOutput> GetSampleApplyItem(string sampleNo, string barcode);
+
+        // 下载申请单
+        Task<List<GetSampleApplyListOutput>> GetSampleApplyList(long instrumentId, long lastId, int pageSize);
 
         //// 上传设备状态
         //Task UploadDeviceStatusAsync(DeviceStatus status);

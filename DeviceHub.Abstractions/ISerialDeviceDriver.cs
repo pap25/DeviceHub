@@ -1,4 +1,4 @@
-﻿using DeviceHub.Lis.Dto;
+﻿using DeviceHub.Abstractions.Dto;
 
 namespace DeviceHub.Abstractions
 {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DeviceHub.Lis.Dto
+namespace DeviceHub.Abstractions.Dto
 {
     public class DriverConfig
     {

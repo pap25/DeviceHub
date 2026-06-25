@@ -11,6 +11,7 @@
     <ProjectReference Include="..\DeviceHub.Base\DeviceHub.Base.csproj" />
     <ProjectReference Include="..\DeviceHub.Lis\DeviceHub.Lis.csproj" />
     <ProjectReference Include="..\DeviceHub.Repository\DeviceHub.Repository.csproj" />
+    <ProjectReference Include="..\DeviceHub.Utils\DeviceHub.Utils.csproj" />
   </ItemGroup>
 
 </Project>

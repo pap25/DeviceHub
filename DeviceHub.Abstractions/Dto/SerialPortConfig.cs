@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DeviceHub.Lis.Dto
+namespace DeviceHub.Abstractions.Dto
 {
     public class SerialPortConfig
     {
