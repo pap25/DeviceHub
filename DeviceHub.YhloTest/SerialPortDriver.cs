@@ -28,17 +28,22 @@ namespace DeviceHub.Yhlo
             return Resp.Ok();
         }
 
+        /// <summary>
+        /// 串口数据接收事件
+        /// </summary>
         private async void Transport_DataReceived(byte[] data)
         {
             try
             {
                 buffer.AddRange(data);
 
+                // 提取控制字符
                 while (TryExtractControlChar(out byte controlChar))
                 {
                     await HandleControlCharAsync(controlChar);
                 }
 
+                // 按 ASTM 帧格式切分数据
                 while (TryExtractFrame(out List<byte> frame))
                 {
                     LogFrame(frame);
@@ -51,6 +56,9 @@ namespace DeviceHub.Yhlo
             }
         }
 
+        /// <summary>
+        /// 处理控制字符
+        /// </summary>
         private async Task HandleControlCharAsync(byte controlChar)
         {
             switch (controlChar)
@@ -129,7 +137,9 @@ namespace DeviceHub.Yhlo
             return false;
         }
 
-        // 尝试提取控制字符
+        /// <summary>
+        /// 提取控制字符
+        /// </summary>
         private bool TryExtractControlChar(out byte controlChar)
         {
             controlChar = 0;
@@ -146,6 +156,9 @@ namespace DeviceHub.Yhlo
             return true;
         }
 
+        /// <summary>
+        /// 日志记录帧
+        /// </summary>
         private static void LogFrame(List<byte> frame)
         {
             int delimiterIndex = -1;
@@ -170,6 +183,9 @@ namespace DeviceHub.Yhlo
             Logger.Info($"串口接收{frameType} FN={fn} DATA={payload} 原始={Encoding.ASCII.GetString(frame.ToArray())}");
         }
 
+        /// <summary>
+        /// 查找字节
+        /// </summary>
         private int IndexOfByte(byte value, int startIndex = 0)
         {
             for (int i = startIndex; i < buffer.Count; i++)
