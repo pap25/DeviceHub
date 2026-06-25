@@ -1,4 +1,6 @@
-
+drop database if exists device_hub_yhlotest;
+create database device_hub_yhlotest character set utf8mb4;
+use device_hub_yhlotest;
 
 create table receive_message (
     id bigint not null auto_increment comment '主键ID',
