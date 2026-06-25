@@ -43,7 +43,7 @@ namespace DeviceHub.Yhlo
                     await HandleControlCharAsync(controlChar);
                 }
 
-                // 按 ASTM 帧格式切分数据
+                // 按结束帧格式切分数据
                 while (TryExtractFrame(out List<byte> frame))
                 {
                     LogFrame(frame);
@@ -85,9 +85,8 @@ namespace DeviceHub.Yhlo
         }
 
         /// <summary>
-        /// 按 ASTM 帧格式切分数据：
-        /// 中间帧 &lt;STX&gt; FN &lt;DATA&gt; &lt;ETB&gt; &lt;CS&gt; &lt;CR&gt;&lt;LF&gt;
-        /// 结束帧 &lt;STX&gt; FN &lt;DATA&gt; &lt;ETX&gt;&lt;CS&gt; &lt;CR&gt;&lt;LF&gt;
+        /// 按结束帧格式切分：<STX> FN &lt;DATA&gt; &lt;ETX&gt;&lt;CS&gt; &lt;CR&gt;&lt;LF&gt;
+        /// 中间帧（ETB）不切分，累积至收到结束帧后一次性取出
         /// </summary>
         private bool TryExtractFrame(out List<byte> frame)
         {
@@ -107,13 +106,13 @@ namespace DeviceHub.Yhlo
             if (startIndex > 0)
                 buffer.RemoveRange(0, startIndex);
 
-            // STX + FN + ETB/ETX + CS(2) + CR + LF
+            // STX + FN + ETX + CS(2) + CR + LF
             if (buffer.Count < 7)
                 return false;
 
             for (int i = 2; i < buffer.Count; i++)
             {
-                if (!ASTMProtocols.IsFrameEnd(buffer[i]))
+                if (buffer[i] != ASTMProtocols.ETX)
                     continue;
 
                 if (i + 4 >= buffer.Count)
@@ -130,7 +129,7 @@ namespace DeviceHub.Yhlo
 
             if (buffer.Count > Constants.FourMB)
             {
-                Logger.Error($"接收数据无完整帧异常: {Encoding.ASCII.GetString(buffer.ToArray(), buffer.Count - Constants.OneMB, Constants.OneMB)}");
+                Logger.Error($"接收数据无完整结束帧异常: {Encoding.ASCII.GetString(buffer.ToArray(), buffer.Count - Constants.OneMB, Constants.OneMB)}");
                 buffer.Clear();
             }
 
@@ -157,30 +156,51 @@ namespace DeviceHub.Yhlo
         }
 
         /// <summary>
-        /// 日志记录帧
+        /// 日志记录完整消息（含中间帧与结束帧）
         /// </summary>
         private static void LogFrame(List<byte> frame)
         {
-            int delimiterIndex = -1;
-            for (int i = 2; i < frame.Count; i++)
+            Logger.Info($"串口接收完整消息 原始={Encoding.ASCII.GetString(frame.ToArray())}");
+
+            int offset = 0;
+            while (offset < frame.Count)
             {
-                if (ASTMProtocols.IsFrameEnd(frame[i]))
+                int stxIndex = -1;
+                for (int i = offset; i < frame.Count; i++)
                 {
-                    delimiterIndex = i;
-                    break;
+                    if (frame[i] == ASTMProtocols.STX)
+                    {
+                        stxIndex = i;
+                        break;
+                    }
                 }
+
+                if (stxIndex < 0)
+                    break;
+
+                int delimiterIndex = -1;
+                for (int i = stxIndex + 2; i < frame.Count; i++)
+                {
+                    if (frame[i] == ASTMProtocols.ETX || frame[i] == ASTMProtocols.ETB)
+                    {
+                        delimiterIndex = i;
+                        break;
+                    }
+                }
+
+                if (delimiterIndex < 0)
+                    break;
+
+                string frameType = frame[delimiterIndex] == ASTMProtocols.ETX ? "结束帧" : "中间帧";
+                string fn = frame.Count > stxIndex + 1 ? ((char)frame[stxIndex + 1]).ToString() : "?";
+                string payload = delimiterIndex > stxIndex + 2
+                    ? Encoding.ASCII.GetString(frame.ToArray(), stxIndex + 2, delimiterIndex - stxIndex - 2)
+                    : string.Empty;
+
+                Logger.Info($"  └ {frameType} FN={fn} DATA={payload}");
+
+                offset = delimiterIndex + 5;
             }
-
-            string frameType = delimiterIndex >= 0 && frame[delimiterIndex] == ASTMProtocols.ETX
-                ? "结束帧"
-                : "中间帧";
-
-            string fn = frame.Count > 1 ? ((char)frame[1]).ToString() : "?";
-            string payload = delimiterIndex > 2
-                ? Encoding.ASCII.GetString(frame.ToArray(), 2, delimiterIndex - 2)
-                : string.Empty;
-
-            Logger.Info($"串口接收{frameType} FN={fn} DATA={payload} 原始={Encoding.ASCII.GetString(frame.ToArray())}");
         }
 
         /// <summary>
