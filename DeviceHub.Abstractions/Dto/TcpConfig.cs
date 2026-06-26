@@ -8,5 +8,6 @@ namespace DeviceHub.Abstractions.Dto
     {
         public string Host { get; set; }
         public int Port { get; set; }
+        public string Encoding { get; set; }
     }
 }

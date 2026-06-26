@@ -2,6 +2,7 @@
 using DeviceHub.Lis.dto;
 using DeviceHub.Lis.Dto;
 using System.Text.Json;
+using static DeviceHub.Lis.Dto.GetInstrument;
 
 namespace DeviceHub.Lis.Impl
 {
@@ -15,9 +16,16 @@ namespace DeviceHub.Lis.Impl
         {
         }
 
-        public Task<GetInstrument> GetInstrument(long instrumentId)
+        public async Task<GetInstrument> GetInstrument(long instrumentId)
         {
-            throw new NotImplementedException();
+            return new GetInstrument
+            {
+                InstrumentId = 446,
+                InstrumentModel = "AUTOLAS",
+                InstrumentName = "流水线Autolas",
+                AuthCode = "1234567890",
+                status = AuthCodeStatus.Normal
+            };
         }
 
         public async Task<DriverConfig> GetDriverConfig(long instrumentId)
@@ -65,6 +73,40 @@ namespace DeviceHub.Lis.Impl
                 TcpConfig = tcpConfig,
                 SerialPortConfig = serialPortConfig
             };
+        }
+
+        public Task<Page<GetInstrumentItemMappingPage>> GetInstrumentItemMappingPage(int instrumentId, int pageIndex, int pageSize)
+        {
+            const int totalCount = 15;
+            var allItems = new List<GetInstrumentItemMappingPage>
+            {
+                new() { InstrumentItemCode = "GLU", InstrumentItemName = "葡萄糖", LisItemCode = "L001", LisItemName = "葡萄糖", Unit = "mmol/L" },
+                new() { InstrumentItemCode = "ALT", InstrumentItemName = "丙氨酸氨基转移酶", LisItemCode = "L002", LisItemName = "ALT", Unit = "U/L" },
+                new() { InstrumentItemCode = "AST", InstrumentItemName = "天门冬氨酸氨基转移酶", LisItemCode = "L003", LisItemName = "AST", Unit = "U/L" },
+                new() { InstrumentItemCode = "CREA", InstrumentItemName = "肌酐", LisItemCode = "L004", LisItemName = "肌酐", Unit = "μmol/L" },
+                new() { InstrumentItemCode = "UREA", InstrumentItemName = "尿素", LisItemCode = "L005", LisItemName = "尿素", Unit = "mmol/L" },
+                new() { InstrumentItemCode = "TP", InstrumentItemName = "总蛋白", LisItemCode = "L006", LisItemName = "总蛋白", Unit = "g/L" },
+                new() { InstrumentItemCode = "ALB", InstrumentItemName = "白蛋白", LisItemCode = "L007", LisItemName = "白蛋白", Unit = "g/L" },
+                new() { InstrumentItemCode = "TBIL", InstrumentItemName = "总胆红素", LisItemCode = "L008", LisItemName = "总胆红素", Unit = "μmol/L" },
+                new() { InstrumentItemCode = "DBIL", InstrumentItemName = "直接胆红素", LisItemCode = "L009", LisItemName = "直接胆红素", Unit = "μmol/L" },
+                new() { InstrumentItemCode = "CHOL", InstrumentItemName = "总胆固醇", LisItemCode = "L010", LisItemName = "总胆固醇", Unit = "mmol/L" },
+                new() { InstrumentItemCode = "TG", InstrumentItemName = "甘油三酯", LisItemCode = "L011", LisItemName = "甘油三酯", Unit = "mmol/L" },
+                new() { InstrumentItemCode = "HDL-C", InstrumentItemName = "高密度脂蛋白胆固醇", LisItemCode = "L012", LisItemName = "HDL-C", Unit = "mmol/L" },
+                new() { InstrumentItemCode = "LDL-C", InstrumentItemName = "低密度脂蛋白胆固醇", LisItemCode = "L013", LisItemName = "LDL-C", Unit = "mmol/L" },
+                new() { InstrumentItemCode = "UA", InstrumentItemName = "尿酸", LisItemCode = "L014", LisItemName = "尿酸", Unit = "μmol/L" },
+                new() { InstrumentItemCode = "K", InstrumentItemName = "钾", LisItemCode = "L015", LisItemName = "钾", Unit = "mmol/L" },
+            };
+
+            int skip = Math.Max(0, (pageIndex - 1) * pageSize);
+            var pageData = allItems.Skip(skip).Take(pageSize).ToList();
+
+            return Task.FromResult(new Page<GetInstrumentItemMappingPage>
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+                Data = pageData
+            });
         }
 
         public Task<Resp<UploadSpecimenTestResultOutput>> UploadSpecimenTestResult(UploadSpecimenTestResultInput uploadSpecimenTestResultInput)

@@ -9,5 +9,6 @@ namespace DeviceHub.Abstractions.Dto
         public int Parity { get; set; }
         public int DataBits { get; set; }
         public int StopBits { get; set; }
+        public string Encoding { get; set; }
     }
 }

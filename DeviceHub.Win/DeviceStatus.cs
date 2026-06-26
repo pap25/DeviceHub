@@ -2,6 +2,7 @@
 using DeviceHub.Abstractions.Dto;
 using DeviceHub.Base.Common;
 using DeviceHub.Lis;
+using DeviceHub.Lis.Dto;
 using DeviceHub.Lis.Impl;
 using DeviceHub.Win.Utils;
 using System.Reflection;
@@ -26,81 +27,88 @@ namespace DeviceHub.Win
                 return;
             }
             int driverId = int.Parse(driverIdStr);
-            Resp<DriverConfig> respConfig = await LoadDriverConfig(driverId);
-            if (!respConfig.IsSuccess())
+
+            GetInstrument instrument = await lisClient.GetInstrument(driverId);
+            if (instrument == null)
             {
-                lblConfig.Text = respConfig.GetErrorMsg();
+                MessageBox.Show($"LIS上没有这仪器driverId: {driverId}");
                 return;
             }
-            DriverConfig? config = respConfig.GetData();
-            lblConfig.Text = FormatString(config);
+            this.Text += $" {instrument.InstrumentModel} {instrument.InstrumentName} {instrument.InstrumentId}";
 
-            try
+            DriverConfig config = await lisClient.GetDriverConfig(driverId);
+            Resp resp;
+            if (config.TcpConfig != null)
             {
-                Resp resp;
-                if (config.TcpConfig != null)
-                {
-                    ITcpDeviceDriver yhloTestDriver = DriverFactory.Create<ITcpDeviceDriver>();
-                    resp = await yhloTestDriver.Start(config.TcpConfig);
-                }
-                else if (config.SerialPortConfig != null)
-                {
-                    ISerialDeviceDriver serialDeviceDriver = DriverFactory.Create<ISerialDeviceDriver>();
-                    resp = await serialDeviceDriver.Start(config.SerialPortConfig);
-                }
-                else
-                {
-                    lblErrorMsg.Text = $"配置错误driverId:{driverId}";
-                    Logger.Info(nameof(DeviceStatus), $"配置错误driverId:{driverId}");
-                    return;
-                }
-                if (!resp.IsSuccess())
-                {
-                    lblErrorMsg.Text = resp.GetErrorMsg();
-                }
+                ITcpDeviceDriver yhloTestDriver = DriverFactory.Create<ITcpDeviceDriver>();
+                resp = await yhloTestDriver.Start(config.TcpConfig);
             }
-            catch (Exception ex)
+            else if (config.SerialPortConfig != null)
             {
-                lblErrorMsg.Text = ex.Message;
+                ISerialDeviceDriver serialDeviceDriver = DriverFactory.Create<ISerialDeviceDriver>();
+                resp = await serialDeviceDriver.Start(config.SerialPortConfig);
             }
-        }
-
-        private static string FormatString(DriverConfig config)
-        {
-            var sb = new StringBuilder();
-            AppendVoFields(sb, config.SerialPortConfig);
-            AppendVoFields(sb, config.TcpConfig);
-            return sb.ToString();
-        }
-
-        private static void AppendVoFields(StringBuilder sb, object? vo)
-        {
-            if (vo == null)
+            else
+            {
+                MessageBox.Show($"LIS上没有配置这仪器连接方式driverId: {driverId}");
                 return;
-
-            foreach (PropertyInfo prop in vo.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
-            {
-                sb.AppendLine($"{prop.Name}: {prop.GetValue(vo)}");
             }
+            if (!resp.IsSuccess())
+            {
+                MessageBox.Show($"启动失败errorMsg: {resp.GetErrorMsg()}");
+                return;
+            }
+
+            await initLisConfig(instrument, config);
         }
 
-        private async Task<Resp<DriverConfig>> LoadDriverConfig(int driverId)
+        private async Task initLisConfig(GetInstrument instrument, DriverConfig config)
         {
-            Logger.Info(nameof(DeviceStatus), $"=====================start driverId:{driverId}======================");
-
-            try
+            // InstrumentItemCode、InstrumentItemName、LisItemCode、LisItemName、Unit
+            Page<GetInstrumentItemMappingPage> page = await lisClient.GetInstrumentItemMappingPage(instrument.InstrumentId, 1, 100);
+            MessageBox.Show($"查询项目映射成功pageIndex: {page.PageIndex} pageSize: {page.PageSize} totalCount: {page.TotalCount}");
+            foreach (var item in page.Data)
             {
-                DriverConfig config = await lisClient.GetDriverConfig(driverId);
-
-                Logger.Info(nameof(DeviceStatus), $"从LIS拉取配置成功: {JsonSerializer.Serialize(config)}");
-
-                return Resp<DriverConfig>.Ok(config);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(nameof(DeviceStatus), $"从LIS拉取配置失败 driverId:{driverId}", ex);
-                return Resp<DriverConfig>.Fail($"从LIS拉取配置失败 driverId:{driverId}");
+                MessageBox.Show($"项目映射: {item.InstrumentItemCode} {item.InstrumentItemName} {item.LisItemCode} {item.LisItemName} {item.Unit}");
             }
         }
+
+        //private static string FormatString(DriverConfig config)
+        //{
+        //    var sb = new StringBuilder();
+        //    AppendVoFields(sb, config.SerialPortConfig);
+        //    AppendVoFields(sb, config.TcpConfig);
+        //    return sb.ToString();
+        //}
+
+        //private static void AppendVoFields(StringBuilder sb, object? vo)
+        //{
+        //    if (vo == null)
+        //        return;
+
+        //    foreach (PropertyInfo prop in vo.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+        //    {
+        //        sb.AppendLine($"{prop.Name}: {prop.GetValue(vo)}");
+        //    }
+        //}
+
+        //private async Task<Resp<DriverConfig>> LoadDriverConfig(int driverId)
+        //{
+        //    Logger.Info(nameof(DeviceStatus), $"=====================start driverId:{driverId}======================");
+
+        //    try
+        //    {
+        //        DriverConfig config = await lisClient.GetDriverConfig(driverId);
+
+        //        Logger.Info(nameof(DeviceStatus), $"从LIS拉取配置成功: {JsonSerializer.Serialize(config)}");
+
+        //        return Resp<DriverConfig>.Ok(config);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logger.Error(nameof(DeviceStatus), $"从LIS拉取配置失败 driverId:{driverId}", ex);
+        //        return Resp<DriverConfig>.Fail($"从LIS拉取配置失败 driverId:{driverId}");
+        //    }
+        //}
     }
 }

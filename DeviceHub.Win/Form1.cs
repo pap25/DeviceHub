@@ -22,7 +22,7 @@ namespace DeviceHub.Win
 
         private void 从LIS同步ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+               
         }
 
         private void label5_Click(object sender, EventArgs e)
