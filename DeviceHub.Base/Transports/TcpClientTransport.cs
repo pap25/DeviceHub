@@ -4,105 +4,102 @@ using System.Net.Sockets;
 
 namespace DeviceHub.Base.Transports
 {
-    namespace DeviceHub.Base.Transports
+    public class TcpClientTransport : IDisposable
     {
-        public class TcpClientTransport : IDisposable
+        private readonly string logType = nameof(TcpClientTransport);
+        private readonly string _host;
+        private readonly int _port;
+
+        private TcpClient? _client;
+        private NetworkStream? _stream;
+
+        public event Action<byte[]>? DataReceived;
+
+        public bool IsConnected => _client?.Connected ?? false;
+
+        public TcpClientTransport(string host, int port)
         {
-            private readonly string logType = nameof(TcpClientTransport);
-            private readonly string _host;
-            private readonly int _port;
+            _host = host;
+            _port = port;
+            Logger.Info(logType, $"初始化TCP客户端 host:{host}, port:{port}");
+        }
 
-            private TcpClient? _client;
-            private NetworkStream? _stream;
+        public async Task ConnectAsync()
+        {
+            _client = new TcpClient();
 
-            public event Action<byte[]>? DataReceived;
+            await _client.ConnectAsync(_host, _port);
 
-            public bool IsConnected => _client?.Connected ?? false;
+            Logger.Info(logType, $"TCP客户端已连接 host:{_host}, port:{_port}");
 
-            public TcpClientTransport(string host, int port)
+            _stream = _client.GetStream();
+
+            _ = Task.Run(ReceiveLoop);
+        }
+
+        public Task Disconnect()
+        {
+            _stream?.Close();
+            _client?.Close();
+
+            Logger.Info(logType, $"TCP客户端断开连接 host:{_host}, port:{_port}");
+
+            return Task.CompletedTask;
+        }
+
+        public async Task SendAsync(byte[] data)
+        {
+            if (_stream == null)
+                throw new InvalidOperationException("TCP客户端未连接");
+
+            await _stream.WriteAsync(data);
+        }
+
+        public Task SendAsync(string message, Encoding? encoding = null)
+        {
+            encoding ??= Encoding.ASCII;
+
+            return SendAsync(encoding.GetBytes(message));
+        }
+
+        private async Task ReceiveLoop()
+        {
+            var buffer = new byte[4096];
+
+            try
             {
-                _host = host;
-                _port = port;
-                Logger.Info(logType, $"初始化TCP客户端 host:{host}, port:{port}");
-            }
-
-            public async Task ConnectAsync()
-            {
-                _client = new TcpClient();
-
-                await _client.ConnectAsync(_host, _port);
-
-                Logger.Info(logType, $"TCP客户端已连接 host:{_host}, port:{_port}");
-
-                _stream = _client.GetStream();
-
-                _ = Task.Run(ReceiveLoop);
-            }
-
-            public Task DisconnectAsync()
-            {
-                _stream?.Close();
-                _client?.Close();
-
-                Logger.Info(logType, $"TCP客户端断开连接 host:{_host}, port:{_port}");
-
-                return Task.CompletedTask;
-            }
-
-            public async Task SendAsync(byte[] data)
-            {
-                if (_stream == null)
-                    throw new InvalidOperationException("TCP客户端未连接");
-
-                await _stream.WriteAsync(data);
-            }
-
-            public Task SendAsync(string message, Encoding? encoding = null)
-            {
-                encoding ??= Encoding.ASCII;
-
-                return SendAsync(encoding.GetBytes(message));
-            }
-
-            private async Task ReceiveLoop()
-            {
-                var buffer = new byte[4096];
-
-                try
+                while (true)
                 {
-                    while (true)
-                    {
-                        int len = await _stream!.ReadAsync(buffer);
+                    int len = await _stream!.ReadAsync(buffer);
 
-                        if (len == 0)
-                            break;
+                    if (len == 0)
+                        break;
 
-                        var data = buffer[..len];
+                    var data = buffer[..len];
 
-                        DataReceived?.Invoke(data);
-                    }
-                }
-                catch (ObjectDisposedException ex)
-                {
-                    Logger.Error(logType, "TCP客户端 ObjectDisposedException 异常", ex);
-                }
-                catch (IOException ex)
-                {
-                    Logger.Error(logType, "TCP客户端 IOException 异常", ex);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error(logType, "TCP客户端 Exception 异常", ex);
+                    DataReceived?.Invoke(data);
                 }
             }
-
-            public void Dispose()
+            catch (ObjectDisposedException ex)
             {
-                _stream?.Dispose();
-                _client?.Dispose();
-
-                Logger.Info(logType, $"TCP客户端 Dispose host:{_host}, port:{_port}");
+                Logger.Error(logType, "TCP客户端 ObjectDisposedException 异常", ex);
             }
+            catch (IOException ex)
+            {
+                Logger.Error(logType, "TCP客户端 IOException 异常", ex);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(logType, "TCP客户端 Exception 异常", ex);
+            }
+        }
+
+        public void Dispose()
+        {
+            _stream?.Dispose();
+            _client?.Dispose();
+
+            Logger.Info(logType, $"TCP客户端 Dispose host:{_host}, port:{_port}");
         }
     }
 }

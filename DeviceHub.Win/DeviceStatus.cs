@@ -37,6 +37,8 @@ namespace DeviceHub.Win
             this.Text += $" {instrument.InstrumentModel} {instrument.InstrumentName} {instrument.InstrumentId}";
 
             DriverConfig config = await lisClient.GetDriverConfig(driverId);
+            await initLisConfig(instrument, config);
+
             Resp resp;
             if (config.TcpConfig != null)
             {
@@ -58,19 +60,17 @@ namespace DeviceHub.Win
                 MessageBox.Show($"启动失败errorMsg: {resp.GetErrorMsg()}");
                 return;
             }
-
-            await initLisConfig(instrument, config);
         }
 
         private async Task initLisConfig(GetInstrument instrument, DriverConfig config)
         {
-            // InstrumentItemCode、InstrumentItemName、LisItemCode、LisItemName、Unit
             Page<GetInstrumentItemMappingPage> page = await lisClient.GetInstrumentItemMappingPage(instrument.InstrumentId, 1, 100);
             MessageBox.Show($"查询项目映射成功pageIndex: {page.PageIndex} pageSize: {page.PageSize} totalCount: {page.TotalCount}");
             foreach (var item in page.Data)
             {
                 MessageBox.Show($"项目映射: {item.InstrumentItemCode} {item.InstrumentItemName} {item.LisItemCode} {item.LisItemName} {item.Unit}");
             }
+            dgvInstrumentItemMapping.DataSource = page.Data;
         }
 
         //private static string FormatString(DriverConfig config)

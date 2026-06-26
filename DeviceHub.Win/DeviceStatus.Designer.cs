@@ -29,15 +29,15 @@
         private void InitializeComponent()
         {
             grpAuthInfo = new GroupBox();
+            label3 = new Label();
+            label2 = new Label();
+            label1 = new Label();
             dgvInstrumentItemMapping = new DataGridView();
             Column1 = new DataGridViewTextBoxColumn();
             Column2 = new DataGridViewTextBoxColumn();
             Column3 = new DataGridViewTextBoxColumn();
             Column4 = new DataGridViewTextBoxColumn();
             Column5 = new DataGridViewTextBoxColumn();
-            label1 = new Label();
-            label2 = new Label();
-            label3 = new Label();
             grpAuthInfo.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvInstrumentItemMapping).BeginInit();
             SuspendLayout();
@@ -54,6 +54,33 @@
             grpAuthInfo.TabStop = false;
             grpAuthInfo.Text = "授权信息";
             // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(34, 177);
+            label3.Name = "label3";
+            label3.Size = new Size(43, 17);
+            label3.TabIndex = 2;
+            label3.Text = "label3";
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(34, 113);
+            label2.Name = "label2";
+            label2.Size = new Size(43, 17);
+            label2.TabIndex = 1;
+            label2.Text = "label2";
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(34, 51);
+            label1.Name = "label1";
+            label1.Size = new Size(44, 17);
+            label1.TabIndex = 0;
+            label1.Text = "授权码";
+            // 
             // dgvInstrumentItemMapping
             // 
             dgvInstrumentItemMapping.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -65,55 +92,33 @@
             // 
             // Column1
             // 
+            Column1.DataPropertyName = "InstrumentItemCode";
             Column1.HeaderText = "仪器项目编号";
             Column1.Name = "Column1";
             // 
             // Column2
             // 
+            Column2.DataPropertyName = "InstrumentItemName";
             Column2.HeaderText = "仪器项目名";
             Column2.Name = "Column2";
             // 
             // Column3
             // 
+            Column3.DataPropertyName = "LisItemCode";
             Column3.HeaderText = "LIS项目编号";
             Column3.Name = "Column3";
             // 
             // Column4
             // 
+            Column4.DataPropertyName = "LisItemName";
             Column4.HeaderText = "LIS项目名";
             Column4.Name = "Column4";
             // 
             // Column5
             // 
+            Column5.DataPropertyName = "Unit";
             Column5.HeaderText = "单位";
             Column5.Name = "Column5";
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(34, 51);
-            label1.Name = "label1";
-            label1.Size = new Size(44, 17);
-            label1.TabIndex = 0;
-            label1.Text = "授权码";
-            // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Location = new Point(34, 113);
-            label2.Name = "label2";
-            label2.Size = new Size(43, 17);
-            label2.TabIndex = 1;
-            label2.Text = "label2";
-            // 
-            // label3
-            // 
-            label3.AutoSize = true;
-            label3.Location = new Point(34, 177);
-            label3.Name = "label3";
-            label3.Size = new Size(43, 17);
-            label3.TabIndex = 2;
-            label3.Text = "label3";
             // 
             // DeviceStatus
             // 

@@ -35,7 +35,7 @@ namespace DeviceHub.Yhlo.yhloTest
             try
             {
                 serialPort.DataReceived += OnDataReceived;
-                serialPort.OpenAsync();
+                serialPort.Open();
             }
             catch (Exception ex)
             {

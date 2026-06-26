@@ -19,7 +19,7 @@ namespace DeviceHub.Yhlo
         public async Task<Resp> Start(TcpConfig config)
         {
             TcpServerTransport transport = new(config.Host, config.Port);
-            await transport.StartAsync();
+            await transport.StartListeningAsync();
 
             transport.DataReceived += Transport_DataReceived;
 

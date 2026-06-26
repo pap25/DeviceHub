@@ -25,7 +25,7 @@ namespace DeviceHub.Base.Transports
         /// <summary>
         /// 打开串口
         /// </summary>
-        public Task OpenAsync()
+        public Task Open()
         {
             if (!_serialPort.IsOpen)
             {
@@ -39,7 +39,7 @@ namespace DeviceHub.Base.Transports
         /// <summary>
         /// 关闭串口
         /// </summary>
-        public Task CloseAsync()
+        public Task Close()
         {
             if (_serialPort.IsOpen)
             {
@@ -53,7 +53,7 @@ namespace DeviceHub.Base.Transports
         /// <summary>
         /// 发送字节
         /// </summary>
-        public Task SendAsync(byte[] data)
+        public Task Send(byte[] data)
         {
             if (!_serialPort.IsOpen)
             {
@@ -65,19 +65,19 @@ namespace DeviceHub.Base.Transports
             return Task.CompletedTask;
         }
 
-        public Task SendAsync(byte data)
+        public Task Send(byte data)
         {
-            return SendAsync([data]);
+            return Send([data]);
         }
 
         /// <summary>
         /// 发送字符串
         /// </summary>
-        public Task SendAsync(string message, Encoding? encoding = null)
+        public Task Send(string message, Encoding? encoding = null)
         {
             encoding ??= Encoding.ASCII;
 
-            return SendAsync(encoding.GetBytes(message));
+            return Send(encoding.GetBytes(message));
         }
 
         private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)

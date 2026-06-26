@@ -22,7 +22,7 @@ namespace DeviceHub.Yhlo
                 config.DataBits,
                 (StopBits)config.StopBits
             );
-            await transport.OpenAsync();
+            await transport.Open();
 
             transport.DataReceived += Transport_DataReceived;
 
@@ -66,7 +66,7 @@ namespace DeviceHub.Yhlo
             {
                 case ASTMProtocols.ENQ:
                     Logger.Info(logType, "收到 ENQ");
-                    await transport.SendAsync(ASTMProtocols.ACK);
+                    await transport.Send(ASTMProtocols.ACK);
                     return;
 
                 case ASTMProtocols.ACK:
@@ -76,7 +76,7 @@ namespace DeviceHub.Yhlo
                 case ASTMProtocols.NAK:
                     Logger.Info(logType, "收到 NAK");
                     await Task.Delay(10000);
-                    await transport.SendAsync(ASTMProtocols.EOT);
+                    await transport.Send(ASTMProtocols.EOT);
                     return;
 
                 case ASTMProtocols.EOT:
@@ -220,7 +220,7 @@ namespace DeviceHub.Yhlo
 
         public void Stop()
         {
-            transport.CloseAsync();
+            transport.Close();
         }
     }
 }
