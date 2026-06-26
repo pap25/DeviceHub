@@ -69,7 +69,6 @@ namespace DeviceHub.Win
 
         private async Task initLisConfig(GetInstrument instrument, DriverConfig config)
         {
-            //dgvInstrumentItemMapping.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
             _instrumentId = instrument.InstrumentId;
             this.Text += $" {instrument.InstrumentModel} {instrument.InstrumentName} {instrument.InstrumentId}";
 
@@ -93,43 +92,5 @@ namespace DeviceHub.Win
             dgvInstrumentItemMapping.DataSource = page.Data;
             pagerInstrumentItemMapping.SetPageInfo(page);
         }
-
-        //private static string FormatString(DriverConfig config)
-        //{
-        //    var sb = new StringBuilder();
-        //    AppendVoFields(sb, config.SerialPortConfig);
-        //    AppendVoFields(sb, config.TcpConfig);
-        //    return sb.ToString();
-        //}
-
-        //private static void AppendVoFields(StringBuilder sb, object? vo)
-        //{
-        //    if (vo == null)
-        //        return;
-
-        //    foreach (PropertyInfo prop in vo.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
-        //    {
-        //        sb.AppendLine($"{prop.Name}: {prop.GetValue(vo)}");
-        //    }
-        //}
-
-        //private async Task<Resp<DriverConfig>> LoadDriverConfig(int driverId)
-        //{
-        //    Logger.Info(nameof(DeviceStatus), $"=====================start driverId:{driverId}======================");
-
-        //    try
-        //    {
-        //        DriverConfig config = await lisClient.GetDriverConfig(driverId);
-
-        //        Logger.Info(nameof(DeviceStatus), $"从LIS拉取配置成功: {JsonSerializer.Serialize(config)}");
-
-        //        return Resp<DriverConfig>.Ok(config);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Logger.Error(nameof(DeviceStatus), $"从LIS拉取配置失败 driverId:{driverId}", ex);
-        //        return Resp<DriverConfig>.Fail($"从LIS拉取配置失败 driverId:{driverId}");
-        //    }
-        //}
     }
 }
