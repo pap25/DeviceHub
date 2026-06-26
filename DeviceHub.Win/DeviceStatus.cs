@@ -69,6 +69,7 @@ namespace DeviceHub.Win
 
         private async Task initLisConfig(GetInstrument instrument, DriverConfig config)
         {
+            //dgvInstrumentItemMapping.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
             _instrumentId = instrument.InstrumentId;
             this.Text += $" {instrument.InstrumentModel} {instrument.InstrumentName} {instrument.InstrumentId}";
 

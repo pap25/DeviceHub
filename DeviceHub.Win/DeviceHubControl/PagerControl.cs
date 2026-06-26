@@ -12,7 +12,7 @@ namespace DeviceHub.Win.DeviceHubControl
 
         private long _totalCount;
         private int _pageIndex = 1;
-        private int _pageSize = 10;
+        private int _pageSize = 20;
         private bool _suppressPageChanged;
 
         public PagerControl()

@@ -61,10 +61,10 @@
             grpAuthInfo.Controls.Add(label2);
             grpAuthInfo.Controls.Add(lblAuthCode);
             grpAuthInfo.Controls.Add(label1);
+            grpAuthInfo.ForeColor = Color.DarkBlue;
             grpAuthInfo.Location = new Point(3, 6);
             grpAuthInfo.Name = "grpAuthInfo";
             grpAuthInfo.Size = new Size(250, 145);
-            grpAuthInfo.ForeColor = Color.DarkBlue;
             grpAuthInfo.TabIndex = 0;
             grpAuthInfo.TabStop = false;
             grpAuthInfo.Text = "授权信息";
@@ -133,7 +133,7 @@
             dgvInstrumentItemMapping.Columns.AddRange(new DataGridViewColumn[] { Column1, Column2, Column3, Column4, Column5 });
             dgvInstrumentItemMapping.Location = new Point(259, 16);
             dgvInstrumentItemMapping.Name = "dgvInstrumentItemMapping";
-            dgvInstrumentItemMapping.Size = new Size(1080, 448);
+            dgvInstrumentItemMapping.Size = new Size(1080, 527);
             dgvInstrumentItemMapping.TabIndex = 1;
             // 
             // Column1
@@ -170,7 +170,7 @@
             // 
             pagerInstrumentItemMapping.AutoSize = true;
             pagerInstrumentItemMapping.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            pagerInstrumentItemMapping.Location = new Point(259, 470);
+            pagerInstrumentItemMapping.Location = new Point(259, 549);
             pagerInstrumentItemMapping.MinimumSize = new Size(640, 32);
             pagerInstrumentItemMapping.Name = "pagerInstrumentItemMapping";
             pagerInstrumentItemMapping.Size = new Size(670, 33);
@@ -186,7 +186,7 @@
             tabControl1.Location = new Point(0, 0);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(1350, 729);
+            tabControl1.Size = new Size(1350, 621);
             tabControl1.TabIndex = 3;
             // 
             // tabPage1
@@ -197,7 +197,7 @@
             tabPage1.Location = new Point(4, 26);
             tabPage1.Name = "tabPage1";
             tabPage1.Padding = new Padding(3);
-            tabPage1.Size = new Size(1342, 699);
+            tabPage1.Size = new Size(1342, 591);
             tabPage1.TabIndex = 0;
             tabPage1.Text = "LIS参数配置";
             tabPage1.UseVisualStyleBackColor = true;
@@ -207,7 +207,7 @@
             tabPage2.Location = new Point(4, 26);
             tabPage2.Name = "tabPage2";
             tabPage2.Padding = new Padding(3);
-            tabPage2.Size = new Size(1342, 699);
+            tabPage2.Size = new Size(1342, 585);
             tabPage2.TabIndex = 1;
             tabPage2.Text = "接收仪器数据队列";
             tabPage2.UseVisualStyleBackColor = true;
@@ -216,7 +216,7 @@
             // 
             tabPage3.Location = new Point(4, 26);
             tabPage3.Name = "tabPage3";
-            tabPage3.Size = new Size(1342, 699);
+            tabPage3.Size = new Size(1342, 585);
             tabPage3.TabIndex = 2;
             tabPage3.Text = "发送仪器数据队列";
             tabPage3.UseVisualStyleBackColor = true;
@@ -225,7 +225,7 @@
             // 
             tabPage4.Location = new Point(4, 26);
             tabPage4.Name = "tabPage4";
-            tabPage4.Size = new Size(1342, 699);
+            tabPage4.Size = new Size(1342, 585);
             tabPage4.TabIndex = 3;
             tabPage4.Text = "操作日志";
             tabPage4.UseVisualStyleBackColor = true;
@@ -234,7 +234,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1350, 729);
+            ClientSize = new Size(1350, 621);
             Controls.Add(tabControl1);
             Name = "DeviceStatus";
             Text = "DeviceStatus";
