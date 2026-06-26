@@ -12,8 +12,8 @@ public class ReceiveMessageDecodeRepository : IReceiveMessageDecodeRepository
     public async Task<long> InsertAsync(ReceiveMessageDecode entity, CancellationToken cancellationToken = default)
     {
         const string sql = """
-            INSERT INTO receive_message_decode (receive_message_id, type, barcode, result_json, create_time, update_time)
-            VALUES (@receive_message_id, @type, @barcode, @result_json, @create_time, @update_time)
+            INSERT INTO receive_message_decode (receive_message_id, type, sample_no, barcode, result_json, create_time, update_time)
+            VALUES (@receive_message_id, @type, @sample_no, @barcode, @result_json, @create_time, @update_time)
             RETURNING id;
             """;
 
@@ -22,6 +22,7 @@ public class ReceiveMessageDecodeRepository : IReceiveMessageDecodeRepository
             [
                 DbHelper.Param("@receive_message_id", entity.ReceiveMessageId),
                 DbHelper.Param("@type", (byte)entity.Type),
+                DbHelper.Param("@sample_no", entity.SampleNo),
                 DbHelper.Param("@barcode", entity.Barcode),
                 DbHelper.Param("@result_json", entity.ResultJson),
                 DbHelper.Param("@create_time", entity.CreateTime),
@@ -38,6 +39,7 @@ public class ReceiveMessageDecodeRepository : IReceiveMessageDecodeRepository
             UPDATE receive_message_decode
             SET receive_message_id = @receive_message_id,
                 type = @type,
+                sample_no = @sample_no,
                 barcode = @barcode,
                 result_json = @result_json,
                 create_time = @create_time,
@@ -51,6 +53,7 @@ public class ReceiveMessageDecodeRepository : IReceiveMessageDecodeRepository
                 DbHelper.Param("@id", entity.Id),
                 DbHelper.Param("@receive_message_id", entity.ReceiveMessageId),
                 DbHelper.Param("@type", (byte)entity.Type),
+                DbHelper.Param("@sample_no", entity.SampleNo),
                 DbHelper.Param("@barcode", entity.Barcode),
                 DbHelper.Param("@result_json", entity.ResultJson),
                 DbHelper.Param("@create_time", entity.CreateTime),
@@ -94,16 +97,17 @@ public class ReceiveMessageDecodeRepository : IReceiveMessageDecodeRepository
             cancellationToken: cancellationToken);
 
     private const string SelectColumns =
-        "SELECT id, receive_message_id, type, barcode, result_json, create_time, update_time FROM receive_message_decode";
+        "SELECT id, receive_message_id, type, sample_no, barcode, result_json, create_time, update_time FROM receive_message_decode";
 
     private static ReceiveMessageDecode Map(SqliteDataReader reader) => new()
     {
         Id = reader.GetInt64(0),
         ReceiveMessageId = reader.GetInt64(1),
         Type = (ReceiveMessageDecodeType)reader.GetByte(2),
-        Barcode = reader.GetString(3),
-        ResultJson = reader.GetString(4),
-        CreateTime = reader.GetInt64(5),
-        UpdateTime = reader.GetInt64(6)
+        SampleNo = reader.GetString(3),
+        Barcode = reader.GetString(4),
+        ResultJson = reader.GetString(5),
+        CreateTime = reader.GetInt64(6),
+        UpdateTime = reader.GetInt64(7)
     };
 }

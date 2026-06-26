@@ -23,6 +23,11 @@ public class SendMessage
     public SendMessageType Type { get; set; }
 
     /// <summary>
+    /// 样本号
+    /// </summary>
+    public string SampleNo { get; set; } = string.Empty;
+
+    /// <summary>
     /// 条形码
     /// </summary>
     public string Barcode { get; set; } = string.Empty;

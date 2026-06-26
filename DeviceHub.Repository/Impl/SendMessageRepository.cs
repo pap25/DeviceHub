@@ -12,8 +12,8 @@ public class SendMessageRepository : ISendMessageRepository
     public async Task<long> InsertAsync(SendMessage entity, CancellationToken cancellationToken = default)
     {
         const string sql = """
-            INSERT INTO send_message (instrument_id, type, barcode, status, create_time, update_time)
-            VALUES (@instrument_id, @type, @barcode, @status, @create_time, @update_time)
+            INSERT INTO send_message (instrument_id, type, sample_no, barcode, status, create_time, update_time)
+            VALUES (@instrument_id, @type, @sample_no, @barcode, @status, @create_time, @update_time)
             RETURNING id;
             """;
 
@@ -22,6 +22,7 @@ public class SendMessageRepository : ISendMessageRepository
             [
                 DbHelper.Param("@instrument_id", entity.InstrumentId),
                 DbHelper.Param("@type", (byte)entity.Type),
+                DbHelper.Param("@sample_no", entity.SampleNo),
                 DbHelper.Param("@barcode", entity.Barcode),
                 DbHelper.Param("@status", (byte)entity.Status),
                 DbHelper.Param("@create_time", entity.CreateTime),
@@ -38,6 +39,7 @@ public class SendMessageRepository : ISendMessageRepository
             UPDATE send_message
             SET instrument_id = @instrument_id,
                 type = @type,
+                sample_no = @sample_no,
                 barcode = @barcode,
                 status = @status,
                 create_time = @create_time,
@@ -51,6 +53,7 @@ public class SendMessageRepository : ISendMessageRepository
                 DbHelper.Param("@id", entity.Id),
                 DbHelper.Param("@instrument_id", entity.InstrumentId),
                 DbHelper.Param("@type", (byte)entity.Type),
+                DbHelper.Param("@sample_no", entity.SampleNo),
                 DbHelper.Param("@barcode", entity.Barcode),
                 DbHelper.Param("@status", (byte)entity.Status),
                 DbHelper.Param("@create_time", entity.CreateTime),
@@ -94,16 +97,17 @@ public class SendMessageRepository : ISendMessageRepository
             cancellationToken);
 
     private const string SelectColumns =
-        "SELECT id, instrument_id, type, barcode, status, create_time, update_time FROM send_message";
+        "SELECT id, instrument_id, type, sample_no, barcode, status, create_time, update_time FROM send_message";
 
     private static SendMessage Map(SqliteDataReader reader) => new()
     {
         Id = reader.GetInt64(0),
         InstrumentId = reader.GetInt64(1),
         Type = (SendMessageType)reader.GetByte(2),
-        Barcode = reader.GetString(3),
-        Status = (MessageStatus)reader.GetByte(4),
-        CreateTime = reader.GetInt64(5),
-        UpdateTime = reader.GetInt64(6)
+        SampleNo = reader.GetString(3),
+        Barcode = reader.GetString(4),
+        Status = (MessageStatus)reader.GetByte(5),
+        CreateTime = reader.GetInt64(6),
+        UpdateTime = reader.GetInt64(7)
     };
 }
