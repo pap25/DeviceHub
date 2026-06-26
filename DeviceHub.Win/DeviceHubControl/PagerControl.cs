@@ -261,7 +261,8 @@ namespace DeviceHub.Win.DeviceHubControl
             {
                 return new Label
                 {
-                    AutoSize = true,
+                    //AutoSize = true,
+                    Size = new Size(56, 25),
                     BackColor = Color.FromArgb(0, 120, 215),
                     ForeColor = Color.White,
                     Margin = new Padding(2, 2, 2, 0),
@@ -273,7 +274,8 @@ namespace DeviceHub.Win.DeviceHubControl
 
             var button = new Button
             {
-                AutoSize = true,
+                //AutoSize = true,
+                Size = new Size(56, 25),
                 FlatStyle = FlatStyle.Flat,
                 Margin = new Padding(2, 2, 2, 0),
                 Padding = new Padding(4, 0, 4, 0),

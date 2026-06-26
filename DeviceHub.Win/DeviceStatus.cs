@@ -76,6 +76,8 @@ namespace DeviceHub.Win
             lblAuthStatus.Text = Helper.FormatAuthStatus(instrument.Status);
             lblExpireTime.Text = Helper.FormatExpireTime(instrument.ExpireTime);
 
+            // 显示通信配置
+
             await LoadInstrumentItemMappingPageAsync(1, pagerInstrumentItemMapping.PageSize);
         }
 
