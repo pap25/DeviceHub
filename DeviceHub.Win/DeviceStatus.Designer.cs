@@ -64,6 +64,7 @@
             grpAuthInfo.Location = new Point(3, 6);
             grpAuthInfo.Name = "grpAuthInfo";
             grpAuthInfo.Size = new Size(250, 145);
+            grpAuthInfo.ForeColor = Color.DarkBlue;
             grpAuthInfo.TabIndex = 0;
             grpAuthInfo.TabStop = false;
             grpAuthInfo.Text = "授权信息";
@@ -71,6 +72,7 @@
             // lblExpireTime
             // 
             lblExpireTime.AutoSize = true;
+            lblExpireTime.ForeColor = SystemColors.ControlText;
             lblExpireTime.Location = new Point(100, 113);
             lblExpireTime.Name = "lblExpireTime";
             lblExpireTime.Size = new Size(0, 17);
@@ -79,6 +81,7 @@
             // label3
             // 
             label3.AutoSize = true;
+            label3.ForeColor = SystemColors.ControlText;
             label3.Location = new Point(20, 113);
             label3.Name = "label3";
             label3.Size = new Size(68, 17);
@@ -88,6 +91,7 @@
             // lblAuthStatus
             // 
             lblAuthStatus.AutoSize = true;
+            lblAuthStatus.ForeColor = Color.Green;
             lblAuthStatus.Location = new Point(100, 78);
             lblAuthStatus.Name = "lblAuthStatus";
             lblAuthStatus.Size = new Size(0, 17);
@@ -96,6 +100,7 @@
             // label2
             // 
             label2.AutoSize = true;
+            label2.ForeColor = SystemColors.ControlText;
             label2.Location = new Point(20, 78);
             label2.Name = "label2";
             label2.Size = new Size(44, 17);
@@ -105,6 +110,7 @@
             // lblAuthCode
             // 
             lblAuthCode.AutoSize = true;
+            lblAuthCode.ForeColor = Color.Red;
             lblAuthCode.Location = new Point(100, 43);
             lblAuthCode.Name = "lblAuthCode";
             lblAuthCode.Size = new Size(0, 17);
@@ -113,6 +119,7 @@
             // label1
             // 
             label1.AutoSize = true;
+            label1.ForeColor = SystemColors.ControlText;
             label1.Location = new Point(20, 43);
             label1.Name = "label1";
             label1.Size = new Size(56, 17);
