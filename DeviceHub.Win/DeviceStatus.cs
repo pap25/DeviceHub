@@ -4,19 +4,25 @@ using DeviceHub.Base.Common;
 using DeviceHub.Lis;
 using DeviceHub.Lis.Dto;
 using DeviceHub.Lis.Impl;
+using DeviceHub.Win.Base;
+using DeviceHub.Win.DeviceHubControl;
 using DeviceHub.Win.Utils;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
+using static DeviceHub.Lis.Dto.GetInstrument;
 
 namespace DeviceHub.Win
 {
     public partial class DeviceStatus : Form
     {
         private readonly ILisClient lisClient = LisClient.Instance;
+        private int _instrumentId;
+
         public DeviceStatus()
         {
             InitializeComponent();
+            pagerInstrumentItemMapping.PageChanged += PagerInstrumentItemMapping_PageChanged;
         }
         private async void DeviceStatus_Shown(object sender, EventArgs e)
         {
@@ -34,7 +40,6 @@ namespace DeviceHub.Win
                 MessageBox.Show($"LIS上没有这仪器driverId: {driverId}");
                 return;
             }
-            this.Text += $" {instrument.InstrumentModel} {instrument.InstrumentName} {instrument.InstrumentId}";
 
             DriverConfig config = await lisClient.GetDriverConfig(driverId);
             await initLisConfig(instrument, config);
@@ -64,9 +69,26 @@ namespace DeviceHub.Win
 
         private async Task initLisConfig(GetInstrument instrument, DriverConfig config)
         {
-            Page<GetInstrumentItemMappingPage> page = await lisClient.GetInstrumentItemMappingPage(instrument.InstrumentId, 1, 100);
-            //MessageBox.Show($"查询项目映射成功pageIndex: {page.PageIndex} pageSize: {page.PageSize} totalCount: {page.TotalCount}");
+            _instrumentId = instrument.InstrumentId;
+            this.Text += $" {instrument.InstrumentModel} {instrument.InstrumentName} {instrument.InstrumentId}";
+
+            lblAuthCode.Text = Helper.MaskAuthCode(instrument.AuthCode);
+            lblAuthStatus.Text = Helper.FormatAuthStatus(instrument.Status);
+            lblExpireTime.Text = Helper.FormatExpireTime(instrument.ExpireTime);
+
+            await LoadInstrumentItemMappingPageAsync(1, pagerInstrumentItemMapping.PageSize);
+        }
+
+        private async void PagerInstrumentItemMapping_PageChanged(object? sender, PagerChangedEventArgs e)
+        {
+            await LoadInstrumentItemMappingPageAsync(e.PageIndex, e.PageSize);
+        }
+
+        private async Task LoadInstrumentItemMappingPageAsync(int pageIndex, int pageSize)
+        {
+            Page<GetInstrumentItemMappingPage> page = await lisClient.GetInstrumentItemMappingPage(_instrumentId, pageIndex, pageSize);
             dgvInstrumentItemMapping.DataSource = page.Data;
+            pagerInstrumentItemMapping.SetPageInfo(page);
         }
 
         //private static string FormatString(DriverConfig config)

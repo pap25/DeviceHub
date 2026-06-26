@@ -34,7 +34,7 @@ namespace DeviceHub.Lis.Dto
         /// <summary>
         /// 授权码状态
         /// </summary>
-        public AuthCodeStatus status { get; set; }
+        public AuthCodeStatus Status { get; set; }
 
         public enum AuthCodeStatus : byte
         {

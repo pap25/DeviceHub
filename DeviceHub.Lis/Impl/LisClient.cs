@@ -23,8 +23,9 @@ namespace DeviceHub.Lis.Impl
                 InstrumentId = 446,
                 InstrumentModel = "AUTOLAS",
                 InstrumentName = "流水线Autolas",
-                AuthCode = "1234567890",
-                status = AuthCodeStatus.Normal
+                AuthCode = "8F4A-92C7-D1E5-B3A9",
+                ExpireTime = 1782555453000,
+                Status = AuthCodeStatus.Normal
             };
         }
 
@@ -77,7 +78,7 @@ namespace DeviceHub.Lis.Impl
 
         public Task<Page<GetInstrumentItemMappingPage>> GetInstrumentItemMappingPage(int instrumentId, int pageIndex, int pageSize)
         {
-            const int totalCount = 15;
+            const int totalCount = 1500;
             var allItems = new List<GetInstrumentItemMappingPage>
             {
                 new() { InstrumentItemCode = "GLU", InstrumentItemName = "葡萄糖", LisItemCode = "L001", LisItemName = "葡萄糖", Unit = "mmol/L" },
@@ -96,6 +97,10 @@ namespace DeviceHub.Lis.Impl
                 new() { InstrumentItemCode = "UA", InstrumentItemName = "尿酸", LisItemCode = "L014", LisItemName = "尿酸", Unit = "μmol/L" },
                 new() { InstrumentItemCode = "K", InstrumentItemName = "钾", LisItemCode = "L015", LisItemName = "钾", Unit = "mmol/L" },
             };
+            for (int i = 0; i < totalCount - 15; i++)
+            {
+                allItems.Add(new() { InstrumentItemCode = "GLU " + i, InstrumentItemName = "葡萄糖 " + i, LisItemCode = "L001 " + i, LisItemName = "葡萄糖 " + i, Unit = "mmol/L " + i });
+            }
 
             int skip = Math.Max(0, (pageIndex - 1) * pageSize);
             var pageData = allItems.Skip(skip).Take(pageSize).ToList();
