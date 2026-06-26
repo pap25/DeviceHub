@@ -65,11 +65,7 @@ namespace DeviceHub.Win
         private async Task initLisConfig(GetInstrument instrument, DriverConfig config)
         {
             Page<GetInstrumentItemMappingPage> page = await lisClient.GetInstrumentItemMappingPage(instrument.InstrumentId, 1, 100);
-            MessageBox.Show($"查询项目映射成功pageIndex: {page.PageIndex} pageSize: {page.PageSize} totalCount: {page.TotalCount}");
-            foreach (var item in page.Data)
-            {
-                MessageBox.Show($"项目映射: {item.InstrumentItemCode} {item.InstrumentItemName} {item.LisItemCode} {item.LisItemName} {item.Unit}");
-            }
+            //MessageBox.Show($"查询项目映射成功pageIndex: {page.PageIndex} pageSize: {page.PageSize} totalCount: {page.TotalCount}");
             dgvInstrumentItemMapping.DataSource = page.Data;
         }
 
