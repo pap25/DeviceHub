@@ -1,4 +1,4 @@
-namespace DeviceHub.Model.Entities;
+namespace DeviceHub.Model;
 
 /// <summary>
 /// 接收仪器消息队列表扩展表

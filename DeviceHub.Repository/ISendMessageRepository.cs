@@ -1,5 +1,4 @@
-using DeviceHub.Model.Entities;
-using DeviceHub.Model.Enums;
+using DeviceHub.Model;
 
 namespace DeviceHub.Repository;
 
@@ -18,5 +17,5 @@ public interface ISendMessageRepository
 
     Task<IReadOnlyList<SendMessage>> GetAllAsync(CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<SendMessage>> GetByStatusAsync(MessageStatus status, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<SendMessage>> GetByStatusAsync(SendMessage.StatusEnum status, CancellationToken cancellationToken = default);
 }

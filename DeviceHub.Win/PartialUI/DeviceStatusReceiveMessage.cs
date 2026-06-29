@@ -1,4 +1,6 @@
-﻿using DeviceHub.Win.DeviceHubControl;
+﻿using DeviceHub.Model;
+using DeviceHub.Utils;
+using DeviceHub.Win.DeviceHubControl;
 
 namespace DeviceHub.Win
 {
@@ -11,6 +13,9 @@ namespace DeviceHub.Win
             dtpReceiveMessageCreateTimeStart.Value = DateTime.Today;
             dtpReceiveMessageCreateTimeEnd.Value = DateTime.Today;
 
+            EnumExtensions.GetKeyValues<ReceiveMessage.StatusEnum>();
+            EnumExtensions.GetKeyValues<ReceiveMessageDecode.TypeEnum>();
+
             await LoadReceiveMessagePageAsync(1, pagerReceiveMessage.PageSize);
         }
 
@@ -19,9 +24,9 @@ namespace DeviceHub.Win
             await LoadReceiveMessagePageAsync(pagerReceiveMessage.PageIndex, pagerReceiveMessage.PageSize);
         }
 
-        private void btnReceiveMessageQuery_Click(object sender, EventArgs e)
+        private async void btnReceiveMessageQuery_Click(object sender, EventArgs e)
         {
-
+            await LoadReceiveMessagePageAsync(1, pagerReceiveMessage.PageSize);
         }
 
         private async void PagerReceiveMessage_PageChanged(object? sender, PagerChangedEventArgs e)

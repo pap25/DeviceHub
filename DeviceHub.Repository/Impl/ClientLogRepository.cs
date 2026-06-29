@@ -1,5 +1,4 @@
-using DeviceHub.Model.Entities;
-using DeviceHub.Model.Enums;
+using DeviceHub.Model;
 using DeviceHub.Repository.Interfaces;
 using Microsoft.Data.Sqlite;
 
@@ -10,6 +9,12 @@ namespace DeviceHub.Repository.Repositories;
 /// </summary>
 public class ClientLogRepository : IClientLogRepository
 {
+    private static readonly ClientLogRepository _instance = new();
+    public static ClientLogRepository Instance => _instance;
+    private ClientLogRepository()
+    {
+    }
+
     public async Task<long> InsertAsync(ClientLog entity, CancellationToken cancellationToken = default)
     {
         const string sql = """
@@ -81,7 +86,7 @@ public class ClientLogRepository : IClientLogRepository
             Map,
             cancellationToken: cancellationToken);
 
-    public async Task<IReadOnlyList<ClientLog>> GetByLevelAsync(ClientLogLevel level, CancellationToken cancellationToken = default) =>
+    public async Task<IReadOnlyList<ClientLog>> GetByLevelAsync(ClientLog.LevelEnum level, CancellationToken cancellationToken = default) =>
         await DbHelper.QueryAsync(
             SelectColumns + " WHERE level = @level ORDER BY id;",
             Map,
@@ -95,7 +100,7 @@ public class ClientLogRepository : IClientLogRepository
     {
         Id = reader.GetInt64(0),
         Type = reader.GetByte(1),
-        Level = (ClientLogLevel)reader.GetByte(2),
+        Level = (ClientLog.LevelEnum)reader.GetByte(2),
         Message = reader.GetString(3),
         CreateTime = reader.GetInt64(4)
     };

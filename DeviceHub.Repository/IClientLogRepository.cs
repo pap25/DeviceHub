@@ -1,5 +1,4 @@
-using DeviceHub.Model.Entities;
-using DeviceHub.Model.Enums;
+using DeviceHub.Model;
 
 namespace DeviceHub.Repository.Interfaces;
 
@@ -18,5 +17,5 @@ public interface IClientLogRepository
 
     Task<IReadOnlyList<ClientLog>> GetAllAsync(CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<ClientLog>> GetByLevelAsync(ClientLogLevel level, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<ClientLog>> GetByLevelAsync(ClientLog.LevelEnum level, CancellationToken cancellationToken = default);
 }

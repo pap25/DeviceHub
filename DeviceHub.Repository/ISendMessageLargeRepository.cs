@@ -1,4 +1,4 @@
-using DeviceHub.Model.Entities;
+using DeviceHub.Model;
 
 namespace DeviceHub.Repository;
 

@@ -1,6 +1,6 @@
-using DeviceHub.Model.Enums;
+using System.ComponentModel;
 
-namespace DeviceHub.Model.Entities;
+namespace DeviceHub.Model;
 
 /// <summary>
 /// 接收仪器消息解码结果表
@@ -20,7 +20,7 @@ public class ReceiveMessageDecode
     /// <summary>
     /// 解码类型
     /// </summary>
-    public ReceiveMessageDecodeType Type { get; set; }
+    public TypeEnum Type { get; set; }
 
     /// <summary>
     /// 样本号
@@ -46,4 +46,22 @@ public class ReceiveMessageDecode
     /// 更新时间（Unix 毫秒时间戳）
     /// </summary>
     public long UpdateTime { get; set; }
+
+    /// <summary>
+    /// 解码类型
+    /// </summary>
+    public enum TypeEnum : byte
+    {
+        /// <summary>
+        /// 检验结果
+        /// </summary>
+        [Description("检验结果")]
+        TestResult = 0,
+
+        /// <summary>
+        /// 查询样本申请信息
+        /// </summary>
+        [Description("查询样本申请信息")]
+        SampleQuery = 1
+    }
 }

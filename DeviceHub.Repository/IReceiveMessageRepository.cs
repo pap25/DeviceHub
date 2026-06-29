@@ -1,5 +1,4 @@
-using DeviceHub.Model.Entities;
-using DeviceHub.Model.Enums;
+using DeviceHub.Model;
 
 namespace DeviceHub.Repository;
 
@@ -20,5 +19,5 @@ public interface IReceiveMessageRepository
 
     Task<IReadOnlyList<ReceiveMessage>> GetByInstrumentIdAsync(long instrumentId, CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<ReceiveMessage>> GetByStatusAsync(MessageStatus status, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<ReceiveMessage>> GetByStatusAsync(ReceiveMessage.StatusEnum status, CancellationToken cancellationToken = default);
 }

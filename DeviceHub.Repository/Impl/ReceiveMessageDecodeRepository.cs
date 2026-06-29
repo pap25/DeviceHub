@@ -1,5 +1,4 @@
-using DeviceHub.Model.Entities;
-using DeviceHub.Model.Enums;
+using DeviceHub.Model;
 using Microsoft.Data.Sqlite;
 
 namespace DeviceHub.Repository.Repositories;
@@ -9,6 +8,12 @@ namespace DeviceHub.Repository.Repositories;
 /// </summary>
 public class ReceiveMessageDecodeRepository : IReceiveMessageDecodeRepository
 {
+    private static readonly ReceiveMessageDecodeRepository _instance = new();
+    public static ReceiveMessageDecodeRepository Instance => _instance;
+    private ReceiveMessageDecodeRepository()
+    {
+    }
+
     public async Task<long> InsertAsync(ReceiveMessageDecode entity, CancellationToken cancellationToken = default)
     {
         const string sql = """
@@ -103,7 +108,7 @@ public class ReceiveMessageDecodeRepository : IReceiveMessageDecodeRepository
     {
         Id = reader.GetInt64(0),
         ReceiveMessageId = reader.GetInt64(1),
-        Type = (ReceiveMessageDecodeType)reader.GetByte(2),
+        Type = (ReceiveMessageDecode.TypeEnum)reader.GetByte(2),
         SampleNo = reader.GetString(3),
         Barcode = reader.GetString(4),
         ResultJson = reader.GetString(5),

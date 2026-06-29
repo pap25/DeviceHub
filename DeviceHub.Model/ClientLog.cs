@@ -1,6 +1,6 @@
-using DeviceHub.Model.Enums;
+using System.ComponentModel;
 
-namespace DeviceHub.Model.Entities;
+namespace DeviceHub.Model;
 
 /// <summary>
 /// 仪器通信日志表
@@ -20,7 +20,7 @@ public class ClientLog
     /// <summary>
     /// 日志级别
     /// </summary>
-    public ClientLogLevel Level { get; set; }
+    public LevelEnum Level { get; set; }
 
     /// <summary>
     /// 日志内容
@@ -31,4 +31,28 @@ public class ClientLog
     /// 创建时间（Unix 毫秒时间戳）
     /// </summary>
     public long CreateTime { get; set; }
+
+    /// <summary>
+    /// 日志级别
+    /// </summary>
+    public enum LevelEnum : byte
+    {
+        /// <summary>
+        /// 普通
+        /// </summary>
+        [Description("普通")]
+        Info = 0,
+
+        /// <summary>
+        /// 警告
+        /// </summary>
+        [Description("警告")]
+        Warning = 1,
+
+        /// <summary>
+        /// 异常
+        /// </summary>
+        [Description("异常")]
+        Error = 2
+    }
 }

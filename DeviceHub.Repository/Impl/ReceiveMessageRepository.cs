@@ -1,5 +1,4 @@
-using DeviceHub.Model.Entities;
-using DeviceHub.Model.Enums;
+using DeviceHub.Model;
 using Microsoft.Data.Sqlite;
 
 namespace DeviceHub.Repository.Repositories;
@@ -9,6 +8,12 @@ namespace DeviceHub.Repository.Repositories;
 /// </summary>
 public class ReceiveMessageRepository : IReceiveMessageRepository
 {
+    private static readonly ReceiveMessageRepository _instance = new();
+    public static ReceiveMessageRepository Instance => _instance;
+    private ReceiveMessageRepository()
+    {
+    }
+
     public async Task<long> InsertAsync(ReceiveMessage entity, CancellationToken cancellationToken = default)
     {
         const string sql = """
@@ -87,7 +92,7 @@ public class ReceiveMessageRepository : IReceiveMessageRepository
             [DbHelper.Param("@instrument_id", instrumentId)],
             cancellationToken);
 
-    public async Task<IReadOnlyList<ReceiveMessage>> GetByStatusAsync(MessageStatus status, CancellationToken cancellationToken = default) =>
+    public async Task<IReadOnlyList<ReceiveMessage>> GetByStatusAsync(ReceiveMessage.StatusEnum status, CancellationToken cancellationToken = default) =>
         await DbHelper.QueryAsync(
             "SELECT id, instrument_id, status, error_message, create_time FROM receive_message WHERE status = @status ORDER BY id;",
             Map,
@@ -98,7 +103,7 @@ public class ReceiveMessageRepository : IReceiveMessageRepository
     {
         Id = reader.GetInt64(0),
         InstrumentId = reader.GetInt64(1),
-        Status = (MessageStatus)reader.GetByte(2),
+        Status = (ReceiveMessage.StatusEnum)reader.GetByte(2),
         ErrorMessage = reader.GetString(3),
         CreateTime = reader.GetInt64(4)
     };

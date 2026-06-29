@@ -1,4 +1,4 @@
-using DeviceHub.Model.Entities;
+using DeviceHub.Model;
 using Microsoft.Data.Sqlite;
 
 namespace DeviceHub.Repository.Repositories;
@@ -8,6 +8,12 @@ namespace DeviceHub.Repository.Repositories;
 /// </summary>
 public class SendMessageLargeRepository : ISendMessageLargeRepository
 {
+    private static readonly SendMessageLargeRepository _instance = new();
+    public static SendMessageLargeRepository Instance => _instance;
+    private SendMessageLargeRepository()
+    {
+    }
+
     public async Task<bool> InsertAsync(SendMessageLarge entity, CancellationToken cancellationToken = default)
     {
         const string sql = """

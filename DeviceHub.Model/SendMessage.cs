@@ -1,6 +1,6 @@
-using DeviceHub.Model.Enums;
+using System.ComponentModel;
 
-namespace DeviceHub.Model.Entities;
+namespace DeviceHub.Model;
 
 /// <summary>
 /// 发送仪器消息队列表
@@ -20,7 +20,7 @@ public class SendMessage
     /// <summary>
     /// 消息类型
     /// </summary>
-    public SendMessageType Type { get; set; }
+    public TypeEnum Type { get; set; }
 
     /// <summary>
     /// 样本号
@@ -35,7 +35,7 @@ public class SendMessage
     /// <summary>
     /// 处理状态
     /// </summary>
-    public MessageStatus Status { get; set; }
+    public StatusEnum Status { get; set; }
 
     /// <summary>
     /// 创建时间（Unix 毫秒时间戳）
@@ -46,4 +46,40 @@ public class SendMessage
     /// 更新时间（Unix 毫秒时间戳）
     /// </summary>
     public long UpdateTime { get; set; }
+
+    /// <summary>
+    /// 消息类型
+    /// </summary>
+    public enum TypeEnum : byte
+    {
+        /// <summary>
+        /// 申请单
+        /// </summary>
+        [Description("申请单")]
+        Application = 0
+    }
+
+    /// <summary>
+    /// 处理状态
+    /// </summary>
+    public enum StatusEnum : byte
+    {
+        /// <summary>
+        /// 待处理
+        /// </summary>
+        [Description("待处理")]
+        Pending = 0,
+
+        /// <summary>
+        /// 处理成功
+        /// </summary>
+        [Description("处理成功")]
+        Success = 1,
+
+        /// <summary>
+        /// 处理失败
+        /// </summary>
+        [Description("处理失败")]
+        Failed = 2
+    }
 }

@@ -1,5 +1,4 @@
-using DeviceHub.Model.Entities;
-using DeviceHub.Model.Enums;
+using DeviceHub.Model;
 using Microsoft.Data.Sqlite;
 
 namespace DeviceHub.Repository.Repositories;
@@ -9,6 +8,12 @@ namespace DeviceHub.Repository.Repositories;
 /// </summary>
 public class SendMessageRepository : ISendMessageRepository
 {
+    private static readonly SendMessageRepository _instance = new();
+    public static SendMessageRepository Instance => _instance;
+    private SendMessageRepository()
+    {
+    }
+
     public async Task<long> InsertAsync(SendMessage entity, CancellationToken cancellationToken = default)
     {
         const string sql = """
@@ -89,7 +94,7 @@ public class SendMessageRepository : ISendMessageRepository
             Map,
             cancellationToken: cancellationToken);
 
-    public async Task<IReadOnlyList<SendMessage>> GetByStatusAsync(MessageStatus status, CancellationToken cancellationToken = default) =>
+    public async Task<IReadOnlyList<SendMessage>> GetByStatusAsync(SendMessage.StatusEnum status, CancellationToken cancellationToken = default) =>
         await DbHelper.QueryAsync(
             SelectColumns + " WHERE status = @status ORDER BY id;",
             Map,
@@ -103,10 +108,10 @@ public class SendMessageRepository : ISendMessageRepository
     {
         Id = reader.GetInt64(0),
         InstrumentId = reader.GetInt64(1),
-        Type = (SendMessageType)reader.GetByte(2),
+        Type = (SendMessage.TypeEnum)reader.GetByte(2),
         SampleNo = reader.GetString(3),
         Barcode = reader.GetString(4),
-        Status = (MessageStatus)reader.GetByte(5),
+        Status = (SendMessage.StatusEnum)reader.GetByte(5),
         CreateTime = reader.GetInt64(6),
         UpdateTime = reader.GetInt64(7)
     };
