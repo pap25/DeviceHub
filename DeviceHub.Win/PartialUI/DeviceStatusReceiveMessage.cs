@@ -3,6 +3,7 @@ using DeviceHub.Model.Entities;
 using DeviceHub.Model.Vo;
 using DeviceHub.Service;
 using DeviceHub.Win.DeviceHubControl;
+using SQLitePCL;
 
 namespace DeviceHub.Win
 {
@@ -16,6 +17,32 @@ namespace DeviceHub.Win
             cboReceiveMessageType.SelectedValue = ((int)ReceiveMessageDecode.TypeEnum.TestResult).ToString();
             dtpReceiveMessageCreateTimeStart.Value = DateTime.Today;
             dtpReceiveMessageCreateTimeEnd.Value = DateTime.Today;
+            dgvReceiveMessage.ColumnHeaderMouseClick += dgvReceiveMessage_ColumnHeaderMouseClick;
+        }
+
+        private void dgvReceiveMessage_ColumnHeaderMouseClick(object? sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.ColumnIndex != colReceiveMessageSelect.Index || dgvReceiveMessage.Rows.Count == 0)
+            {
+                return;
+            }
+            dgvReceiveMessage.EndEdit();
+            if (colReceiveMessageSelect.HeaderText == "全选")
+            {
+                colReceiveMessageSelect.HeaderText = "反全选";
+                foreach (DataGridViewRow row in dgvReceiveMessage.Rows)
+                {
+                    row.Cells[colReceiveMessageSelect.Index].Value = true;
+                }
+            }
+            else
+            {
+                colReceiveMessageSelect.HeaderText = "全选";
+                foreach (DataGridViewRow row in dgvReceiveMessage.Rows)
+                {
+                    row.Cells[colReceiveMessageSelect.Index].Value = false;
+                }
+            }
         }
 
         private async Task RefreshReceiveMessage()

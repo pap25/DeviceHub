@@ -73,6 +73,7 @@
             btnReceiveMessageQuery = new Button();
             tabPageSendMessage = new TabPage();
             tabPageOperationLog = new TabPage();
+            button1 = new Button();
             grpLisConfigAuthInfo.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvInstrumentItemMapping).BeginInit();
             tabControl1.SuspendLayout();
@@ -286,10 +287,10 @@
             // colReceiveMessageSelect
             // 
             colReceiveMessageSelect.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            colReceiveMessageSelect.FillWeight = 40F;
+            colReceiveMessageSelect.FillWeight = 51F;
             colReceiveMessageSelect.HeaderText = "全选";
             colReceiveMessageSelect.Name = "colReceiveMessageSelect";
-            colReceiveMessageSelect.Width = 40;
+            colReceiveMessageSelect.Width = 51;
             // 
             // colReceiveMessageStatus
             // 
@@ -308,6 +309,7 @@
             colReceiveMessageType.HeaderText = "类型";
             colReceiveMessageType.Name = "colReceiveMessageType";
             colReceiveMessageType.ReadOnly = true;
+            colReceiveMessageType.Width = 80;
             // 
             // colReceiveMessageRawMessage
             // 
@@ -356,7 +358,6 @@
             // colReceiveMessageErrorMessage
             // 
             colReceiveMessageErrorMessage.DataPropertyName = "ErrorMessage";
-            colReceiveMessageErrorMessage.FillWeight = 150F;
             colReceiveMessageErrorMessage.HeaderText = "失败原因";
             colReceiveMessageErrorMessage.Name = "colReceiveMessageErrorMessage";
             colReceiveMessageErrorMessage.ReadOnly = true;
@@ -375,6 +376,7 @@
             // 
             // pnlReceiveMessageQuery
             // 
+            pnlReceiveMessageQuery.Controls.Add(button1);
             pnlReceiveMessageQuery.Controls.Add(lblReceiveMessageStatus);
             pnlReceiveMessageQuery.Controls.Add(cboReceiveMessageStatus);
             pnlReceiveMessageQuery.Controls.Add(lblReceiveMessageType);
@@ -528,6 +530,15 @@
             tabPageOperationLog.Text = "操作日志";
             tabPageOperationLog.UseVisualStyleBackColor = true;
             // 
+            // button1
+            // 
+            button1.Location = new Point(1169, 10);
+            button1.Name = "button1";
+            button1.Size = new Size(132, 26);
+            button1.TabIndex = 13;
+            button1.Text = "重新解码并同步LIS";
+            button1.UseVisualStyleBackColor = true;
+            // 
             // DeviceStatus
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
@@ -598,5 +609,6 @@
         private DataGridViewTextBoxColumn colReceiveMessageSampleNo;
         private DataGridViewTextBoxColumn colReceiveMessageCreateTime;
         private DataGridViewTextBoxColumn colReceiveMessageErrorMessage;
+        private Button button1;
     }
 }
