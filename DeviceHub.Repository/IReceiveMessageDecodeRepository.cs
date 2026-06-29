@@ -7,15 +7,15 @@ namespace DeviceHub.Repository;
 /// </summary>
 public interface IReceiveMessageDecodeRepository
 {
-    Task<long> InsertAsync(ReceiveMessageDecode entity, CancellationToken cancellationToken = default);
+    Task<long> Insert(ReceiveMessageDecode entity, CancellationToken cancellationToken = default);
 
-    Task<bool> UpdateAsync(ReceiveMessageDecode entity, CancellationToken cancellationToken = default);
+    Task<bool> Update(ReceiveMessageDecode entity, CancellationToken cancellationToken = default);
 
-    Task<bool> DeleteByIdAsync(long id, CancellationToken cancellationToken = default);
+    Task<bool> DeleteById(long id, CancellationToken cancellationToken = default);
 
-    Task<ReceiveMessageDecode?> GetByIdAsync(long id, CancellationToken cancellationToken = default);
+    Task<ReceiveMessageDecode?> GetById(long id, CancellationToken cancellationToken = default);
 
-    Task<ReceiveMessageDecode?> GetByReceiveMessageIdAsync(long receiveMessageId, CancellationToken cancellationToken = default);
+    Task<ReceiveMessageDecode?> GetByReceiveMessageId(long receiveMessageId, CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<ReceiveMessageDecode>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<ReceiveMessageDecode>> GetAll(CancellationToken cancellationToken = default);
 }

@@ -7,15 +7,17 @@ namespace DeviceHub.Repository.Interfaces;
 /// </summary>
 public interface IClientLogRepository
 {
-    Task<long> InsertAsync(ClientLog entity, CancellationToken cancellationToken = default);
+    Task<long> Insert(ClientLog entity, CancellationToken cancellationToken = default);
 
-    Task<bool> UpdateAsync(ClientLog entity, CancellationToken cancellationToken = default);
+    Task<bool> Update(ClientLog entity, CancellationToken cancellationToken = default);
 
-    Task<bool> DeleteByIdAsync(long id, CancellationToken cancellationToken = default);
+    Task<bool> DeleteById(long id, CancellationToken cancellationToken = default);
 
-    Task<ClientLog?> GetByIdAsync(long id, CancellationToken cancellationToken = default);
+    Task<ClientLog?> GetById(long id, CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<ClientLog>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<ClientLog>> GetAll(CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<ClientLog>> GetByLevelAsync(ClientLog.LevelEnum level, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<ClientLog>> GetByType(ClientLog.TypeEnum type, CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<ClientLog>> GetByLevel(ClientLog.LevelEnum level, CancellationToken cancellationToken = default);
 }

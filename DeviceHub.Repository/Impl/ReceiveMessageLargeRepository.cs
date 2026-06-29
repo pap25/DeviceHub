@@ -14,7 +14,7 @@ public class ReceiveMessageLargeRepository : IReceiveMessageLargeRepository
     {
     }
 
-    public async Task<bool> InsertAsync(ReceiveMessageLarge entity, CancellationToken cancellationToken = default)
+    public async Task<bool> Insert(ReceiveMessageLarge entity, CancellationToken cancellationToken = default)
     {
         const string sql = """
             INSERT INTO receive_message_large (receive_message_id, raw_message)
@@ -32,7 +32,7 @@ public class ReceiveMessageLargeRepository : IReceiveMessageLargeRepository
         return rows > 0;
     }
 
-    public async Task<bool> UpdateAsync(ReceiveMessageLarge entity, CancellationToken cancellationToken = default)
+    public async Task<bool> Update(ReceiveMessageLarge entity, CancellationToken cancellationToken = default)
     {
         const string sql = """
             UPDATE receive_message_large
@@ -51,7 +51,7 @@ public class ReceiveMessageLargeRepository : IReceiveMessageLargeRepository
         return rows > 0;
     }
 
-    public async Task<bool> DeleteByReceiveMessageIdAsync(long receiveMessageId, CancellationToken cancellationToken = default)
+    public async Task<bool> DeleteByReceiveMessageId(long receiveMessageId, CancellationToken cancellationToken = default)
     {
         const string sql = "DELETE FROM receive_message_large WHERE receive_message_id = @receive_message_id;";
 
@@ -63,14 +63,14 @@ public class ReceiveMessageLargeRepository : IReceiveMessageLargeRepository
         return rows > 0;
     }
 
-    public Task<ReceiveMessageLarge?> GetByReceiveMessageIdAsync(long receiveMessageId, CancellationToken cancellationToken = default) =>
+    public Task<ReceiveMessageLarge?> GetByReceiveMessageId(long receiveMessageId, CancellationToken cancellationToken = default) =>
         DbHelper.QuerySingleAsync(
             "SELECT receive_message_id, raw_message FROM receive_message_large WHERE receive_message_id = @receive_message_id;",
             Map,
             [DbHelper.Param("@receive_message_id", receiveMessageId)],
             cancellationToken);
 
-    public async Task<IReadOnlyList<ReceiveMessageLarge>> GetAllAsync(CancellationToken cancellationToken = default) =>
+    public async Task<IReadOnlyList<ReceiveMessageLarge>> GetAll(CancellationToken cancellationToken = default) =>
         await DbHelper.QueryAsync(
             "SELECT receive_message_id, raw_message FROM receive_message_large ORDER BY receive_message_id;",
             Map,

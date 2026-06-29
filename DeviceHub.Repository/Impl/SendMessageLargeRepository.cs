@@ -14,7 +14,7 @@ public class SendMessageLargeRepository : ISendMessageLargeRepository
     {
     }
 
-    public async Task<bool> InsertAsync(SendMessageLarge entity, CancellationToken cancellationToken = default)
+    public async Task<bool> Insert(SendMessageLarge entity, CancellationToken cancellationToken = default)
     {
         const string sql = """
             INSERT INTO send_message_large (send_message_id, send_json)
@@ -32,7 +32,7 @@ public class SendMessageLargeRepository : ISendMessageLargeRepository
         return rows > 0;
     }
 
-    public async Task<bool> UpdateAsync(SendMessageLarge entity, CancellationToken cancellationToken = default)
+    public async Task<bool> Update(SendMessageLarge entity, CancellationToken cancellationToken = default)
     {
         const string sql = """
             UPDATE send_message_large
@@ -51,7 +51,7 @@ public class SendMessageLargeRepository : ISendMessageLargeRepository
         return rows > 0;
     }
 
-    public async Task<bool> DeleteBySendMessageIdAsync(long sendMessageId, CancellationToken cancellationToken = default)
+    public async Task<bool> DeleteBySendMessageId(long sendMessageId, CancellationToken cancellationToken = default)
     {
         const string sql = "DELETE FROM send_message_large WHERE send_message_id = @send_message_id;";
 
@@ -63,14 +63,14 @@ public class SendMessageLargeRepository : ISendMessageLargeRepository
         return rows > 0;
     }
 
-    public Task<SendMessageLarge?> GetBySendMessageIdAsync(long sendMessageId, CancellationToken cancellationToken = default) =>
+    public Task<SendMessageLarge?> GetBySendMessageId(long sendMessageId, CancellationToken cancellationToken = default) =>
         DbHelper.QuerySingleAsync(
             "SELECT send_message_id, send_json FROM send_message_large WHERE send_message_id = @send_message_id;",
             Map,
             [DbHelper.Param("@send_message_id", sendMessageId)],
             cancellationToken);
 
-    public async Task<IReadOnlyList<SendMessageLarge>> GetAllAsync(CancellationToken cancellationToken = default) =>
+    public async Task<IReadOnlyList<SendMessageLarge>> GetAll(CancellationToken cancellationToken = default) =>
         await DbHelper.QueryAsync(
             "SELECT send_message_id, send_json FROM send_message_large ORDER BY send_message_id;",
             Map,

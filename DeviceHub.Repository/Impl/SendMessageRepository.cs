@@ -15,7 +15,7 @@ public class SendMessageRepository : ISendMessageRepository
     {
     }
 
-    public async Task<long> InsertAsync(SendMessage entity, CancellationToken cancellationToken = default)
+    public async Task<long> Insert(SendMessage entity, CancellationToken cancellationToken = default)
     {
         const string sql = """
             INSERT INTO send_message (instrument_id, type, sample_no, barcode, status, error_message, create_time, update_time)
@@ -40,7 +40,7 @@ public class SendMessageRepository : ISendMessageRepository
         return id;
     }
 
-    public async Task<bool> UpdateAsync(SendMessage entity, CancellationToken cancellationToken = default)
+    public async Task<bool> Update(SendMessage entity, CancellationToken cancellationToken = default)
     {
         const string sql = """
             UPDATE send_message
@@ -73,7 +73,7 @@ public class SendMessageRepository : ISendMessageRepository
         return rows > 0;
     }
 
-    public async Task<bool> DeleteByIdAsync(long id, CancellationToken cancellationToken = default)
+    public async Task<bool> DeleteById(long id, CancellationToken cancellationToken = default)
     {
         const string sql = "DELETE FROM send_message WHERE id = @id;";
 
@@ -85,20 +85,20 @@ public class SendMessageRepository : ISendMessageRepository
         return rows > 0;
     }
 
-    public Task<SendMessage?> GetByIdAsync(long id, CancellationToken cancellationToken = default) =>
+    public Task<SendMessage?> GetById(long id, CancellationToken cancellationToken = default) =>
         DbHelper.QuerySingleAsync(
             SelectColumns + " WHERE id = @id;",
             Map,
             [DbHelper.Param("@id", id)],
             cancellationToken);
 
-    public async Task<IReadOnlyList<SendMessage>> GetAllAsync(CancellationToken cancellationToken = default) =>
+    public async Task<IReadOnlyList<SendMessage>> GetAll(CancellationToken cancellationToken = default) =>
         await DbHelper.QueryAsync(
             SelectColumns + " ORDER BY id;",
             Map,
             cancellationToken: cancellationToken);
 
-    public async Task<IReadOnlyList<SendMessage>> GetByStatusAsync(SendMessage.StatusEnum status, CancellationToken cancellationToken = default) =>
+    public async Task<IReadOnlyList<SendMessage>> GetByStatus(SendMessage.StatusEnum status, CancellationToken cancellationToken = default) =>
         await DbHelper.QueryAsync(
             SelectColumns + " WHERE status = @status ORDER BY id;",
             Map,

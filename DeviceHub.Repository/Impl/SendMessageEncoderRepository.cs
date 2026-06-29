@@ -14,7 +14,7 @@ public class SendMessageEncoderRepository : ISendMessageEncoderRepository
     {
     }
 
-    public async Task<long> InsertAsync(SendMessageEncoder entity, CancellationToken cancellationToken = default)
+    public async Task<long> Insert(SendMessageEncoder entity, CancellationToken cancellationToken = default)
     {
         const string sql = """
             INSERT INTO send_message_encoder (send_message_id, send_content, create_time, update_time)
@@ -35,7 +35,7 @@ public class SendMessageEncoderRepository : ISendMessageEncoderRepository
         return id;
     }
 
-    public async Task<bool> UpdateAsync(SendMessageEncoder entity, CancellationToken cancellationToken = default)
+    public async Task<bool> Update(SendMessageEncoder entity, CancellationToken cancellationToken = default)
     {
         const string sql = """
             UPDATE send_message_encoder
@@ -60,7 +60,7 @@ public class SendMessageEncoderRepository : ISendMessageEncoderRepository
         return rows > 0;
     }
 
-    public async Task<bool> DeleteByIdAsync(long id, CancellationToken cancellationToken = default)
+    public async Task<bool> DeleteById(long id, CancellationToken cancellationToken = default)
     {
         const string sql = "DELETE FROM send_message_encoder WHERE id = @id;";
 
@@ -72,21 +72,21 @@ public class SendMessageEncoderRepository : ISendMessageEncoderRepository
         return rows > 0;
     }
 
-    public Task<SendMessageEncoder?> GetByIdAsync(long id, CancellationToken cancellationToken = default) =>
+    public Task<SendMessageEncoder?> GetById(long id, CancellationToken cancellationToken = default) =>
         DbHelper.QuerySingleAsync(
             SelectColumns + " WHERE id = @id;",
             Map,
             [DbHelper.Param("@id", id)],
             cancellationToken);
 
-    public Task<SendMessageEncoder?> GetBySendMessageIdAsync(long sendMessageId, CancellationToken cancellationToken = default) =>
+    public Task<SendMessageEncoder?> GetBySendMessageId(long sendMessageId, CancellationToken cancellationToken = default) =>
         DbHelper.QuerySingleAsync(
             SelectColumns + " WHERE send_message_id = @send_message_id;",
             Map,
             [DbHelper.Param("@send_message_id", sendMessageId)],
             cancellationToken);
 
-    public async Task<IReadOnlyList<SendMessageEncoder>> GetAllAsync(CancellationToken cancellationToken = default) =>
+    public async Task<IReadOnlyList<SendMessageEncoder>> GetAll(CancellationToken cancellationToken = default) =>
         await DbHelper.QueryAsync(
             SelectColumns + " ORDER BY id;",
             Map,

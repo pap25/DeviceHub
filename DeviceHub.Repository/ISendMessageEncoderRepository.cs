@@ -7,15 +7,15 @@ namespace DeviceHub.Repository;
 /// </summary>
 public interface ISendMessageEncoderRepository
 {
-    Task<long> InsertAsync(SendMessageEncoder entity, CancellationToken cancellationToken = default);
+    Task<long> Insert(SendMessageEncoder entity, CancellationToken cancellationToken = default);
 
-    Task<bool> UpdateAsync(SendMessageEncoder entity, CancellationToken cancellationToken = default);
+    Task<bool> Update(SendMessageEncoder entity, CancellationToken cancellationToken = default);
 
-    Task<bool> DeleteByIdAsync(long id, CancellationToken cancellationToken = default);
+    Task<bool> DeleteById(long id, CancellationToken cancellationToken = default);
 
-    Task<SendMessageEncoder?> GetByIdAsync(long id, CancellationToken cancellationToken = default);
+    Task<SendMessageEncoder?> GetById(long id, CancellationToken cancellationToken = default);
 
-    Task<SendMessageEncoder?> GetBySendMessageIdAsync(long sendMessageId, CancellationToken cancellationToken = default);
+    Task<SendMessageEncoder?> GetBySendMessageId(long sendMessageId, CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<SendMessageEncoder>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<SendMessageEncoder>> GetAll(CancellationToken cancellationToken = default);
 }

@@ -15,7 +15,7 @@ public class ClientLogRepository : IClientLogRepository
     {
     }
 
-    public async Task<long> InsertAsync(ClientLog entity, CancellationToken cancellationToken = default)
+    public async Task<long> Insert(ClientLog entity, CancellationToken cancellationToken = default)
     {
         const string sql = """
             INSERT INTO client_log (type, level, message, create_time)
@@ -26,7 +26,7 @@ public class ClientLogRepository : IClientLogRepository
         var id = await DbHelper.ExecuteScalarAsync<long>(
             sql,
             [
-                DbHelper.Param("@type", entity.Type),
+                DbHelper.Param("@type", (byte)entity.Type),
                 DbHelper.Param("@level", (byte)entity.Level),
                 DbHelper.Param("@message", entity.Message),
                 DbHelper.Param("@create_time", entity.CreateTime)
@@ -36,7 +36,7 @@ public class ClientLogRepository : IClientLogRepository
         return id;
     }
 
-    public async Task<bool> UpdateAsync(ClientLog entity, CancellationToken cancellationToken = default)
+    public async Task<bool> Update(ClientLog entity, CancellationToken cancellationToken = default)
     {
         const string sql = """
             UPDATE client_log
@@ -51,7 +51,7 @@ public class ClientLogRepository : IClientLogRepository
             sql,
             [
                 DbHelper.Param("@id", entity.Id),
-                DbHelper.Param("@type", entity.Type),
+                DbHelper.Param("@type", (byte)entity.Type),
                 DbHelper.Param("@level", (byte)entity.Level),
                 DbHelper.Param("@message", entity.Message),
                 DbHelper.Param("@create_time", entity.CreateTime)
@@ -61,7 +61,7 @@ public class ClientLogRepository : IClientLogRepository
         return rows > 0;
     }
 
-    public async Task<bool> DeleteByIdAsync(long id, CancellationToken cancellationToken = default)
+    public async Task<bool> DeleteById(long id, CancellationToken cancellationToken = default)
     {
         const string sql = "DELETE FROM client_log WHERE id = @id;";
 
@@ -73,20 +73,27 @@ public class ClientLogRepository : IClientLogRepository
         return rows > 0;
     }
 
-    public Task<ClientLog?> GetByIdAsync(long id, CancellationToken cancellationToken = default) =>
+    public Task<ClientLog?> GetById(long id, CancellationToken cancellationToken = default) =>
         DbHelper.QuerySingleAsync(
             SelectColumns + " WHERE id = @id;",
             Map,
             [DbHelper.Param("@id", id)],
             cancellationToken);
 
-    public async Task<IReadOnlyList<ClientLog>> GetAllAsync(CancellationToken cancellationToken = default) =>
+    public async Task<IReadOnlyList<ClientLog>> GetAll(CancellationToken cancellationToken = default) =>
         await DbHelper.QueryAsync(
             SelectColumns + " ORDER BY id;",
             Map,
             cancellationToken: cancellationToken);
 
-    public async Task<IReadOnlyList<ClientLog>> GetByLevelAsync(ClientLog.LevelEnum level, CancellationToken cancellationToken = default) =>
+    public async Task<IReadOnlyList<ClientLog>> GetByType(ClientLog.TypeEnum type, CancellationToken cancellationToken = default) =>
+        await DbHelper.QueryAsync(
+            SelectColumns + " WHERE type = @type ORDER BY id;",
+            Map,
+            [DbHelper.Param("@type", (byte)type)],
+            cancellationToken);
+
+    public async Task<IReadOnlyList<ClientLog>> GetByLevel(ClientLog.LevelEnum level, CancellationToken cancellationToken = default) =>
         await DbHelper.QueryAsync(
             SelectColumns + " WHERE level = @level ORDER BY id;",
             Map,
@@ -99,7 +106,7 @@ public class ClientLogRepository : IClientLogRepository
     private static ClientLog Map(SqliteDataReader reader) => new()
     {
         Id = reader.GetInt64(0),
-        Type = reader.GetByte(1),
+        Type = (ClientLog.TypeEnum)reader.GetByte(1),
         Level = (ClientLog.LevelEnum)reader.GetByte(2),
         Message = reader.GetString(3),
         CreateTime = reader.GetInt64(4)

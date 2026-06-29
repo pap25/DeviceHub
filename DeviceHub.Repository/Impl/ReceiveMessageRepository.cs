@@ -15,7 +15,7 @@ public class ReceiveMessageRepository : IReceiveMessageRepository
     {
     }
 
-    public async Task<long> InsertAsync(ReceiveMessage entity, CancellationToken cancellationToken = default)
+    public async Task<long> Insert(ReceiveMessage entity, CancellationToken cancellationToken = default)
     {
         const string sql = """
             INSERT INTO receive_message (instrument_id, status, error_message, create_time, update_time)
@@ -37,7 +37,7 @@ public class ReceiveMessageRepository : IReceiveMessageRepository
         return id;
     }
 
-    public async Task<bool> UpdateAsync(ReceiveMessage entity, CancellationToken cancellationToken = default)
+    public async Task<bool> Update(ReceiveMessage entity, CancellationToken cancellationToken = default)
     {
         const string sql = """
             UPDATE receive_message
@@ -64,7 +64,7 @@ public class ReceiveMessageRepository : IReceiveMessageRepository
         return rows > 0;
     }
 
-    public async Task<bool> DeleteByIdAsync(long id, CancellationToken cancellationToken = default)
+    public async Task<bool> DeleteById(long id, CancellationToken cancellationToken = default)
     {
         const string sql = "DELETE FROM receive_message WHERE id = @id;";
 
@@ -76,27 +76,27 @@ public class ReceiveMessageRepository : IReceiveMessageRepository
         return rows > 0;
     }
 
-    public Task<ReceiveMessage?> GetByIdAsync(long id, CancellationToken cancellationToken = default) =>
+    public Task<ReceiveMessage?> GetById(long id, CancellationToken cancellationToken = default) =>
         DbHelper.QuerySingleAsync(
             "SELECT id, instrument_id, status, error_message, create_time, update_time FROM receive_message WHERE id = @id;",
             Map,
             [DbHelper.Param("@id", id)],
             cancellationToken);
 
-    public async Task<IReadOnlyList<ReceiveMessage>> GetAllAsync(CancellationToken cancellationToken = default) =>
+    public async Task<IReadOnlyList<ReceiveMessage>> GetAll(CancellationToken cancellationToken = default) =>
         await DbHelper.QueryAsync(
             "SELECT id, instrument_id, status, error_message, create_time, update_time FROM receive_message ORDER BY id;",
             Map,
             cancellationToken: cancellationToken);
 
-    public async Task<IReadOnlyList<ReceiveMessage>> GetByInstrumentIdAsync(long instrumentId, CancellationToken cancellationToken = default) =>
+    public async Task<IReadOnlyList<ReceiveMessage>> GetByInstrumentId(long instrumentId, CancellationToken cancellationToken = default) =>
         await DbHelper.QueryAsync(
             "SELECT id, instrument_id, status, error_message, create_time, update_time FROM receive_message WHERE instrument_id = @instrument_id ORDER BY id;",
             Map,
             [DbHelper.Param("@instrument_id", instrumentId)],
             cancellationToken);
 
-    public async Task<IReadOnlyList<ReceiveMessage>> GetByStatusAsync(ReceiveMessage.StatusEnum status, CancellationToken cancellationToken = default) =>
+    public async Task<IReadOnlyList<ReceiveMessage>> GetByStatus(ReceiveMessage.StatusEnum status, CancellationToken cancellationToken = default) =>
         await DbHelper.QueryAsync(
             "SELECT id, instrument_id, status, error_message, create_time, update_time FROM receive_message WHERE status = @status ORDER BY id;",
             Map,

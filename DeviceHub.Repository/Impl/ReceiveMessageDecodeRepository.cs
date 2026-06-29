@@ -14,7 +14,7 @@ public class ReceiveMessageDecodeRepository : IReceiveMessageDecodeRepository
     {
     }
 
-    public async Task<long> InsertAsync(ReceiveMessageDecode entity, CancellationToken cancellationToken = default)
+    public async Task<long> Insert(ReceiveMessageDecode entity, CancellationToken cancellationToken = default)
     {
         const string sql = """
             INSERT INTO receive_message_decode (receive_message_id, type, sample_no, barcode, result_json, create_time, update_time)
@@ -38,7 +38,7 @@ public class ReceiveMessageDecodeRepository : IReceiveMessageDecodeRepository
         return id;
     }
 
-    public async Task<bool> UpdateAsync(ReceiveMessageDecode entity, CancellationToken cancellationToken = default)
+    public async Task<bool> Update(ReceiveMessageDecode entity, CancellationToken cancellationToken = default)
     {
         const string sql = """
             UPDATE receive_message_decode
@@ -69,7 +69,7 @@ public class ReceiveMessageDecodeRepository : IReceiveMessageDecodeRepository
         return rows > 0;
     }
 
-    public async Task<bool> DeleteByIdAsync(long id, CancellationToken cancellationToken = default)
+    public async Task<bool> DeleteById(long id, CancellationToken cancellationToken = default)
     {
         const string sql = "DELETE FROM receive_message_decode WHERE id = @id;";
 
@@ -81,21 +81,21 @@ public class ReceiveMessageDecodeRepository : IReceiveMessageDecodeRepository
         return rows > 0;
     }
 
-    public Task<ReceiveMessageDecode?> GetByIdAsync(long id, CancellationToken cancellationToken = default) =>
+    public Task<ReceiveMessageDecode?> GetById(long id, CancellationToken cancellationToken = default) =>
         DbHelper.QuerySingleAsync(
             SelectColumns + " WHERE id = @id;",
             Map,
             [DbHelper.Param("@id", id)],
             cancellationToken);
 
-    public Task<ReceiveMessageDecode?> GetByReceiveMessageIdAsync(long receiveMessageId, CancellationToken cancellationToken = default) =>
+    public Task<ReceiveMessageDecode?> GetByReceiveMessageId(long receiveMessageId, CancellationToken cancellationToken = default) =>
         DbHelper.QuerySingleAsync(
             SelectColumns + " WHERE receive_message_id = @receive_message_id;",
             Map,
             [DbHelper.Param("@receive_message_id", receiveMessageId)],
             cancellationToken);
 
-    public async Task<IReadOnlyList<ReceiveMessageDecode>> GetAllAsync(CancellationToken cancellationToken = default) =>
+    public async Task<IReadOnlyList<ReceiveMessageDecode>> GetAll(CancellationToken cancellationToken = default) =>
         await DbHelper.QueryAsync(
             SelectColumns + " ORDER BY id;",
             Map,

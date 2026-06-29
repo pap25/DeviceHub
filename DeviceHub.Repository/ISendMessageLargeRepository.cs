@@ -7,13 +7,13 @@ namespace DeviceHub.Repository;
 /// </summary>
 public interface ISendMessageLargeRepository
 {
-    Task<bool> InsertAsync(SendMessageLarge entity, CancellationToken cancellationToken = default);
+    Task<bool> Insert(SendMessageLarge entity, CancellationToken cancellationToken = default);
 
-    Task<bool> UpdateAsync(SendMessageLarge entity, CancellationToken cancellationToken = default);
+    Task<bool> Update(SendMessageLarge entity, CancellationToken cancellationToken = default);
 
-    Task<bool> DeleteBySendMessageIdAsync(long sendMessageId, CancellationToken cancellationToken = default);
+    Task<bool> DeleteBySendMessageId(long sendMessageId, CancellationToken cancellationToken = default);
 
-    Task<SendMessageLarge?> GetBySendMessageIdAsync(long sendMessageId, CancellationToken cancellationToken = default);
+    Task<SendMessageLarge?> GetBySendMessageId(long sendMessageId, CancellationToken cancellationToken = default);
 
-    Task<IReadOnlyList<SendMessageLarge>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<SendMessageLarge>> GetAll(CancellationToken cancellationToken = default);
 }
