@@ -8,6 +8,7 @@ create table receive_message (
     status tinyint not null comment '状态(0:待处理, 1:处理成功, 2:处理失败)',
     error_message varchar(500) not null comment '处理失败原因',
     create_time bigint not null comment '创建时间',
+    update_time bigint not null comment '更新时间',
     primary key(id),
     key idx_instrument_id(instrument_id),
     key idx_status(status)
@@ -39,6 +40,7 @@ create table send_message (
     sample_no varchar(30) not null comment '样本号',
     barcode varchar(50) not null comment '条形码',
     status tinyint not null comment '状态(0:待处理，1:处理成功，2:处理失败)',
+    error_message varchar(500) not null comment '处理失败原因',
     create_time bigint not null comment '创建时间',
     update_time bigint not null comment '更新时间',
     primary key(id),

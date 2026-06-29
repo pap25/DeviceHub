@@ -33,6 +33,11 @@ public class ReceiveMessage
     public long CreateTime { get; set; }
 
     /// <summary>
+    /// 更新时间（Unix 毫秒时间戳）
+    /// </summary>
+    public long UpdateTime { get; set; }
+
+    /// <summary>
     /// 处理状态
     /// </summary>
     public enum StatusEnum : byte

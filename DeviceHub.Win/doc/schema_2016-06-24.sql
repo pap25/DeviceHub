@@ -11,6 +11,16 @@
     unique key uk_instrument_code(instrument_code)
 ) engine=innodb default charset=utf8mb4 comment '仪器基础信息(此表在LIS业务系统)';*/
 
+select count(*)
+from send_message a
+where a.instrument_id=? and a.status=? and a.barcode=? and a.sample_no=? and a.create_time>=? and a.create_time<=?
+
+select a.status,b.send_json,c.send_content,a.barcode,b.sample_no,a.create_time,a.error_message
+from send_message a
+inner join send_message_large b on a.id=b.send_message_id
+left join send_message_encoder c on a.id=c.send_message_id
+where a.instrument_id=? and a.status=? and a.barcode=? and a.sample_no=? and a.create_time>=? and a.create_time<=?
+
 create table instrument_plugin (
     id bigint not null auto_increment comment '主键ID',
     plugin_name varchar(100) not null comment '插件名称（如：迈瑞血球解析DLL）',

@@ -11,7 +11,8 @@ internal static class SqliteSchema
             instrument_id INTEGER NOT NULL,
             status INTEGER NOT NULL,
             error_message TEXT NOT NULL DEFAULT '',
-            create_time INTEGER NOT NULL
+            create_time INTEGER NOT NULL,
+            update_time INTEGER NOT NULL
         );
 
         CREATE INDEX IF NOT EXISTS idx_receive_message_instrument_id ON receive_message(instrument_id);
@@ -41,6 +42,7 @@ internal static class SqliteSchema
             sample_no TEXT NOT NULL DEFAULT '',
             barcode TEXT NOT NULL DEFAULT '',
             status INTEGER NOT NULL,
+            error_message TEXT NOT NULL DEFAULT '',
             create_time INTEGER NOT NULL,
             update_time INTEGER NOT NULL
         );
