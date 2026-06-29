@@ -79,11 +79,11 @@ namespace DeviceHub.Win
 
         private async Task RefreshCurrentTab()
         {
-            if (tabControl1.SelectedTab == tabPageLisConfig)
+            if (tabControl1.SelectedTab == tabLisConfig)
             {
                 await RefreshLisConfig();
             }
-            else if (tabControl1.SelectedTab == tabPageReceiveMessage)
+            else if (tabControl1.SelectedTab == tabReceiveMessage)
             {
                 await RefreshReceiveMessage();
             }

@@ -43,9 +43,9 @@
             colInstrumentItemMappingUnit = new DataGridViewTextBoxColumn();
             pagerInstrumentItemMapping = new DeviceHub.Win.DeviceHubControl.PagerControl();
             tabControl1 = new TabControl();
-            tabPageLisConfig = new TabPage();
+            tabLisConfig = new TabPage();
             pnlLisConfigLeft = new Panel();
-            tabPageReceiveMessage = new TabPage();
+            tabReceiveMessage = new TabPage();
             dgvReceiveMessage = new DataGridView();
             colReceiveMessageSelect = new DataGridViewCheckBoxColumn();
             colReceiveMessageStatus = new DataGridViewTextBoxColumn();
@@ -58,6 +58,7 @@
             colReceiveMessageErrorMessage = new DataGridViewTextBoxColumn();
             pagerReceiveMessage = new DeviceHub.Win.DeviceHubControl.PagerControl();
             pnlReceiveMessageQuery = new Panel();
+            button1 = new Button();
             lblReceiveMessageStatus = new Label();
             cboReceiveMessageStatus = new ComboBox();
             lblReceiveMessageType = new Label();
@@ -71,15 +72,14 @@
             lblReceiveMessageCreateTimeTo = new Label();
             dtpReceiveMessageCreateTimeEnd = new DateTimePicker();
             btnReceiveMessageQuery = new Button();
-            tabPageSendMessage = new TabPage();
-            tabPageOperationLog = new TabPage();
-            button1 = new Button();
+            tabSendMessage = new TabPage();
+            tabLog = new TabPage();
             grpLisConfigAuthInfo.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvInstrumentItemMapping).BeginInit();
             tabControl1.SuspendLayout();
-            tabPageLisConfig.SuspendLayout();
+            tabLisConfig.SuspendLayout();
             pnlLisConfigLeft.SuspendLayout();
-            tabPageReceiveMessage.SuspendLayout();
+            tabReceiveMessage.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvReceiveMessage).BeginInit();
             pnlReceiveMessageQuery.SuspendLayout();
             SuspendLayout();
@@ -222,10 +222,10 @@
             // 
             // tabControl1
             // 
-            tabControl1.Controls.Add(tabPageLisConfig);
-            tabControl1.Controls.Add(tabPageReceiveMessage);
-            tabControl1.Controls.Add(tabPageSendMessage);
-            tabControl1.Controls.Add(tabPageOperationLog);
+            tabControl1.Controls.Add(tabLisConfig);
+            tabControl1.Controls.Add(tabReceiveMessage);
+            tabControl1.Controls.Add(tabSendMessage);
+            tabControl1.Controls.Add(tabLog);
             tabControl1.Dock = DockStyle.Fill;
             tabControl1.Location = new Point(0, 0);
             tabControl1.Name = "tabControl1";
@@ -234,18 +234,18 @@
             tabControl1.TabIndex = 3;
             tabControl1.SelectedIndexChanged += TabControl1_SelectedIndexChanged;
             // 
-            // tabPageLisConfig
+            // tabLisConfig
             // 
-            tabPageLisConfig.Controls.Add(dgvInstrumentItemMapping);
-            tabPageLisConfig.Controls.Add(pagerInstrumentItemMapping);
-            tabPageLisConfig.Controls.Add(pnlLisConfigLeft);
-            tabPageLisConfig.Location = new Point(4, 26);
-            tabPageLisConfig.Name = "tabPageLisConfig";
-            tabPageLisConfig.Padding = new Padding(3);
-            tabPageLisConfig.Size = new Size(1342, 591);
-            tabPageLisConfig.TabIndex = 0;
-            tabPageLisConfig.Text = "LIS参数配置";
-            tabPageLisConfig.UseVisualStyleBackColor = true;
+            tabLisConfig.Controls.Add(dgvInstrumentItemMapping);
+            tabLisConfig.Controls.Add(pagerInstrumentItemMapping);
+            tabLisConfig.Controls.Add(pnlLisConfigLeft);
+            tabLisConfig.Location = new Point(4, 26);
+            tabLisConfig.Name = "tabLisConfig";
+            tabLisConfig.Padding = new Padding(3);
+            tabLisConfig.Size = new Size(1342, 591);
+            tabLisConfig.TabIndex = 0;
+            tabLisConfig.Text = "LIS参数配置";
+            tabLisConfig.UseVisualStyleBackColor = true;
             // 
             // pnlLisConfigLeft
             // 
@@ -256,18 +256,18 @@
             pnlLisConfigLeft.Size = new Size(256, 585);
             pnlLisConfigLeft.TabIndex = 0;
             // 
-            // tabPageReceiveMessage
+            // tabReceiveMessage
             // 
-            tabPageReceiveMessage.Controls.Add(dgvReceiveMessage);
-            tabPageReceiveMessage.Controls.Add(pagerReceiveMessage);
-            tabPageReceiveMessage.Controls.Add(pnlReceiveMessageQuery);
-            tabPageReceiveMessage.Location = new Point(4, 26);
-            tabPageReceiveMessage.Name = "tabPageReceiveMessage";
-            tabPageReceiveMessage.Padding = new Padding(3);
-            tabPageReceiveMessage.Size = new Size(1342, 591);
-            tabPageReceiveMessage.TabIndex = 1;
-            tabPageReceiveMessage.Text = "接收仪器数据队列";
-            tabPageReceiveMessage.UseVisualStyleBackColor = true;
+            tabReceiveMessage.Controls.Add(dgvReceiveMessage);
+            tabReceiveMessage.Controls.Add(pagerReceiveMessage);
+            tabReceiveMessage.Controls.Add(pnlReceiveMessageQuery);
+            tabReceiveMessage.Location = new Point(4, 26);
+            tabReceiveMessage.Name = "tabReceiveMessage";
+            tabReceiveMessage.Padding = new Padding(3);
+            tabReceiveMessage.Size = new Size(1342, 591);
+            tabReceiveMessage.TabIndex = 1;
+            tabReceiveMessage.Text = "接收仪器数据队列";
+            tabReceiveMessage.UseVisualStyleBackColor = true;
             // 
             // dgvReceiveMessage
             // 
@@ -396,6 +396,15 @@
             pnlReceiveMessageQuery.Size = new Size(1336, 44);
             pnlReceiveMessageQuery.TabIndex = 0;
             // 
+            // button1
+            // 
+            button1.Location = new Point(1169, 10);
+            button1.Name = "button1";
+            button1.Size = new Size(132, 26);
+            button1.TabIndex = 13;
+            button1.Text = "重新解码并同步LIS";
+            button1.UseVisualStyleBackColor = true;
+            // 
             // lblReceiveMessageStatus
             // 
             lblReceiveMessageStatus.AutoSize = true;
@@ -510,34 +519,25 @@
             btnReceiveMessageQuery.UseVisualStyleBackColor = true;
             btnReceiveMessageQuery.Click += btnReceiveMessageQuery_Click;
             // 
-            // tabPageSendMessage
+            // tabSendMessage
             // 
-            tabPageSendMessage.Location = new Point(4, 26);
-            tabPageSendMessage.Name = "tabPageSendMessage";
-            tabPageSendMessage.Padding = new Padding(3);
-            tabPageSendMessage.Size = new Size(1342, 591);
-            tabPageSendMessage.TabIndex = 2;
-            tabPageSendMessage.Text = "发送仪器数据队列";
-            tabPageSendMessage.UseVisualStyleBackColor = true;
+            tabSendMessage.Location = new Point(4, 26);
+            tabSendMessage.Name = "tabSendMessage";
+            tabSendMessage.Padding = new Padding(3);
+            tabSendMessage.Size = new Size(1342, 591);
+            tabSendMessage.TabIndex = 2;
+            tabSendMessage.Text = "发送仪器数据队列";
+            tabSendMessage.UseVisualStyleBackColor = true;
             // 
-            // tabPageOperationLog
+            // tabLog
             // 
-            tabPageOperationLog.Location = new Point(4, 26);
-            tabPageOperationLog.Name = "tabPageOperationLog";
-            tabPageOperationLog.Padding = new Padding(3);
-            tabPageOperationLog.Size = new Size(1342, 591);
-            tabPageOperationLog.TabIndex = 3;
-            tabPageOperationLog.Text = "操作日志";
-            tabPageOperationLog.UseVisualStyleBackColor = true;
-            // 
-            // button1
-            // 
-            button1.Location = new Point(1169, 10);
-            button1.Name = "button1";
-            button1.Size = new Size(132, 26);
-            button1.TabIndex = 13;
-            button1.Text = "重新解码并同步LIS";
-            button1.UseVisualStyleBackColor = true;
+            tabLog.Location = new Point(4, 26);
+            tabLog.Name = "tabLog";
+            tabLog.Padding = new Padding(3);
+            tabLog.Size = new Size(1342, 591);
+            tabLog.TabIndex = 3;
+            tabLog.Text = "操作日志";
+            tabLog.UseVisualStyleBackColor = true;
             // 
             // DeviceStatus
             // 
@@ -552,11 +552,11 @@
             grpLisConfigAuthInfo.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dgvInstrumentItemMapping).EndInit();
             tabControl1.ResumeLayout(false);
-            tabPageLisConfig.ResumeLayout(false);
-            tabPageLisConfig.PerformLayout();
+            tabLisConfig.ResumeLayout(false);
+            tabLisConfig.PerformLayout();
             pnlLisConfigLeft.ResumeLayout(false);
-            tabPageReceiveMessage.ResumeLayout(false);
-            tabPageReceiveMessage.PerformLayout();
+            tabReceiveMessage.ResumeLayout(false);
+            tabReceiveMessage.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dgvReceiveMessage).EndInit();
             pnlReceiveMessageQuery.ResumeLayout(false);
             pnlReceiveMessageQuery.PerformLayout();
@@ -580,10 +580,10 @@
         private DataGridViewTextBoxColumn colInstrumentItemMappingLisItemName;
         private DataGridViewTextBoxColumn colInstrumentItemMappingUnit;
         private TabControl tabControl1;
-        private TabPage tabPageLisConfig;
-        private TabPage tabPageReceiveMessage;
-        private TabPage tabPageSendMessage;
-        private TabPage tabPageOperationLog;
+        private TabPage tabLisConfig;
+        private TabPage tabReceiveMessage;
+        private TabPage tabSendMessage;
+        private TabPage tabLog;
         private Panel pnlReceiveMessageQuery;
         private Label lblReceiveMessageStatus;
         private ComboBox cboReceiveMessageStatus;
