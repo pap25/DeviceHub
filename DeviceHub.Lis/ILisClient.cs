@@ -24,7 +24,7 @@ namespace DeviceHub.Lis
         // 查询设备配置
         Task<DriverConfig> GetDriverConfig(long instrumentId);
 
-        Task<Page<GetInstrumentItemMappingPage>> GetInstrumentItemMappingPage(int instrumentId, int pageIndex, int pageSize);
+        Task<Page<GetInstrumentItemMappingPage>> GetInstrumentItemMappingPage(int instrumentId, int pageSize, int pageIndex);
 
         // 上传检验结果
         Task<Resp<UploadSpecimenTestResultOutput>> UploadSpecimenTestResult(UploadSpecimenTestResultInput uploadSpecimenTestResultInput);

@@ -18,20 +18,20 @@ namespace DeviceHub.Win
 
         private async Task RefreshSendMessage()
         {
-            await LoadSendMessagePage(pagerSendMessage.PageIndex, pagerSendMessage.PageSize);
+            await LoadSendMessagePage(pagerSendMessage.PageSize, pagerSendMessage.PageIndex);
         }
 
         private async void btnSendMessageQuery_Click(object sender, EventArgs e)
         {
-            await LoadSendMessagePage(1, pagerSendMessage.PageSize);
+            await LoadSendMessagePage(pagerSendMessage.PageSize, 1);
         }
 
         private async void PagerSendMessage_PageChanged(object? sender, PagerChangedEventArgs e)
         {
-            await LoadSendMessagePage(e.PageIndex, e.PageSize);
+            await LoadSendMessagePage(e.PageSize, e.PageIndex);
         }
 
-        private async Task LoadSendMessagePage(int pageIndex, int pageSize)
+        private async Task LoadSendMessagePage(int pageSize, int pageIndex)
         {
             SendMessage.StatusEnum? status = GetSelectedEnum<SendMessage.StatusEnum>(cboSendMessageStatus);
             string barcode = txtSendMessageBarcode.Text.Trim();

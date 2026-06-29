@@ -78,7 +78,7 @@ namespace DeviceHub.Lis.Impl
             };
         }
 
-        public Task<Page<GetInstrumentItemMappingPage>> GetInstrumentItemMappingPage(int instrumentId, int pageIndex, int pageSize)
+        public Task<Page<GetInstrumentItemMappingPage>> GetInstrumentItemMappingPage(int instrumentId, int pageSize, int pageIndex)
         {
             const int totalCount = 1500;
             var allItems = new List<GetInstrumentItemMappingPage>

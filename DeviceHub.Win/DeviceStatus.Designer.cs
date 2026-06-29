@@ -95,6 +95,24 @@
             dtpSendMessageCreateTimeEnd = new DateTimePicker();
             btnSendMessageQuery = new Button();
             tabLog = new TabPage();
+            dgvLog = new DataGridView();
+            colLogLevel = new DataGridViewTextBoxColumn();
+            colLogType = new DataGridViewTextBoxColumn();
+            colLogMessage = new DataGridViewTextBoxColumn();
+            colLogCreateTime = new DataGridViewTextBoxColumn();
+            pagerLog = new DeviceHub.Win.DeviceHubControl.PagerControl();
+            pnlLogQuery = new Panel();
+            lblLogLevel = new Label();
+            cboLogLevel = new ComboBox();
+            lblLogType = new Label();
+            cboLogType = new ComboBox();
+            lblLogMessage = new Label();
+            txtLogMessage = new TextBox();
+            lblLogCreateTime = new Label();
+            dtpLogCreateTimeStart = new DateTimePicker();
+            lblLogCreateTimeTo = new Label();
+            dtpLogCreateTimeEnd = new DateTimePicker();
+            btnLogQuery = new Button();
             grpLisConfigAuthInfo.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvInstrumentItemMapping).BeginInit();
             tabControl1.SuspendLayout();
@@ -106,6 +124,9 @@
             tabSendMessage.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvSendMessage).BeginInit();
             pnlSendMessageQuery.SuspendLayout();
+            tabLog.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvLog).BeginInit();
+            pnlLogQuery.SuspendLayout();
             SuspendLayout();
             // 
             // grpLisConfigAuthInfo
@@ -758,6 +779,9 @@
             // 
             // tabLog
             // 
+            tabLog.Controls.Add(dgvLog);
+            tabLog.Controls.Add(pagerLog);
+            tabLog.Controls.Add(pnlLogQuery);
             tabLog.Location = new Point(4, 26);
             tabLog.Name = "tabLog";
             tabLog.Padding = new Padding(3);
@@ -765,6 +789,183 @@
             tabLog.TabIndex = 3;
             tabLog.Text = "操作日志";
             tabLog.UseVisualStyleBackColor = true;
+            // 
+            // dgvLog
+            // 
+            dgvLog.AllowUserToAddRows = false;
+            dgvLog.AllowUserToDeleteRows = false;
+            dgvLog.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgvLog.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvLog.Columns.AddRange(new DataGridViewColumn[] { colLogLevel, colLogType, colLogMessage, colLogCreateTime });
+            dgvLog.Dock = DockStyle.Fill;
+            dgvLog.Location = new Point(3, 47);
+            dgvLog.Name = "dgvLog";
+            dgvLog.RowHeadersVisible = false;
+            dgvLog.SelectionMode = DataGridViewSelectionMode.CellSelect;
+            dgvLog.Size = new Size(1336, 483);
+            dgvLog.TabIndex = 1;
+            // 
+            // colLogLevel
+            // 
+            colLogLevel.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            colLogLevel.DataPropertyName = "LevelName";
+            colLogLevel.HeaderText = "等级";
+            colLogLevel.Name = "colLogLevel";
+            colLogLevel.ReadOnly = true;
+            colLogLevel.Width = 80;
+            // 
+            // colLogType
+            // 
+            colLogType.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            colLogType.DataPropertyName = "TypeName";
+            colLogType.HeaderText = "类型";
+            colLogType.Name = "colLogType";
+            colLogType.ReadOnly = true;
+            colLogType.Width = 100;
+            // 
+            // colLogMessage
+            // 
+            colLogMessage.DataPropertyName = "Message";
+            colLogMessage.FillWeight = 200F;
+            colLogMessage.HeaderText = "内容";
+            colLogMessage.Name = "colLogMessage";
+            colLogMessage.ReadOnly = true;
+            // 
+            // colLogCreateTime
+            // 
+            colLogCreateTime.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            colLogCreateTime.DataPropertyName = "CreateTime";
+            colLogCreateTime.HeaderText = "创建时间";
+            colLogCreateTime.Name = "colLogCreateTime";
+            colLogCreateTime.ReadOnly = true;
+            colLogCreateTime.Width = 150;
+            // 
+            // pagerLog
+            // 
+            pagerLog.AutoSize = true;
+            pagerLog.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            pagerLog.Dock = DockStyle.Bottom;
+            pagerLog.Location = new Point(3, 530);
+            pagerLog.MinimumSize = new Size(640, 32);
+            pagerLog.Name = "pagerLog";
+            pagerLog.Size = new Size(1336, 33);
+            pagerLog.TabIndex = 2;
+            // 
+            // pnlLogQuery
+            // 
+            pnlLogQuery.Controls.Add(lblLogLevel);
+            pnlLogQuery.Controls.Add(cboLogLevel);
+            pnlLogQuery.Controls.Add(lblLogType);
+            pnlLogQuery.Controls.Add(cboLogType);
+            pnlLogQuery.Controls.Add(lblLogMessage);
+            pnlLogQuery.Controls.Add(txtLogMessage);
+            pnlLogQuery.Controls.Add(lblLogCreateTime);
+            pnlLogQuery.Controls.Add(dtpLogCreateTimeStart);
+            pnlLogQuery.Controls.Add(lblLogCreateTimeTo);
+            pnlLogQuery.Controls.Add(dtpLogCreateTimeEnd);
+            pnlLogQuery.Controls.Add(btnLogQuery);
+            pnlLogQuery.Dock = DockStyle.Top;
+            pnlLogQuery.Location = new Point(3, 3);
+            pnlLogQuery.Name = "pnlLogQuery";
+            pnlLogQuery.Size = new Size(1336, 44);
+            pnlLogQuery.TabIndex = 0;
+            // 
+            // lblLogLevel
+            // 
+            lblLogLevel.AutoSize = true;
+            lblLogLevel.Location = new Point(8, 14);
+            lblLogLevel.Name = "lblLogLevel";
+            lblLogLevel.Size = new Size(32, 17);
+            lblLogLevel.TabIndex = 0;
+            lblLogLevel.Text = "等级";
+            // 
+            // cboLogLevel
+            // 
+            cboLogLevel.DropDownStyle = ComboBoxStyle.DropDownList;
+            cboLogLevel.FormattingEnabled = true;
+            cboLogLevel.Location = new Point(46, 10);
+            cboLogLevel.Name = "cboLogLevel";
+            cboLogLevel.Size = new Size(90, 25);
+            cboLogLevel.TabIndex = 1;
+            // 
+            // lblLogType
+            // 
+            lblLogType.AutoSize = true;
+            lblLogType.Location = new Point(148, 14);
+            lblLogType.Name = "lblLogType";
+            lblLogType.Size = new Size(32, 17);
+            lblLogType.TabIndex = 2;
+            lblLogType.Text = "类型";
+            // 
+            // cboLogType
+            // 
+            cboLogType.DropDownStyle = ComboBoxStyle.DropDownList;
+            cboLogType.FormattingEnabled = true;
+            cboLogType.Location = new Point(186, 10);
+            cboLogType.Name = "cboLogType";
+            cboLogType.Size = new Size(110, 25);
+            cboLogType.TabIndex = 3;
+            // 
+            // lblLogMessage
+            // 
+            lblLogMessage.AutoSize = true;
+            lblLogMessage.Location = new Point(308, 14);
+            lblLogMessage.Name = "lblLogMessage";
+            lblLogMessage.Size = new Size(32, 17);
+            lblLogMessage.TabIndex = 4;
+            lblLogMessage.Text = "内容";
+            // 
+            // txtLogMessage
+            // 
+            txtLogMessage.Location = new Point(346, 10);
+            txtLogMessage.Name = "txtLogMessage";
+            txtLogMessage.PlaceholderText = "请输入日志内容";
+            txtLogMessage.Size = new Size(160, 23);
+            txtLogMessage.TabIndex = 5;
+            // 
+            // lblLogCreateTime
+            // 
+            lblLogCreateTime.AutoSize = true;
+            lblLogCreateTime.Location = new Point(518, 14);
+            lblLogCreateTime.Name = "lblLogCreateTime";
+            lblLogCreateTime.Size = new Size(56, 17);
+            lblLogCreateTime.TabIndex = 6;
+            lblLogCreateTime.Text = "创建时间";
+            // 
+            // dtpLogCreateTimeStart
+            // 
+            dtpLogCreateTimeStart.Format = DateTimePickerFormat.Short;
+            dtpLogCreateTimeStart.Location = new Point(580, 10);
+            dtpLogCreateTimeStart.Name = "dtpLogCreateTimeStart";
+            dtpLogCreateTimeStart.Size = new Size(110, 23);
+            dtpLogCreateTimeStart.TabIndex = 7;
+            // 
+            // lblLogCreateTimeTo
+            // 
+            lblLogCreateTimeTo.AutoSize = true;
+            lblLogCreateTimeTo.Location = new Point(698, 14);
+            lblLogCreateTimeTo.Name = "lblLogCreateTimeTo";
+            lblLogCreateTimeTo.Size = new Size(20, 17);
+            lblLogCreateTimeTo.TabIndex = 8;
+            lblLogCreateTimeTo.Text = "至";
+            // 
+            // dtpLogCreateTimeEnd
+            // 
+            dtpLogCreateTimeEnd.Format = DateTimePickerFormat.Short;
+            dtpLogCreateTimeEnd.Location = new Point(724, 10);
+            dtpLogCreateTimeEnd.Name = "dtpLogCreateTimeEnd";
+            dtpLogCreateTimeEnd.Size = new Size(110, 23);
+            dtpLogCreateTimeEnd.TabIndex = 9;
+            // 
+            // btnLogQuery
+            // 
+            btnLogQuery.Location = new Point(846, 9);
+            btnLogQuery.Name = "btnLogQuery";
+            btnLogQuery.Size = new Size(75, 26);
+            btnLogQuery.TabIndex = 10;
+            btnLogQuery.Text = "查询";
+            btnLogQuery.UseVisualStyleBackColor = true;
+            btnLogQuery.Click += btnLogQuery_Click;
             // 
             // DeviceStatus
             // 
@@ -792,6 +993,11 @@
             ((System.ComponentModel.ISupportInitialize)dgvSendMessage).EndInit();
             pnlSendMessageQuery.ResumeLayout(false);
             pnlSendMessageQuery.PerformLayout();
+            tabLog.ResumeLayout(false);
+            tabLog.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)dgvLog).EndInit();
+            pnlLogQuery.ResumeLayout(false);
+            pnlLogQuery.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -863,5 +1069,23 @@
         private DataGridViewTextBoxColumn colSendMessageSampleNo;
         private DataGridViewTextBoxColumn colSendMessageCreateTime;
         private DataGridViewTextBoxColumn colSendMessageErrorMessage;
+        private Panel pnlLogQuery;
+        private Label lblLogLevel;
+        private ComboBox cboLogLevel;
+        private Label lblLogType;
+        private ComboBox cboLogType;
+        private Label lblLogMessage;
+        private TextBox txtLogMessage;
+        private Label lblLogCreateTime;
+        private DateTimePicker dtpLogCreateTimeStart;
+        private Label lblLogCreateTimeTo;
+        private DateTimePicker dtpLogCreateTimeEnd;
+        private Button btnLogQuery;
+        private DataGridView dgvLog;
+        private DeviceHubControl.PagerControl pagerLog;
+        private DataGridViewTextBoxColumn colLogLevel;
+        private DataGridViewTextBoxColumn colLogType;
+        private DataGridViewTextBoxColumn colLogMessage;
+        private DataGridViewTextBoxColumn colLogCreateTime;
     }
 }

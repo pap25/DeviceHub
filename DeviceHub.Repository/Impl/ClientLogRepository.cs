@@ -100,6 +100,74 @@ public class ClientLogRepository : IClientLogRepository
             [DbHelper.Param("@level", (byte)level)],
             cancellationToken);
 
+    public async Task<int> findCount(ClientLog.LevelEnum? level, ClientLog.TypeEnum? type,
+        string message, long createTimeStart, long createTimeEnd, CancellationToken cancellationToken = default)
+    {
+        var (whereClause, parameters) = BuildWhereConditions(level, type, message, createTimeStart, createTimeEnd);
+        var sql = $"""
+            SELECT COUNT(*)
+            FROM client_log a
+            {whereClause};
+            """;
+
+        var count = await DbHelper.ExecuteScalarAsync<long>(sql, parameters, cancellationToken);
+        return (int)count;
+    }
+
+    public async Task<List<ClientLog>> findPageDesc(ClientLog.LevelEnum? level, ClientLog.TypeEnum? type,
+        string message, long createTimeStart, long createTimeEnd, int pageSize, int pageIndex, CancellationToken cancellationToken = default)
+    {
+        var (whereClause, parameters) = BuildWhereConditions(level, type, message, createTimeStart, createTimeEnd);
+        parameters.Add(DbHelper.Param("@page_size", pageSize));
+        parameters.Add(DbHelper.Param("@offset", Math.Max(0, (pageIndex - 1) * pageSize)));
+
+        var sql = $"""
+            SELECT *
+            FROM client_log a
+            {whereClause}
+            ORDER BY a.create_time DESC
+            LIMIT @page_size OFFSET @offset;
+            """;
+
+        return await DbHelper.QueryAsync(sql, Map, parameters, cancellationToken);
+    }
+
+    private static (string WhereClause, List<SqliteParameter> Parameters) BuildWhereConditions(
+        ClientLog.LevelEnum? level,
+        ClientLog.TypeEnum? type,
+        string message,
+        long createTimeStart,
+        long createTimeEnd)
+    {
+        var conditions = new List<string>();
+        var parameters = new List<SqliteParameter>();
+
+        if (level.HasValue)
+        {
+            conditions.Add("a.level = @level");
+            parameters.Add(DbHelper.Param("@level", (byte)level.Value));
+        }
+
+        if (type.HasValue)
+        {
+            conditions.Add("a.type = @type");
+            parameters.Add(DbHelper.Param("@type", (byte)type.Value));
+        }
+
+        if (!string.IsNullOrWhiteSpace(message))
+        {
+            conditions.Add("a.message LIKE @message");
+            parameters.Add(DbHelper.Param("@message", $"%{message.Trim()}%"));
+        }
+
+        conditions.Add("a.create_time >= @create_time_start");
+        parameters.Add(DbHelper.Param("@create_time_start", createTimeStart));
+        conditions.Add("a.create_time <= @create_time_end");
+        parameters.Add(DbHelper.Param("@create_time_end", createTimeEnd));
+
+        return ("WHERE " + string.Join(" AND ", conditions), parameters);
+    }
+
     private const string SelectColumns =
         "SELECT id, type, level, message, create_time FROM client_log";
 

@@ -20,4 +20,10 @@ public interface IClientLogRepository
     Task<IReadOnlyList<ClientLog>> GetByType(ClientLog.TypeEnum type, CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<ClientLog>> GetByLevel(ClientLog.LevelEnum level, CancellationToken cancellationToken = default);
+
+    Task<int> findCount(ClientLog.LevelEnum? level, ClientLog.TypeEnum? type,
+        string message, long createTimeStart, long createTimeEnd, CancellationToken cancellationToken = default);
+
+    Task<List<ClientLog>> findPageDesc(ClientLog.LevelEnum? level, ClientLog.TypeEnum? type,
+        string message, long createTimeStart, long createTimeEnd, int pageSize, int pageIndex, CancellationToken cancellationToken = default);
 }

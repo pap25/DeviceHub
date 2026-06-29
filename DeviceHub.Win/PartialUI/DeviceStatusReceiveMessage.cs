@@ -47,20 +47,20 @@ namespace DeviceHub.Win
 
         private async Task RefreshReceiveMessage()
         {
-            await LoadReceiveMessagePage(pagerReceiveMessage.PageIndex, pagerReceiveMessage.PageSize);
+            await LoadReceiveMessagePage(pagerReceiveMessage.PageSize, pagerReceiveMessage.PageIndex);
         }
 
         private async void btnReceiveMessageQuery_Click(object sender, EventArgs e)
         {
-            await LoadReceiveMessagePage(1, pagerReceiveMessage.PageSize);
+            await LoadReceiveMessagePage(pagerReceiveMessage.PageSize, 1);
         }
 
         private async void PagerReceiveMessage_PageChanged(object? sender, PagerChangedEventArgs e)
         {
-            await LoadReceiveMessagePage(e.PageIndex, e.PageSize);
+            await LoadReceiveMessagePage(e.PageSize, e.PageIndex);
         }
 
-        private async Task LoadReceiveMessagePage(int pageIndex, int pageSize)
+        private async Task LoadReceiveMessagePage(int pageSize, int pageIndex)
         {
             ReceiveMessage.StatusEnum? status = GetSelectedEnum<ReceiveMessage.StatusEnum>(cboReceiveMessageStatus);
             ReceiveMessageDecode.TypeEnum? type = GetSelectedEnum<ReceiveMessageDecode.TypeEnum>(cboReceiveMessageType);

@@ -51,12 +51,12 @@ namespace DeviceHub.Win
 
         private async void PagerInstrumentItemMapping_PageChanged(object? sender, PagerChangedEventArgs e)
         {
-            await LoadInstrumentItemMappingPage(e.PageIndex, e.PageSize);
+            await LoadInstrumentItemMappingPage(e.PageSize, e.PageIndex);
         }
 
-        private async Task LoadInstrumentItemMappingPage(int pageIndex, int pageSize)
+        private async Task LoadInstrumentItemMappingPage(int pageSize, int pageIndex)
         {
-            Page<GetInstrumentItemMappingPage> page = await lisClient.GetInstrumentItemMappingPage(_instrumentId, pageIndex, pageSize);
+            Page<GetInstrumentItemMappingPage> page = await lisClient.GetInstrumentItemMappingPage(_instrumentId, pageSize, pageIndex);
             dgvInstrumentItemMapping.DataSource = page.Data;
             pagerInstrumentItemMapping.SetPageInfo(page);
         }

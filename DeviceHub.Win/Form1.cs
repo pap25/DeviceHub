@@ -25,7 +25,7 @@ namespace DeviceHub.Win
             comboBox4.SelectedIndex = 1;
 
             
-            dataGridView4.DataSource = lisClient.GetInstrumentItemMappingPage(111, 1, 10).Result.Data;
+            dataGridView4.DataSource = lisClient.GetInstrumentItemMappingPage(111, 10, 1).Result.Data;
         }
 
         private void 从LIS同步ToolStripMenuItem_Click(object sender, EventArgs e)
