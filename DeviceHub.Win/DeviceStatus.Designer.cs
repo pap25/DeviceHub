@@ -168,7 +168,7 @@
             dgvInstrumentItemMapping.Name = "dgvInstrumentItemMapping";
             dgvInstrumentItemMapping.ReadOnly = true;
             dgvInstrumentItemMapping.RowHeadersVisible = false;
-            dgvInstrumentItemMapping.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvInstrumentItemMapping.SelectionMode = DataGridViewSelectionMode.CellSelect;
             dgvInstrumentItemMapping.Size = new Size(1080, 552);
             dgvInstrumentItemMapping.TabIndex = 1;
             // 
@@ -279,7 +279,7 @@
             dgvReceiveMessage.Location = new Point(3, 47);
             dgvReceiveMessage.Name = "dgvReceiveMessage";
             dgvReceiveMessage.RowHeadersVisible = false;
-            dgvReceiveMessage.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvReceiveMessage.SelectionMode = DataGridViewSelectionMode.CellSelect;
             dgvReceiveMessage.Size = new Size(1336, 508);
             dgvReceiveMessage.TabIndex = 1;
             // 
