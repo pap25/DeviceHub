@@ -407,7 +407,6 @@
             // 
             cboReceiveMessageStatus.DropDownStyle = ComboBoxStyle.DropDownList;
             cboReceiveMessageStatus.FormattingEnabled = true;
-            cboReceiveMessageStatus.Items.AddRange(new object[] { "全部", "待处理", "处理成功", "处理失败" });
             cboReceiveMessageStatus.Location = new Point(46, 10);
             cboReceiveMessageStatus.Name = "cboReceiveMessageStatus";
             cboReceiveMessageStatus.Size = new Size(90, 25);
@@ -426,7 +425,6 @@
             // 
             cboReceiveMessageType.DropDownStyle = ComboBoxStyle.DropDownList;
             cboReceiveMessageType.FormattingEnabled = true;
-            cboReceiveMessageType.Items.AddRange(new object[] { "全部", "检验结果", "查询样本申请信息" });
             cboReceiveMessageType.Location = new Point(186, 10);
             cboReceiveMessageType.Name = "cboReceiveMessageType";
             cboReceiveMessageType.Size = new Size(130, 25);

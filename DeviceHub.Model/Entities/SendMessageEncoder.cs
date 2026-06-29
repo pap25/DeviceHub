@@ -1,4 +1,4 @@
-namespace DeviceHub.Model;
+namespace DeviceHub.Model.Entities;
 
 /// <summary>
 /// 发送仪器消息编码记录

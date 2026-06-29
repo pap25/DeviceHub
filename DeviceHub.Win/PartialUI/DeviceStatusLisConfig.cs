@@ -8,7 +8,7 @@ namespace DeviceHub.Win
 {
     public partial class DeviceStatus
     {
-        private async Task ApplyLisConfigAsync(GetInstrument instrument, DriverConfig config)
+        private async Task initLisConfig(GetInstrument instrument, DriverConfig config)
         {
             lblLisConfigAuthCode.Text = Helper.MaskAuthCode(instrument.AuthCode);
             lblLisConfigAuthStatus.Text = Helper.FormatAuthStatus(instrument.Status);
@@ -24,14 +24,14 @@ namespace DeviceHub.Win
                 ShowSerialPortConfig(config.SerialPortConfig);
             }
 
-            await LoadInstrumentItemMappingPageAsync(pagerInstrumentItemMapping.PageIndex, pagerInstrumentItemMapping.PageSize);
+            await LoadInstrumentItemMappingPage(pagerInstrumentItemMapping.PageIndex, pagerInstrumentItemMapping.PageSize);
         }
 
-        private async Task RefreshLisConfigAsync()
+        private async Task RefreshLisConfig()
         {
             GetInstrument instrument = await lisClient.GetInstrument(_instrumentId);
             DriverConfig config = await lisClient.GetDriverConfig(_instrumentId);
-            await ApplyLisConfigAsync(instrument, config);
+            await initLisConfig(instrument, config);
         }
 
         private void ClearCommConfigGroups()
@@ -51,10 +51,10 @@ namespace DeviceHub.Win
 
         private async void PagerInstrumentItemMapping_PageChanged(object? sender, PagerChangedEventArgs e)
         {
-            await LoadInstrumentItemMappingPageAsync(e.PageIndex, e.PageSize);
+            await LoadInstrumentItemMappingPage(e.PageIndex, e.PageSize);
         }
 
-        private async Task LoadInstrumentItemMappingPageAsync(int pageIndex, int pageSize)
+        private async Task LoadInstrumentItemMappingPage(int pageIndex, int pageSize)
         {
             Page<GetInstrumentItemMappingPage> page = await lisClient.GetInstrumentItemMappingPage(_instrumentId, pageIndex, pageSize);
             dgvInstrumentItemMapping.DataSource = page.Data;

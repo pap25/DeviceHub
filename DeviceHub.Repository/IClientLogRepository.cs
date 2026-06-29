@@ -1,4 +1,4 @@
-using DeviceHub.Model;
+using DeviceHub.Model.Entities;
 
 namespace DeviceHub.Repository.Interfaces;
 

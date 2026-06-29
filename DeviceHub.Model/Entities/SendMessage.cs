@@ -1,11 +1,11 @@
 using System.ComponentModel;
 
-namespace DeviceHub.Model;
+namespace DeviceHub.Model.Entities;
 
 /// <summary>
-/// 接收仪器消息解码结果表
+/// 发送仪器消息队列表
 /// </summary>
-public class ReceiveMessageDecode
+public class SendMessage
 {
     /// <summary>
     /// 主键ID
@@ -13,12 +13,12 @@ public class ReceiveMessageDecode
     public long Id { get; set; }
 
     /// <summary>
-    /// 接收仪器消息队列表Id
+    /// 仪器ID
     /// </summary>
-    public long ReceiveMessageId { get; set; }
+    public long InstrumentId { get; set; }
 
     /// <summary>
-    /// 解码类型
+    /// 消息类型
     /// </summary>
     public TypeEnum Type { get; set; }
 
@@ -33,9 +33,9 @@ public class ReceiveMessageDecode
     public string Barcode { get; set; } = string.Empty;
 
     /// <summary>
-    /// 解码结果JSON
+    /// 处理状态
     /// </summary>
-    public string ResultJson { get; set; } = string.Empty;
+    public StatusEnum Status { get; set; }
 
     /// <summary>
     /// 创建时间（Unix 毫秒时间戳）
@@ -48,20 +48,38 @@ public class ReceiveMessageDecode
     public long UpdateTime { get; set; }
 
     /// <summary>
-    /// 解码类型
+    /// 消息类型
     /// </summary>
     public enum TypeEnum : byte
     {
         /// <summary>
-        /// 检验结果
+        /// 申请单
         /// </summary>
-        [Description("检验结果")]
-        TestResult = 0,
+        [Description("申请单")]
+        Application = 0
+    }
+
+    /// <summary>
+    /// 处理状态
+    /// </summary>
+    public enum StatusEnum : byte
+    {
+        /// <summary>
+        /// 待处理
+        /// </summary>
+        [Description("待处理")]
+        Pending = 0,
 
         /// <summary>
-        /// 查询样本申请信息
+        /// 处理成功
         /// </summary>
-        [Description("查询样本申请信息")]
-        SampleQuery = 1
+        [Description("处理成功")]
+        Success = 1,
+
+        /// <summary>
+        /// 处理失败
+        /// </summary>
+        [Description("处理失败")]
+        Failed = 2
     }
 }

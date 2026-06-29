@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace DeviceHub.Model;
+namespace DeviceHub.Model.Entities;
 
 /// <summary>
 /// 仪器通信日志表

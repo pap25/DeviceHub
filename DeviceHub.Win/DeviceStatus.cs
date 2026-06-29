@@ -3,6 +3,7 @@ using DeviceHub.Abstractions.Dto;
 using DeviceHub.Lis;
 using DeviceHub.Lis.Dto;
 using DeviceHub.Lis.Impl;
+using DeviceHub.Utils;
 using DeviceHub.Win.Base;
 
 namespace DeviceHub.Win
@@ -39,7 +40,7 @@ namespace DeviceHub.Win
             this.Text += $" {instrument.InstrumentModel} {instrument.InstrumentName} {instrument.InstrumentId}"; // 窗口title
 
             DriverConfig config = await lisClient.GetDriverConfig(_instrumentId);
-            await ApplyLisConfigAsync(instrument, config);
+            await initLisConfig(instrument, config);
             await initReceiveMessage();
             _isReady = true;
 
@@ -73,19 +74,37 @@ namespace DeviceHub.Win
                 return;
             }
 
-            await RefreshCurrentTabAsync();
+            await RefreshCurrentTab();
         }
 
-        private async Task RefreshCurrentTabAsync()
+        private async Task RefreshCurrentTab()
         {
             if (tabControl1.SelectedTab == tabPageLisConfig)
             {
-                await RefreshLisConfigAsync();
+                await RefreshLisConfig();
             }
             else if (tabControl1.SelectedTab == tabPageReceiveMessage)
             {
-                await RefreshReceiveMessageAsync();
+                await RefreshReceiveMessage();
             }
+        }
+
+        private static void BindEnumComboBox<TEnum>(ComboBox combo, bool isAll) where TEnum : Enum
+        {
+            var items = EnumExtensions.GetKeyValues<TEnum>();
+            if (isAll)
+                items.Insert(0, new EnumExtensions.KeyValue { Key = string.Empty, Value = "全部" });
+            combo.DataSource = items;
+            combo.DisplayMember = nameof(EnumExtensions.KeyValue.Value);
+            combo.ValueMember = nameof(EnumExtensions.KeyValue.Key);
+        }
+
+        private TEnum? GetSelectedEnum<TEnum>(ComboBox comboBox) where TEnum : struct, Enum
+        {
+            if (comboBox.SelectedValue is not string key || string.IsNullOrWhiteSpace(key))
+                return null;
+
+            return (TEnum)Enum.ToObject(typeof(TEnum), byte.Parse(key));
         }
     }
 }

@@ -1,4 +1,4 @@
-using DeviceHub.Model;
+using DeviceHub.Model.Entities;
 using Microsoft.Data.Sqlite;
 
 namespace DeviceHub.Repository.Repositories;

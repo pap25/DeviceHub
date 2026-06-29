@@ -1,5 +1,7 @@
-﻿using DeviceHub.Model;
-using DeviceHub.Utils;
+﻿using DeviceHub.Abstractions.Dto;
+using DeviceHub.Model.Entities;
+using DeviceHub.Model.Vo;
+using DeviceHub.Service;
 using DeviceHub.Win.DeviceHubControl;
 
 namespace DeviceHub.Win
@@ -8,36 +10,40 @@ namespace DeviceHub.Win
     {
         private async Task initReceiveMessage()
         {
-            cboReceiveMessageStatus.SelectedIndex = 0;
-            cboReceiveMessageType.SelectedIndex = 0;
+            BindEnumComboBox<ReceiveMessage.StatusEnum>(cboReceiveMessageStatus, true);
+            BindEnumComboBox<ReceiveMessageDecode.TypeEnum>(cboReceiveMessageType, true);
+            cboReceiveMessageStatus.SelectedValue = ((int)ReceiveMessage.StatusEnum.Pending).ToString();
+            cboReceiveMessageType.SelectedValue = ((int)ReceiveMessageDecode.TypeEnum.TestResult).ToString();
             dtpReceiveMessageCreateTimeStart.Value = DateTime.Today;
             dtpReceiveMessageCreateTimeEnd.Value = DateTime.Today;
-
-            EnumExtensions.GetKeyValues<ReceiveMessage.StatusEnum>();
-            EnumExtensions.GetKeyValues<ReceiveMessageDecode.TypeEnum>();
-
-            await LoadReceiveMessagePageAsync(1, pagerReceiveMessage.PageSize);
         }
 
-        private async Task RefreshReceiveMessageAsync()
+        private async Task RefreshReceiveMessage()
         {
-            await LoadReceiveMessagePageAsync(pagerReceiveMessage.PageIndex, pagerReceiveMessage.PageSize);
+            await LoadReceiveMessagePage(pagerReceiveMessage.PageIndex, pagerReceiveMessage.PageSize);
         }
 
         private async void btnReceiveMessageQuery_Click(object sender, EventArgs e)
         {
-            await LoadReceiveMessagePageAsync(1, pagerReceiveMessage.PageSize);
+            await LoadReceiveMessagePage(1, pagerReceiveMessage.PageSize);
         }
 
         private async void PagerReceiveMessage_PageChanged(object? sender, PagerChangedEventArgs e)
         {
-            await LoadReceiveMessagePageAsync(e.PageIndex, e.PageSize);
+            await LoadReceiveMessagePage(e.PageIndex, e.PageSize);
         }
 
-        private async Task LoadReceiveMessagePageAsync(int pageIndex, int pageSize)
+        private async Task LoadReceiveMessagePage(int pageIndex, int pageSize)
         {
-            // TODO: 接入接收消息分页查询 API
-            await Task.CompletedTask;
+            ReceiveMessage.StatusEnum? status = GetSelectedEnum<ReceiveMessage.StatusEnum>(cboReceiveMessageStatus);
+            ReceiveMessageDecode.TypeEnum? type = GetSelectedEnum<ReceiveMessageDecode.TypeEnum>(cboReceiveMessageType);
+            string barcode = txtReceiveMessageBarcode.Text.Trim();
+            string sampleNo = txtReceiveMessageSampleNo.Text.Trim();
+            long createTimeStart = new DateTimeOffset(dtpReceiveMessageCreateTimeStart.Value.Date).ToUnixTimeMilliseconds();
+            long createTimeEnd = new DateTimeOffset(dtpReceiveMessageCreateTimeEnd.Value.Date.AddDays(1).AddMilliseconds(-1)).ToUnixTimeMilliseconds();
+            Page<ReceiveMessagePageItem> page = await ReceiveMessageService.Instance.GetPage(_instrumentId, status, type, barcode, sampleNo, createTimeStart, createTimeEnd, pageSize, pageIndex);
+            dgvReceiveMessage.DataSource = page.Data;
+            pagerReceiveMessage.SetPageInfo(page);
         }
     }
 }
