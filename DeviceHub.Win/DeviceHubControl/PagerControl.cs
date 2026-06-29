@@ -13,7 +13,7 @@ namespace DeviceHub.Win.DeviceHubControl
 
         private long _totalCount;
         private int _pageIndex = 1;
-        private int _pageSize = 15;
+        private int _pageSize = 20;
         private bool _suppressPageChanged;
 
         public PagerControl()
@@ -31,7 +31,7 @@ namespace DeviceHub.Win.DeviceHubControl
         public int PageIndex => _pageIndex;
 
         /// <summary>每页条数</summary>
-        [DefaultValue(15)]
+        [DefaultValue(20)]
         public int PageSize
         {
             get => _pageSize;
