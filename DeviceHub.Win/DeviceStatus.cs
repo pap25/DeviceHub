@@ -16,6 +16,7 @@ namespace DeviceHub.Win
         {
             InitializeComponent();
             pagerInstrumentItemMapping.PageChanged += PagerInstrumentItemMapping_PageChanged;
+            pagerReceiveMessage.PageChanged += PagerReceiveMessage_PageChanged;
         }
         private async void DeviceStatus_Shown(object sender, EventArgs e)
         {
