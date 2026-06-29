@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace DeviceHub.Win.Utils
+namespace DeviceHub.Win.Base
 {
     internal class DriverFactory
     {

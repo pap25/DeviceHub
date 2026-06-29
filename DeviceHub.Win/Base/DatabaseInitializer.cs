@@ -1,6 +1,5 @@
 using DeviceHub.Base.Common;
 using DeviceHub.Repository;
-using DeviceHub.Win.Utils;
 
 namespace DeviceHub.Win.Base;
 

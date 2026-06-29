@@ -18,11 +18,7 @@ namespace DeviceHub.Win
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
-                    $"数据库初始化失败：{ex.Message}",
-                    "错误",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
+                MessageBox.Show($"数据库初始化失败：{ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 

@@ -8,7 +8,7 @@ namespace DeviceHub.Repository;
 /// </summary>
 public static class DbHelper
 {
-    private static string _connectionString = "Data Source=devicehub.db";
+    private static string _connectionString = "";
 
     /// <summary>
     /// 当前连接字符串

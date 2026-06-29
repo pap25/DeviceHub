@@ -6,7 +6,6 @@ using DeviceHub.Lis.Dto;
 using DeviceHub.Lis.Impl;
 using DeviceHub.Win.Base;
 using DeviceHub.Win.DeviceHubControl;
-using DeviceHub.Win.Utils;
 using System.Drawing;
 using System.IO.Ports;
 using System.Reflection;

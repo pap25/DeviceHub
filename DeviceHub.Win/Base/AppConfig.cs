@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace DeviceHub.Win.Utils
+namespace DeviceHub.Win.Base
 {
     internal static class AppConfig
     {
