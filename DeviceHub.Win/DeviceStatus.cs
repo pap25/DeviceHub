@@ -44,6 +44,7 @@ namespace DeviceHub.Win
 
             DriverConfig config = await lisClient.GetDriverConfig(driverId);
             await initLisConfig(instrument, config);
+            //await initReceiveMessage();
 
             Resp resp;
             if (config.TcpConfig != null)
