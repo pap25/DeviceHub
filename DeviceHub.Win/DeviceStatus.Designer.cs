@@ -177,30 +177,35 @@
             colInstrumentItemMappingInstrumentItemCode.DataPropertyName = "InstrumentItemCode";
             colInstrumentItemMappingInstrumentItemCode.HeaderText = "仪器项目编号";
             colInstrumentItemMappingInstrumentItemCode.Name = "colInstrumentItemMappingInstrumentItemCode";
+            colInstrumentItemMappingInstrumentItemCode.ReadOnly = true;
             // 
             // colInstrumentItemMappingInstrumentItemName
             // 
             colInstrumentItemMappingInstrumentItemName.DataPropertyName = "InstrumentItemName";
             colInstrumentItemMappingInstrumentItemName.HeaderText = "仪器项目名";
             colInstrumentItemMappingInstrumentItemName.Name = "colInstrumentItemMappingInstrumentItemName";
+            colInstrumentItemMappingInstrumentItemName.ReadOnly = true;
             // 
             // colInstrumentItemMappingLisItemCode
             // 
             colInstrumentItemMappingLisItemCode.DataPropertyName = "LisItemCode";
             colInstrumentItemMappingLisItemCode.HeaderText = "LIS项目编号";
             colInstrumentItemMappingLisItemCode.Name = "colInstrumentItemMappingLisItemCode";
+            colInstrumentItemMappingLisItemCode.ReadOnly = true;
             // 
             // colInstrumentItemMappingLisItemName
             // 
             colInstrumentItemMappingLisItemName.DataPropertyName = "LisItemName";
             colInstrumentItemMappingLisItemName.HeaderText = "LIS项目名";
             colInstrumentItemMappingLisItemName.Name = "colInstrumentItemMappingLisItemName";
+            colInstrumentItemMappingLisItemName.ReadOnly = true;
             // 
             // colInstrumentItemMappingUnit
             // 
             colInstrumentItemMappingUnit.DataPropertyName = "Unit";
             colInstrumentItemMappingUnit.HeaderText = "单位";
             colInstrumentItemMappingUnit.Name = "colInstrumentItemMappingUnit";
+            colInstrumentItemMappingUnit.ReadOnly = true;
             // 
             // pagerInstrumentItemMapping
             // 
@@ -226,6 +231,7 @@
             tabControl1.SelectedIndex = 0;
             tabControl1.Size = new Size(1350, 621);
             tabControl1.TabIndex = 3;
+            tabControl1.SelectedIndexChanged += TabControl1_SelectedIndexChanged;
             // 
             // tabPageLisConfig
             // 
@@ -299,11 +305,9 @@
             // 
             colReceiveMessageType.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
             colReceiveMessageType.DataPropertyName = "Type";
-            colReceiveMessageType.FillWeight = 100F;
             colReceiveMessageType.HeaderText = "类型";
             colReceiveMessageType.Name = "colReceiveMessageType";
             colReceiveMessageType.ReadOnly = true;
-            colReceiveMessageType.Width = 100;
             // 
             // colReceiveMessageRawMessage
             // 
@@ -335,11 +339,9 @@
             // 
             colReceiveMessageSampleNo.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
             colReceiveMessageSampleNo.DataPropertyName = "SampleNo";
-            colReceiveMessageSampleNo.FillWeight = 100F;
             colReceiveMessageSampleNo.HeaderText = "样本号";
             colReceiveMessageSampleNo.Name = "colReceiveMessageSampleNo";
             colReceiveMessageSampleNo.ReadOnly = true;
-            colReceiveMessageSampleNo.Width = 100;
             // 
             // colReceiveMessageCreateTime
             // 
@@ -542,6 +544,7 @@
             ((System.ComponentModel.ISupportInitialize)dgvInstrumentItemMapping).EndInit();
             tabControl1.ResumeLayout(false);
             tabPageLisConfig.ResumeLayout(false);
+            tabPageLisConfig.PerformLayout();
             pnlLisConfigLeft.ResumeLayout(false);
             tabPageReceiveMessage.ResumeLayout(false);
             tabPageReceiveMessage.PerformLayout();

@@ -18,30 +18,8 @@ namespace DeviceHub.Win
             InitializeComponent();
             pagerInstrumentItemMapping.PageChanged += PagerInstrumentItemMapping_PageChanged;
             pagerReceiveMessage.PageChanged += PagerReceiveMessage_PageChanged;
-            tabControl1.SelectedIndexChanged += TabControl1_SelectedIndexChanged;
         }
 
-        private async void TabControl1_SelectedIndexChanged(object? sender, EventArgs e)
-        {
-            if (!_isReady)
-            {
-                return;
-            }
-
-            await RefreshCurrentTabAsync();
-        }
-
-        private async Task RefreshCurrentTabAsync()
-        {
-            if (tabControl1.SelectedTab == tabPageLisConfig)
-            {
-                await RefreshLisConfigAsync();
-            }
-            else if (tabControl1.SelectedTab == tabPageReceiveMessage)
-            {
-                await RefreshReceiveMessageAsync();
-            }
-        }
         private async void DeviceStatus_Shown(object sender, EventArgs e)
         {
             string? instrumentIdStr = AppConfig.Configuration["InstrumentId"];
@@ -85,6 +63,28 @@ namespace DeviceHub.Win
             {
                 MessageBox.Show($"启动失败errorMsg: {resp.GetErrorMsg()}");
                 return;
+            }
+        }
+
+        private async void TabControl1_SelectedIndexChanged(object? sender, EventArgs e)
+        {
+            if (!_isReady)
+            {
+                return;
+            }
+
+            await RefreshCurrentTabAsync();
+        }
+
+        private async Task RefreshCurrentTabAsync()
+        {
+            if (tabControl1.SelectedTab == tabPageLisConfig)
+            {
+                await RefreshLisConfigAsync();
+            }
+            else if (tabControl1.SelectedTab == tabPageReceiveMessage)
+            {
+                await RefreshReceiveMessageAsync();
             }
         }
     }
