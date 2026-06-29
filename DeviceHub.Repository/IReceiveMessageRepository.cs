@@ -1,4 +1,5 @@
 using DeviceHub.Model.Entities;
+using DeviceHub.Model.view;
 
 namespace DeviceHub.Repository;
 
@@ -20,4 +21,10 @@ public interface IReceiveMessageRepository
     Task<IReadOnlyList<ReceiveMessage>> GetByInstrumentIdAsync(long instrumentId, CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<ReceiveMessage>> GetByStatusAsync(ReceiveMessage.StatusEnum status, CancellationToken cancellationToken = default);
+
+    Task<int> findCount(long instrumentId, ReceiveMessage.StatusEnum? status, ReceiveMessageDecode.TypeEnum? type,
+        string barcode, string sampleNo, long createTimeStart, long createTimeEnd, CancellationToken cancellationToken = default);
+
+    Task<List<ReceiveMessageView>> findPageDesc(long instrumentId, ReceiveMessage.StatusEnum? status, ReceiveMessageDecode.TypeEnum? type,
+        string barcode, string sampleNo, long createTimeStart, long createTimeEnd, int pageSize, int pageIndex, CancellationToken cancellationToken = default);
 }

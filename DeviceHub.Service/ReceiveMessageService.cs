@@ -24,8 +24,8 @@ public class ReceiveMessageService
     public async Task<Page<ReceiveMessagePageItem>> GetPage(long instrumentId, ReceiveMessage.StatusEnum? status, ReceiveMessageDecode.TypeEnum? type,
         string barcode, string sampleNo, long createTimeStart, long createTimeEnd, int pageSize, int pageIndex)
     {
-        int totalCount = 0;// receiveMessageRepository.findCount(instrumentId, status, type, barcode, sampleNo, createTimeStart, createTimeEnd);
-        List<ReceiveMessageView> receiveMessageList = null;//receiveMessageRepository.findPageDesc(instrumentId, status, type, barcode, sampleNo, createTimeStart, createTimeEnd, pageSize, pageIndex);
+        int totalCount = await receiveMessageRepository.findCount(instrumentId, status, type, barcode, sampleNo, createTimeStart, createTimeEnd);
+        List<ReceiveMessageView> receiveMessageList = await receiveMessageRepository.findPageDesc(instrumentId, status, type, barcode, sampleNo, createTimeStart, createTimeEnd, pageSize, pageIndex);
 
         List<ReceiveMessagePageItem> outputList = new(receiveMessageList.Count);
         foreach (ReceiveMessageView row in receiveMessageList)
