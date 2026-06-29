@@ -8,14 +8,13 @@ namespace DeviceHub.Win
 {
     public partial class DeviceStatus
     {
-        private async Task initLisConfig(GetInstrument instrument, DriverConfig config)
+        private async Task ApplyLisConfigAsync(GetInstrument instrument, DriverConfig config)
         {
-            // 授权信息
-            lblAuthCode.Text = Helper.MaskAuthCode(instrument.AuthCode);
-            lblAuthStatus.Text = Helper.FormatAuthStatus(instrument.Status);
-            lblExpireTime.Text = Helper.FormatExpireTime(instrument.ExpireTime);
+            lblLisConfigAuthCode.Text = Helper.MaskAuthCode(instrument.AuthCode);
+            lblLisConfigAuthStatus.Text = Helper.FormatAuthStatus(instrument.Status);
+            lblLisConfigExpireTime.Text = Helper.FormatExpireTime(instrument.ExpireTime);
 
-            // 显示通信配置
+            ClearCommConfigGroups();
             if (config.TcpConfig != null)
             {
                 ShowTcpConfig(config.TcpConfig);
@@ -25,8 +24,29 @@ namespace DeviceHub.Win
                 ShowSerialPortConfig(config.SerialPortConfig);
             }
 
-            // 仪器项目映射列表
-            await LoadInstrumentItemMappingPageAsync(1, pagerInstrumentItemMapping.PageSize);
+            await LoadInstrumentItemMappingPageAsync(pagerInstrumentItemMapping.PageIndex, pagerInstrumentItemMapping.PageSize);
+        }
+
+        private async Task RefreshLisConfigAsync()
+        {
+            GetInstrument instrument = await lisClient.GetInstrument(_instrumentId);
+            DriverConfig config = await lisClient.GetDriverConfig(_instrumentId);
+            await ApplyLisConfigAsync(instrument, config);
+        }
+
+        private void ClearCommConfigGroups()
+        {
+            for (int i = pnlLisConfigLeft.Controls.Count - 1; i >= 0; i--)
+            {
+                Control control = pnlLisConfigLeft.Controls[i];
+                if (control == grpLisConfigAuthInfo)
+                {
+                    continue;
+                }
+
+                pnlLisConfigLeft.Controls.Remove(control);
+                control.Dispose();
+            }
         }
 
         private async void PagerInstrumentItemMapping_PageChanged(object? sender, PagerChangedEventArgs e)
@@ -80,8 +100,8 @@ namespace DeviceHub.Win
             {
                 Text = title,
                 ForeColor = Color.DarkBlue,
-                Location = new Point(3, grpAuthInfo.Bottom + 6),
-                Size = new Size(250, startY + (fields.Length - 1) * rowHeight + bottomMargin),
+                Location = new Point(3, grpLisConfigAuthInfo.Bottom + 6),
+                Size = new Size(244, startY + (fields.Length - 1) * rowHeight + bottomMargin),
             };
 
             for (int i = 0; i < fields.Length; i++)
@@ -109,7 +129,7 @@ namespace DeviceHub.Win
                 grp.Controls.Add(lblValue);
             }
 
-            tabPage1.Controls.Add(grp);
+            pnlLisConfigLeft.Controls.Add(grp);
         }
     }
 }

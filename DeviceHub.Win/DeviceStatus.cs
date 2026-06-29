@@ -11,35 +11,59 @@ namespace DeviceHub.Win
     {
         private readonly ILisClient lisClient = LisClient.Instance;
         private int _instrumentId;
+        private bool _isReady;
 
         public DeviceStatus()
         {
             InitializeComponent();
             pagerInstrumentItemMapping.PageChanged += PagerInstrumentItemMapping_PageChanged;
             pagerReceiveMessage.PageChanged += PagerReceiveMessage_PageChanged;
+            tabControl1.SelectedIndexChanged += TabControl1_SelectedIndexChanged;
+        }
+
+        private async void TabControl1_SelectedIndexChanged(object? sender, EventArgs e)
+        {
+            if (!_isReady)
+            {
+                return;
+            }
+
+            await RefreshCurrentTabAsync();
+        }
+
+        private async Task RefreshCurrentTabAsync()
+        {
+            if (tabControl1.SelectedTab == tabPageLisConfig)
+            {
+                await RefreshLisConfigAsync();
+            }
+            else if (tabControl1.SelectedTab == tabPageReceiveMessage)
+            {
+                await RefreshReceiveMessageAsync();
+            }
         }
         private async void DeviceStatus_Shown(object sender, EventArgs e)
         {
-            string? driverIdStr = AppConfig.Configuration["DeviceId"];
-            if (driverIdStr == null)
+            string? instrumentIdStr = AppConfig.Configuration["InstrumentId"];
+            if (instrumentIdStr == null)
             {
-                MessageBox.Show("没有配置设备ID");
+                MessageBox.Show("没有配置仪器ID");
                 return;
             }
-            int driverId = int.Parse(driverIdStr);
+            _instrumentId = int.Parse(instrumentIdStr);
 
-            GetInstrument instrument = await lisClient.GetInstrument(driverId);
+            GetInstrument instrument = await lisClient.GetInstrument(_instrumentId);
             if (instrument == null)
             {
-                MessageBox.Show($"LIS上没有这仪器driverId: {driverId}");
+                MessageBox.Show($"LIS上没有这仪器instrumentId: {_instrumentId}");
                 return;
             }
-            _instrumentId = instrument.InstrumentId;
             this.Text += $" {instrument.InstrumentModel} {instrument.InstrumentName} {instrument.InstrumentId}"; // 窗口title
 
-            DriverConfig config = await lisClient.GetDriverConfig(driverId);
-            await initLisConfig(instrument, config);
+            DriverConfig config = await lisClient.GetDriverConfig(_instrumentId);
+            await ApplyLisConfigAsync(instrument, config);
             await initReceiveMessage();
+            _isReady = true;
 
             Resp resp;
             if (config.TcpConfig != null)
@@ -54,7 +78,7 @@ namespace DeviceHub.Win
             }
             else
             {
-                MessageBox.Show($"LIS上没有配置这仪器连接方式driverId: {driverId}");
+                MessageBox.Show($"LIS上没有配置这仪器连接方式instrumentId: {_instrumentId}");
                 return;
             }
             if (!resp.IsSuccess())

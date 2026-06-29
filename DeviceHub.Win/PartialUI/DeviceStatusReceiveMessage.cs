@@ -14,6 +14,11 @@ namespace DeviceHub.Win
             await LoadReceiveMessagePageAsync(1, pagerReceiveMessage.PageSize);
         }
 
+        private async Task RefreshReceiveMessageAsync()
+        {
+            await LoadReceiveMessagePageAsync(pagerReceiveMessage.PageIndex, pagerReceiveMessage.PageSize);
+        }
+
         private void btnReceiveMessageQuery_Click(object sender, EventArgs e)
         {
 
