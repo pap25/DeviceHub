@@ -194,7 +194,7 @@
             dgvInstrumentItemMapping.ReadOnly = true;
             dgvInstrumentItemMapping.RowHeadersVisible = false;
             dgvInstrumentItemMapping.SelectionMode = DataGridViewSelectionMode.CellSelect;
-            dgvInstrumentItemMapping.Size = new Size(1080, 552);
+            dgvInstrumentItemMapping.Size = new Size(1080, 528);
             dgvInstrumentItemMapping.TabIndex = 1;
             // 
             // colInstrumentItemMappingInstrumentItemCode
@@ -237,7 +237,7 @@
             pagerInstrumentItemMapping.AutoSize = true;
             pagerInstrumentItemMapping.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             pagerInstrumentItemMapping.Dock = DockStyle.Bottom;
-            pagerInstrumentItemMapping.Location = new Point(259, 555);
+            pagerInstrumentItemMapping.Location = new Point(259, 531);
             pagerInstrumentItemMapping.MinimumSize = new Size(640, 32);
             pagerInstrumentItemMapping.Name = "pagerInstrumentItemMapping";
             pagerInstrumentItemMapping.Size = new Size(1080, 33);
@@ -253,7 +253,7 @@
             tabControl1.Location = new Point(0, 0);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(1350, 621);
+            tabControl1.Size = new Size(1350, 597);
             tabControl1.TabIndex = 3;
             tabControl1.SelectedIndexChanged += TabControl1_SelectedIndexChanged;
             // 
@@ -265,7 +265,7 @@
             tabLisConfig.Location = new Point(4, 26);
             tabLisConfig.Name = "tabLisConfig";
             tabLisConfig.Padding = new Padding(3);
-            tabLisConfig.Size = new Size(1342, 591);
+            tabLisConfig.Size = new Size(1342, 567);
             tabLisConfig.TabIndex = 0;
             tabLisConfig.Text = "LIS参数配置";
             tabLisConfig.UseVisualStyleBackColor = true;
@@ -276,7 +276,7 @@
             pnlLisConfigLeft.Dock = DockStyle.Left;
             pnlLisConfigLeft.Location = new Point(3, 3);
             pnlLisConfigLeft.Name = "pnlLisConfigLeft";
-            pnlLisConfigLeft.Size = new Size(256, 585);
+            pnlLisConfigLeft.Size = new Size(256, 561);
             pnlLisConfigLeft.TabIndex = 0;
             // 
             // tabReceiveMessage
@@ -287,7 +287,7 @@
             tabReceiveMessage.Location = new Point(4, 26);
             tabReceiveMessage.Name = "tabReceiveMessage";
             tabReceiveMessage.Padding = new Padding(3);
-            tabReceiveMessage.Size = new Size(1342, 591);
+            tabReceiveMessage.Size = new Size(1342, 567);
             tabReceiveMessage.TabIndex = 1;
             tabReceiveMessage.Text = "接收仪器数据队列";
             tabReceiveMessage.UseVisualStyleBackColor = true;
@@ -304,7 +304,7 @@
             dgvReceiveMessage.Name = "dgvReceiveMessage";
             dgvReceiveMessage.RowHeadersVisible = false;
             dgvReceiveMessage.SelectionMode = DataGridViewSelectionMode.CellSelect;
-            dgvReceiveMessage.Size = new Size(1336, 508);
+            dgvReceiveMessage.Size = new Size(1336, 484);
             dgvReceiveMessage.TabIndex = 1;
             // 
             // colReceiveMessageSelect
@@ -390,7 +390,7 @@
             pagerReceiveMessage.AutoSize = true;
             pagerReceiveMessage.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             pagerReceiveMessage.Dock = DockStyle.Bottom;
-            pagerReceiveMessage.Location = new Point(3, 555);
+            pagerReceiveMessage.Location = new Point(3, 531);
             pagerReceiveMessage.MinimumSize = new Size(640, 32);
             pagerReceiveMessage.Name = "pagerReceiveMessage";
             pagerReceiveMessage.Size = new Size(1336, 33);
@@ -549,7 +549,7 @@
             tabSendMessage.Location = new Point(4, 26);
             tabSendMessage.Name = "tabSendMessage";
             tabSendMessage.Padding = new Padding(3);
-            tabSendMessage.Size = new Size(1342, 591);
+            tabSendMessage.Size = new Size(1342, 567);
             tabSendMessage.TabIndex = 2;
             tabSendMessage.Text = "发送仪器数据队列";
             tabSendMessage.UseVisualStyleBackColor = true;
@@ -566,7 +566,7 @@
             dgvSendMessage.Name = "dgvSendMessage";
             dgvSendMessage.RowHeadersVisible = false;
             dgvSendMessage.SelectionMode = DataGridViewSelectionMode.CellSelect;
-            dgvSendMessage.Size = new Size(1336, 508);
+            dgvSendMessage.Size = new Size(1336, 484);
             dgvSendMessage.TabIndex = 1;
             // 
             // colSendMessageStatus
@@ -635,7 +635,7 @@
             pagerSendMessage.AutoSize = true;
             pagerSendMessage.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             pagerSendMessage.Dock = DockStyle.Bottom;
-            pagerSendMessage.Location = new Point(3, 555);
+            pagerSendMessage.Location = new Point(3, 531);
             pagerSendMessage.MinimumSize = new Size(640, 32);
             pagerSendMessage.Name = "pagerSendMessage";
             pagerSendMessage.Size = new Size(1336, 33);
@@ -761,7 +761,7 @@
             tabLog.Location = new Point(4, 26);
             tabLog.Name = "tabLog";
             tabLog.Padding = new Padding(3);
-            tabLog.Size = new Size(1342, 591);
+            tabLog.Size = new Size(1342, 567);
             tabLog.TabIndex = 3;
             tabLog.Text = "操作日志";
             tabLog.UseVisualStyleBackColor = true;
@@ -770,7 +770,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1350, 621);
+            ClientSize = new Size(1350, 597);
             Controls.Add(tabControl1);
             Name = "DeviceStatus";
             Text = "DeviceStatus";
