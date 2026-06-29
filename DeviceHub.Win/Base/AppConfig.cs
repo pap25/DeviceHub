@@ -17,7 +17,7 @@ namespace DeviceHub.Win.Base
         {
             Configuration = new ConfigurationBuilder()
                 .SetBasePath(AppContext.BaseDirectory)
-                .AddJsonFile("appsettings.json", optional: false)
+                .AddJsonFile("config/appsettings.json", optional: false)
                 .Build();
         }
     }

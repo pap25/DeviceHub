@@ -1,4 +1,5 @@
 using DeviceHub.Abstractions.Dto;
+using System.ComponentModel;
 
 namespace DeviceHub.Win.DeviceHubControl
 {
@@ -8,11 +9,11 @@ namespace DeviceHub.Win.DeviceHubControl
     /// </summary>
     public partial class PagerControl : UserControl
     {
-        private static readonly int[] DefaultPageSizeOptions = [10, 20, 50, 100];
+        private static readonly int[] DefaultPageSizeOptions = [10, 15, 20, 50, 100];
 
         private long _totalCount;
         private int _pageIndex = 1;
-        private int _pageSize = 20;
+        private int _pageSize = 15;
         private bool _suppressPageChanged;
 
         public PagerControl()
@@ -30,7 +31,12 @@ namespace DeviceHub.Win.DeviceHubControl
         public int PageIndex => _pageIndex;
 
         /// <summary>每页条数</summary>
-        public int PageSize => _pageSize;
+        [DefaultValue(15)]
+        public int PageSize
+        {
+            get => _pageSize;
+            set => _pageSize = value;
+        }
 
         /// <summary>总页数</summary>
         public int TotalPages =>

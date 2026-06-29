@@ -13,6 +13,9 @@ internal static class DatabaseInitializer
     /// </summary>
     public static async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
+        var dbDir = Path.Combine(AppContext.BaseDirectory, "db");
+        Directory.CreateDirectory(dbDir);
+
         var connectionString = AppConfig.DatabaseConnectionString;
         DbHelper.Configure(connectionString);
 
