@@ -1,4 +1,5 @@
 using DeviceHub.Model.Entities;
+using DeviceHub.Model.view;
 using Microsoft.Data.Sqlite;
 
 namespace DeviceHub.Repository.Repositories;
@@ -104,6 +105,83 @@ public class SendMessageRepository : ISendMessageRepository
             [DbHelper.Param("@status", (byte)status)],
             cancellationToken);
 
+    public async Task<int> findCount(long instrumentId, SendMessage.StatusEnum? status,
+        string barcode, string sampleNo, long createTimeStart, long createTimeEnd, CancellationToken cancellationToken = default)
+    {
+        var (whereClause, parameters) = BuildWhereConditions(instrumentId, status, barcode, sampleNo, createTimeStart, createTimeEnd);
+        var sql = $"""
+            SELECT COUNT(*)
+            FROM send_message a
+            {whereClause};
+            """;
+
+        var count = await DbHelper.ExecuteScalarAsync<long>(sql, parameters, cancellationToken);
+        return (int)count;
+    }
+
+    public async Task<List<SendMessageView>> findPageDesc(long instrumentId, SendMessage.StatusEnum? status,
+        string barcode, string sampleNo, long createTimeStart, long createTimeEnd, int pageSize, int pageIndex, CancellationToken cancellationToken = default)
+    {
+        var (whereClause, parameters) = BuildWhereConditions(instrumentId, status, barcode, sampleNo, createTimeStart, createTimeEnd);
+        parameters.Add(DbHelper.Param("@page_size", pageSize));
+        parameters.Add(DbHelper.Param("@offset", Math.Max(0, (pageIndex - 1) * pageSize)));
+
+        var sql = $"""
+            SELECT a.status, b.send_json, c.send_content, a.barcode, a.sample_no, a.create_time, a.error_message
+            FROM send_message a
+            INNER JOIN send_message_large b ON a.id = b.send_message_id
+            LEFT JOIN send_message_encoder c ON a.id = c.send_message_id
+            {whereClause}
+            ORDER BY a.create_time DESC
+            LIMIT @page_size OFFSET @offset;
+            """;
+
+        return await DbHelper.QueryAsync(sql, MapView, parameters, cancellationToken);
+    }
+
+    private static (string WhereClause, List<SqliteParameter> Parameters) BuildWhereConditions(
+        long instrumentId,
+        SendMessage.StatusEnum? status,
+        string barcode,
+        string sampleNo,
+        long createTimeStart,
+        long createTimeEnd)
+    {
+        var conditions = new List<string>
+        {
+            "a.instrument_id = @instrument_id"
+        };
+        var parameters = new List<SqliteParameter>
+        {
+            DbHelper.Param("@instrument_id", instrumentId)
+        };
+
+        if (status.HasValue)
+        {
+            conditions.Add("a.status = @status");
+            parameters.Add(DbHelper.Param("@status", (byte)status.Value));
+        }
+
+        conditions.Add("a.create_time >= @create_time_start");
+        parameters.Add(DbHelper.Param("@create_time_start", createTimeStart));
+        conditions.Add("a.create_time <= @create_time_end");
+        parameters.Add(DbHelper.Param("@create_time_end", createTimeEnd));
+
+        if (!string.IsNullOrWhiteSpace(barcode))
+        {
+            conditions.Add("a.barcode = @barcode");
+            parameters.Add(DbHelper.Param("@barcode", barcode));
+        }
+
+        if (!string.IsNullOrWhiteSpace(sampleNo))
+        {
+            conditions.Add("a.sample_no = @sample_no");
+            parameters.Add(DbHelper.Param("@sample_no", sampleNo));
+        }
+
+        return ("WHERE " + string.Join(" AND ", conditions), parameters);
+    }
+
     private const string SelectColumns =
         "SELECT id, instrument_id, type, sample_no, barcode, status, error_message, create_time, update_time FROM send_message";
 
@@ -118,5 +196,16 @@ public class SendMessageRepository : ISendMessageRepository
         ErrorMessage = reader.GetString(6),
         CreateTime = reader.GetInt64(7),
         UpdateTime = reader.GetInt64(8)
+    };
+
+    private static SendMessageView MapView(SqliteDataReader reader) => new()
+    {
+        Status = (SendMessage.StatusEnum)reader.GetByte(0),
+        SendJson = reader.GetString(1),
+        SendContent = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),
+        Barcode = reader.GetString(3),
+        SampleNo = reader.GetString(4),
+        CreateTime = reader.GetInt64(5),
+        ErrorMessage = reader.GetString(6)
     };
 }

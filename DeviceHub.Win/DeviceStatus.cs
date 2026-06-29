@@ -3,6 +3,7 @@ using DeviceHub.Abstractions.Dto;
 using DeviceHub.Lis;
 using DeviceHub.Lis.Dto;
 using DeviceHub.Lis.Impl;
+using DeviceHub.Model.Entities;
 using DeviceHub.Utils;
 using DeviceHub.Win.Base;
 
@@ -19,6 +20,7 @@ namespace DeviceHub.Win
             InitializeComponent();
             pagerInstrumentItemMapping.PageChanged += PagerInstrumentItemMapping_PageChanged;
             pagerReceiveMessage.PageChanged += PagerReceiveMessage_PageChanged;
+            pagerSendMessage.PageChanged += PagerSendMessage_PageChanged;
         }
 
         private async void DeviceStatus_Shown(object sender, EventArgs e)
@@ -42,6 +44,7 @@ namespace DeviceHub.Win
             DriverConfig config = await lisClient.GetDriverConfig(_instrumentId);
             await initLisConfig(instrument, config);
             await initReceiveMessage();
+            await initSendMessage();
             _isReady = true;
 
             Resp resp;
@@ -86,6 +89,10 @@ namespace DeviceHub.Win
             else if (tabControl1.SelectedTab == tabReceiveMessage)
             {
                 await RefreshReceiveMessage();
+            }
+            else if (tabControl1.SelectedTab == tabSendMessage)
+            {
+                await RefreshSendMessage();
             }
         }
 

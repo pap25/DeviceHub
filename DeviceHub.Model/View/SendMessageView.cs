@@ -1,10 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using DeviceHub.Model.Entities;
 
-namespace DeviceHub.Model.View
+namespace DeviceHub.Model.view;
+
+public class SendMessageView
 {
-    public class SendMessageView
-    {
-    }
+    public SendMessage.StatusEnum Status { get; set; }
+
+    public string SendJson { get; set; }
+
+    public string SendContent { get; set; }
+
+    public string Barcode { get; set; }
+
+    public string SampleNo { get; set; }
+
+    public long CreateTime { get; set; }
+
+    public string ErrorMessage { get; set; }
 }

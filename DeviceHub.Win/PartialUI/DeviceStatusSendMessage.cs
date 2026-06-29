@@ -1,10 +1,46 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using DeviceHub.Abstractions.Dto;
+using DeviceHub.Model.Entities;
+using DeviceHub.Model.Vo;
+using DeviceHub.Service;
+using DeviceHub.Win.DeviceHubControl;
 
-namespace DeviceHub.Win.PartialUI
+namespace DeviceHub.Win
 {
     public partial class DeviceStatus
     {
+        private async Task initSendMessage()
+        {
+            BindEnumComboBox<SendMessage.StatusEnum>(cboSendMessageStatus, true);
+            cboSendMessageStatus.SelectedValue = ((int)SendMessage.StatusEnum.Pending).ToString();
+            dtpSendMessageCreateTimeStart.Value = DateTime.Today;
+            dtpSendMessageCreateTimeEnd.Value = DateTime.Today;
+        }
+
+        private async Task RefreshSendMessage()
+        {
+            await LoadSendMessagePage(pagerSendMessage.PageIndex, pagerSendMessage.PageSize);
+        }
+
+        private async void btnSendMessageQuery_Click(object sender, EventArgs e)
+        {
+            await LoadSendMessagePage(1, pagerSendMessage.PageSize);
+        }
+
+        private async void PagerSendMessage_PageChanged(object? sender, PagerChangedEventArgs e)
+        {
+            await LoadSendMessagePage(e.PageIndex, e.PageSize);
+        }
+
+        private async Task LoadSendMessagePage(int pageIndex, int pageSize)
+        {
+            SendMessage.StatusEnum? status = GetSelectedEnum<SendMessage.StatusEnum>(cboSendMessageStatus);
+            string barcode = txtSendMessageBarcode.Text.Trim();
+            string sampleNo = txtSendMessageSampleNo.Text.Trim();
+            long createTimeStart = new DateTimeOffset(dtpSendMessageCreateTimeStart.Value.Date).ToUnixTimeMilliseconds();
+            long createTimeEnd = new DateTimeOffset(dtpSendMessageCreateTimeEnd.Value.Date.AddDays(1).AddMilliseconds(-1)).ToUnixTimeMilliseconds();
+            Page<SendMessagePageItem> page = await SendMessageService.Instance.GetPage(_instrumentId, status, barcode, sampleNo, createTimeStart, createTimeEnd, pageSize, pageIndex);
+            dgvSendMessage.DataSource = page.Data;
+            pagerSendMessage.SetPageInfo(page);
+        }
     }
 }
