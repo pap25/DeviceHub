@@ -6,7 +6,7 @@ namespace DeviceHub.Win
         ///  The main entry point for the application.
         /// </summary>
         [STAThread]
-        static async Task Main()
+        static void Main()
         {
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
@@ -14,7 +14,7 @@ namespace DeviceHub.Win
 
             try
             {
-                await Base.DatabaseInitializer.InitializeAsync();
+                Base.DatabaseInitializer.InitializeAsync().GetAwaiter().GetResult();
             }
             catch (Exception ex)
             {
@@ -22,8 +22,8 @@ namespace DeviceHub.Win
                 return;
             }
 
-            Application.Run(new DeviceStatus());
-            //Application.Run(new Form1());
+            //Application.Run(new DeviceStatus());
+            Application.Run(new Form1());
         }
     }
 }
