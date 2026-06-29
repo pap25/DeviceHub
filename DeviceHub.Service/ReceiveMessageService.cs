@@ -32,8 +32,8 @@ public class ReceiveMessageService
         {
             outputList.Add(new()
             {
-                Status = row.Status.GetDescription(),
-                Type = row.Type == null ? string.Empty : row.Type.GetDescription(),
+                StatusName = row.Status.GetDescription(),
+                TypeName = row.Type == null ? string.Empty : row.Type.GetDescription(),
                 RawMessage = row.RawMessage,
                 DecodeResult = row.ResultJson,
                 Barcode = row.Barcode,
