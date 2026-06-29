@@ -7,6 +7,7 @@ using DeviceHub.Lis.Impl;
 using DeviceHub.Win.Base;
 using DeviceHub.Win.DeviceHubControl;
 using DeviceHub.Win.Utils;
+using System.IO.Ports;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
@@ -69,15 +70,26 @@ namespace DeviceHub.Win
 
         private async Task initLisConfig(GetInstrument instrument, DriverConfig config)
         {
+            // 窗口title
             _instrumentId = instrument.InstrumentId;
             this.Text += $" {instrument.InstrumentModel} {instrument.InstrumentName} {instrument.InstrumentId}";
 
+            // 授权信息
             lblAuthCode.Text = Helper.MaskAuthCode(instrument.AuthCode);
             lblAuthStatus.Text = Helper.FormatAuthStatus(instrument.Status);
             lblExpireTime.Text = Helper.FormatExpireTime(instrument.ExpireTime);
 
             // 显示通信配置
+            if (config.TcpConfig != null)
+            {
 
+            }
+            else if (config.SerialPortConfig != null)
+            {
+
+            }
+
+            // 仪器项目映射列表
             await LoadInstrumentItemMappingPageAsync(1, pagerInstrumentItemMapping.PageSize);
         }
 
