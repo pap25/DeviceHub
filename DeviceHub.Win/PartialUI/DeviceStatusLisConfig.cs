@@ -24,7 +24,7 @@ namespace DeviceHub.Win
                 ShowSerialPortConfig(config.SerialPortConfig);
             }
 
-            await LoadInstrumentItemMappingPage(pagerInstrumentItemMapping.PageIndex, pagerInstrumentItemMapping.PageSize);
+            await LoadInstrumentItemMappingPage(pagerInstrumentItemMapping.PageSize, pagerInstrumentItemMapping.PageIndex);
         }
 
         private async Task RefreshLisConfig()
