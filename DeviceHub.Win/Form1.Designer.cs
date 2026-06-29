@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             dataGridView1 = new DataGridView();
             Column8 = new DataGridViewCheckBoxColumn();
             状态 = new DataGridViewTextBoxColumn();
@@ -39,8 +38,6 @@
             Column5 = new DataGridViewTextBoxColumn();
             Column6 = new DataGridViewTextBoxColumn();
             tabControl1 = new TabControl();
-            tabPage5 = new TabPage();
-            pictureBox1 = new PictureBox();
             tabPage1 = new TabPage();
             label9 = new Label();
             label8 = new Label();
@@ -85,10 +82,9 @@
             dataGridViewTextBoxColumn1 = new DataGridViewTextBoxColumn();
             dataGridViewTextBoxColumn3 = new DataGridViewTextBoxColumn();
             dataGridViewTextBoxColumn4 = new DataGridViewTextBoxColumn();
+            tabPage5 = new TabPage();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             tabControl1.SuspendLayout();
-            tabPage5.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             tabPage1.SuspendLayout();
             tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView3).BeginInit();
@@ -160,25 +156,6 @@
             tabControl1.SelectedIndex = 0;
             tabControl1.Size = new Size(1058, 613);
             tabControl1.TabIndex = 1;
-            // 
-            // tabPage5
-            // 
-            tabPage5.Controls.Add(pictureBox1);
-            tabPage5.Location = new Point(4, 26);
-            tabPage5.Name = "tabPage5";
-            tabPage5.Size = new Size(1050, 583);
-            tabPage5.TabIndex = 4;
-            tabPage5.Text = "LIS参数配置";
-            tabPage5.UseVisualStyleBackColor = true;
-            // 
-            // pictureBox1
-            // 
-            pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
-            pictureBox1.Location = new Point(0, 0);
-            pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(1054, 575);
-            pictureBox1.TabIndex = 1;
-            pictureBox1.TabStop = false;
             // 
             // tabPage1
             // 
@@ -569,6 +546,15 @@
             dataGridViewTextBoxColumn4.HeaderText = "时间";
             dataGridViewTextBoxColumn4.Name = "dataGridViewTextBoxColumn4";
             // 
+            // tabPage5
+            // 
+            tabPage5.Location = new Point(4, 26);
+            tabPage5.Name = "tabPage5";
+            tabPage5.Size = new Size(1050, 583);
+            tabPage5.TabIndex = 4;
+            tabPage5.Text = "LIS参数配置";
+            tabPage5.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
@@ -579,8 +565,6 @@
             Text = "DeviceHub  AUTOLAS 流水线Autolas 446";
             ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
             tabControl1.ResumeLayout(false);
-            tabPage5.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             tabPage1.ResumeLayout(false);
             tabPage1.PerformLayout();
             tabPage2.ResumeLayout(false);
@@ -611,8 +595,6 @@
         private Label label6;
         private TextBox textBox4;
         private Label label7;
-        private TabPage tabPage5;
-        private PictureBox pictureBox1;
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn3;
         private DataGridViewTextBoxColumn dataGridViewTextBoxColumn4;
@@ -650,5 +632,6 @@
         private Label label13;
         private TextBox textBox8;
         private TextBox textBox9;
+        private TabPage tabPage5;
     }
 }
