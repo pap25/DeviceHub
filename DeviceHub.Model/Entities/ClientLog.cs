@@ -25,7 +25,7 @@ public class ClientLog
     /// <summary>
     /// 日志内容
     /// </summary>
-    public string Message { get; set; } = string.Empty;
+    public string Message { get; set; }
 
     /// <summary>
     /// 创建时间（Unix 毫秒时间戳）

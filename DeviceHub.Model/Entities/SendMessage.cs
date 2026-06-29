@@ -25,12 +25,12 @@ public class SendMessage
     /// <summary>
     /// 样本号
     /// </summary>
-    public string SampleNo { get; set; } = string.Empty;
+    public string SampleNo { get; set; }
 
     /// <summary>
     /// 条形码
     /// </summary>
-    public string Barcode { get; set; } = string.Empty;
+    public string Barcode { get; set; }
 
     /// <summary>
     /// 处理状态

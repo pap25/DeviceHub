@@ -25,7 +25,7 @@ public class ReceiveMessage
     /// <summary>
     /// 处理失败原因
     /// </summary>
-    public string ErrorMessage { get; set; } = string.Empty;
+    public string ErrorMessage { get; set; }
 
     /// <summary>
     /// 创建时间（Unix 毫秒时间戳）

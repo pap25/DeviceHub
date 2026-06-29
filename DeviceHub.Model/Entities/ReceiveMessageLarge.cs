@@ -13,5 +13,5 @@ public class ReceiveMessageLarge
     /// <summary>
     /// 原始报文
     /// </summary>
-    public string RawMessage { get; set; } = string.Empty;
+    public string RawMessage { get; set; }
 }

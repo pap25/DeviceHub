@@ -25,17 +25,17 @@ public class ReceiveMessageDecode
     /// <summary>
     /// 样本号
     /// </summary>
-    public string SampleNo { get; set; } = string.Empty;
+    public string SampleNo { get; set; }
 
     /// <summary>
     /// 条形码
     /// </summary>
-    public string Barcode { get; set; } = string.Empty;
+    public string Barcode { get; set; }
 
     /// <summary>
     /// 解码结果JSON
     /// </summary>
-    public string ResultJson { get; set; } = string.Empty;
+    public string ResultJson { get; set; }
 
     /// <summary>
     /// 创建时间（Unix 毫秒时间戳）

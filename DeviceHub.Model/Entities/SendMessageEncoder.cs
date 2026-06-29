@@ -18,7 +18,7 @@ public class SendMessageEncoder
     /// <summary>
     /// 发送报文内容
     /// </summary>
-    public string SendContent { get; set; } = string.Empty;
+    public string SendContent { get; set; }
 
     /// <summary>
     /// 创建时间（Unix 毫秒时间戳）

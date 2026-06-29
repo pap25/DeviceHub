@@ -13,5 +13,5 @@ public class SendMessageLarge
     /// <summary>
     /// 发送内容JSON
     /// </summary>
-    public string SendJson { get; set; } = string.Empty;
+    public string SendJson { get; set; }
 }
