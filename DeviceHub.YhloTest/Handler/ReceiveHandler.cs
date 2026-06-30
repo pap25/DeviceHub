@@ -20,17 +20,25 @@ namespace DeviceHub.Yhlo.Handler
         }
         public IEnumerable<ReceiveMessage> SearchTask()
         {
-            int pageSize = 10;
-            // select * from receive_message where instrument_id=? and status=? order by id asc limit ?
-            List<ReceiveMessage> taskList = receiveMessageRepository.FindByInstrumentIdAndStatusOrderAsc(_instrumentId, ReceiveMessage.StatusEnum.Pending, pageSize);
+            List<ReceiveMessage> taskList = receiveMessageRepository
+                .FindByInstrumentIdAndStatusOrderAsc(_instrumentId, ReceiveMessage.StatusEnum.Pending, 15).GetAwaiter().GetResult();
             return taskList;
         }
         public void HandleTask(ReceiveMessage task)
         {
             // 调用接口上传检验结果
             // 解码后保存 receive_message_decode 更新receive_message
+            ReceiveMessageLarge? receiveMessageLarge = receiveMessageLargeRepository.GetByReceiveMessageId(task.Id).GetAwaiter().GetResult();
+            if (receiveMessageLarge == null)
+            {
+                long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                //receiveMessageRepository.UpdateStatusAndErrorMessageAndUpdateTimeById(task.Id, ReceiveMessage.StatusEnum.Failed, "数据异常", now);
+                return;
+            }
+            string rawMessage = receiveMessageLarge.RawMessage;
 
-            //ReceiveMessageLarge? receiveMessageLarge = receiveMessageLargeRepository.GetByReceiveMessageId(task.Id);
+
+            //receiveMessageRepository.UpdateStatusAndUpdateTimeById(task.Id, ReceiveMessage.StatusEnum.Success, now);
         }
     }
 }

@@ -114,6 +114,27 @@ public class ReceiveMessageRepository : IReceiveMessageRepository
             [DbHelper.Param("@status", (byte)status)],
             cancellationToken);
 
+    public async Task<List<ReceiveMessage>> FindByInstrumentIdAndStatusOrderAsc(
+        long instrumentId,
+        ReceiveMessage.StatusEnum status,
+        int limit,
+        CancellationToken cancellationToken = default) =>
+        await DbHelper.QueryAsync(
+            """
+            SELECT id, instrument_id, status, error_message, create_time, update_time
+            FROM receive_message
+            WHERE instrument_id = @instrument_id AND status = @status
+            ORDER BY id ASC
+            LIMIT @limit;
+            """,
+            Map,
+            [
+                DbHelper.Param("@instrument_id", instrumentId),
+                DbHelper.Param("@status", (byte)status),
+                DbHelper.Param("@limit", limit)
+            ],
+            cancellationToken);
+
     public async Task<int> findCount(long instrumentId, ReceiveMessage.StatusEnum? status, ReceiveMessageDecode.TypeEnum? type,
         string barcode, string sampleNo, long createTimeStart, long createTimeEnd, CancellationToken cancellationToken = default)
     {

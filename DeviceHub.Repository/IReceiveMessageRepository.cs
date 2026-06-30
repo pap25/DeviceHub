@@ -22,6 +22,8 @@ public interface IReceiveMessageRepository
 
     Task<IReadOnlyList<ReceiveMessage>> GetByStatus(ReceiveMessage.StatusEnum status, CancellationToken cancellationToken = default);
 
+    Task<List<ReceiveMessage>> FindByInstrumentIdAndStatusOrderAsc(long instrumentId, ReceiveMessage.StatusEnum status, int limit, CancellationToken cancellationToken = default);
+
     Task<int> findCount(long instrumentId, ReceiveMessage.StatusEnum? status, ReceiveMessageDecode.TypeEnum? type,
         string barcode, string sampleNo, long createTimeStart, long createTimeEnd, CancellationToken cancellationToken = default);
 

@@ -3,6 +3,9 @@ using DeviceHub.Abstractions.Dto;
 using DeviceHub.Base.Common;
 using DeviceHub.Base.Constant;
 using DeviceHub.Base.Transports;
+using DeviceHub.Model.Entities;
+using DeviceHub.Service;
+using DeviceHub.Yhlo.Handler;
 using System.IO.Ports;
 using System.Text;
 
@@ -11,9 +14,13 @@ namespace DeviceHub.Yhlo
     public class Driver : ISerialDeviceDriver
     {
         private readonly string logType = nameof(Driver);
+        private IConsumeTask receiveTask;
+        private readonly ReceiveMessageService receiveMessageService = ReceiveMessageService.Instance;
+        private long _instrumentId;
+
         private SerialPortTransport transport;
         private readonly List<byte> buffer = new();
-        private long _instrumentId;
+
         public async Task Start(long instrumentId, SerialPortConfig config)
         {
             _instrumentId = instrumentId;
@@ -26,6 +33,9 @@ namespace DeviceHub.Yhlo
                 );
 
             transport.DataReceived += Transport_DataReceived;
+
+            receiveTask = new BatchConsumeTask<ReceiveMessage>(new ReceiveHandler(instrumentId));
+            receiveTask.StartConsume();
 
             await transport.Open();
         }
@@ -76,8 +86,8 @@ namespace DeviceHub.Yhlo
 
                 case ASTMProtocols.NAK:
                     Logger.Info(logType, "收到 NAK");
-                    await Task.Delay(10000);
-                    await transport.Send(ASTMProtocols.EOT);
+                    await Task.Delay(10000); // 收到 NAK 等等10秒再次发ENQ
+                    await transport.Send(ASTMProtocols.ENQ);
                     return;
 
                 case ASTMProtocols.EOT:
@@ -162,8 +172,9 @@ namespace DeviceHub.Yhlo
         /// </summary>
         private void LogFrame(List<byte> frame)
         {
-            Logger.Info(logType, $"串口接收完整消息 原始={Encoding.ASCII.GetString(frame.ToArray())}");
-            // 入库
+            string rawMessage = Encoding.ASCII.GetString(frame.ToArray());
+            Logger.Info(logType, $"串口接收完整消息 原始={rawMessage}");
+            _ = receiveMessageService.Save(_instrumentId, rawMessage);
 
             int offset = 0;
             while (offset < frame.Count)
