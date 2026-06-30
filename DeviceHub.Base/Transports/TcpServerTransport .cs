@@ -214,11 +214,11 @@ namespace DeviceHub.Base.Transports
             }
             catch (IOException ex)
             {
-                Logger.Error(logType, "TCP服务端 IOException 客户端端点:{client.Client.RemoteEndPoint}", ex);
+                Logger.Error(logType, $"TCP服务端 IOException 客户端端点:{client.Client.RemoteEndPoint}", ex);
             }
             catch (Exception ex)
             {
-                Logger.Error(logType, "TCP服务端 Exception 客户端端点:{client.Client.RemoteEndPoint}", ex);
+                Logger.Error(logType, $"TCP服务端 Exception 客户端端点:{client.Client.RemoteEndPoint}", ex);
             }
             finally
             {
