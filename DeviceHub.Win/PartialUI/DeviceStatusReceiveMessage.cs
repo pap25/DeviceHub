@@ -3,7 +3,6 @@ using DeviceHub.Model.Entities;
 using DeviceHub.Model.Vo;
 using DeviceHub.Service;
 using DeviceHub.Win.DeviceHubControl;
-using SQLitePCL;
 
 namespace DeviceHub.Win
 {
@@ -14,7 +13,7 @@ namespace DeviceHub.Win
             BindEnumComboBox<ReceiveMessage.StatusEnum>(cboReceiveMessageStatus, true);
             BindEnumComboBox<ReceiveMessageDecode.TypeEnum>(cboReceiveMessageType, true);
             cboReceiveMessageStatus.SelectedValue = ((int)ReceiveMessage.StatusEnum.Pending).ToString();
-            cboReceiveMessageType.SelectedValue = ((int)ReceiveMessageDecode.TypeEnum.TestResult).ToString();
+            //cboReceiveMessageType.SelectedValue = ((int)ReceiveMessageDecode.TypeEnum.TestResult).ToString();
             dtpReceiveMessageCreateTimeStart.Value = DateTime.Today;
             dtpReceiveMessageCreateTimeEnd.Value = DateTime.Today;
             dgvReceiveMessage.ColumnHeaderMouseClick += dgvReceiveMessage_ColumnHeaderMouseClick;

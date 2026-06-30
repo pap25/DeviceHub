@@ -13,7 +13,7 @@ namespace DeviceHub.Yhlo
     public class Driver : ITcpDeviceDriver
     {
         private readonly string logType = nameof(Driver);
-        private readonly IConsumeTask receiveTask = new BatchConsumeTask<ReceiveMessage>(new ReceiveHandler());
+        private IConsumeTask receiveTask;
         private readonly ReceiveMessageService receiveMessageService = ReceiveMessageService.Instance;
         private long _instrumentId;
 
@@ -25,7 +25,7 @@ namespace DeviceHub.Yhlo
             transport = new(config.Host, config.Port);
             transport.DataReceived += Transport_DataReceived;
 
-            // 启动消费线程
+            receiveTask = new BatchConsumeTask<ReceiveMessage>(new ReceiveHandler(instrumentId));
             receiveTask.StartConsume();
 
             await transport.StartListeningAsync();
