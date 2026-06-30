@@ -35,6 +35,8 @@ namespace DeviceHub.Yhlo
         {
             try
             {
+                Logger.Debug(logType, $"TCP接收消息: {Encoding.UTF8.GetString(data)}");
+
                 buffer.AddRange(data);
 
                 while (TryExtractMessage(out List<byte> message))

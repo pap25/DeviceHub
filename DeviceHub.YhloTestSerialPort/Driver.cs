@@ -47,6 +47,8 @@ namespace DeviceHub.Yhlo
         {
             try
             {
+                Logger.Debug(logType, $"串口接收消息: {Encoding.UTF8.GetString(data)}");
+
                 buffer.AddRange(data);
 
                 // 提取控制字符
