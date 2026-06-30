@@ -70,7 +70,7 @@ namespace DeviceHub.Win
                 ("连接模式", "服务端（Server）", null),
                 ("编码方式", tcpConfig.Encoding ?? string.Empty, null),
                 ("状态", "监听中", Color.Green),
-                ("已连客户端", "172.28.80.1:60941", null),
+                ("已连客户端", tcpDeviceDriver!=null?tcpDeviceDriver.GetClientRemoteEndPoint():string.Empty, null),
             ]);
         }
 

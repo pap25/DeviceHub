@@ -19,6 +19,12 @@ namespace DeviceHub.Base.Transports
         private readonly CancellationTokenSource _cts = new();
 
         public event Action<byte[]>? DataReceived;
+        private string _clientRemoteEndPoint;
+
+        public string GetClientRemoteEndPoint()
+        {
+            return _clientRemoteEndPoint;
+        }
 
         //public bool IsConnected
         //{
@@ -85,7 +91,8 @@ namespace DeviceHub.Base.Transports
                     _client = client;
                     _stream = client.GetStream();
 
-                    Logger.Info(logType, $"客户端已连接: {client.Client.RemoteEndPoint}, host:{_host}, port:{_port}");
+                    _clientRemoteEndPoint = client.Client.RemoteEndPoint.ToString();
+                    Logger.Info(logType, $"客户端已连接: {_clientRemoteEndPoint}, host:{_host}, port:{_port}");
 
                     _ = Task.Run(() => ReceiveLoopAsync(client, _stream, _cts.Token));
                 }

@@ -14,11 +14,12 @@ namespace DeviceHub.Yhlo
     {
         private readonly string logType = nameof(TcpDriver);
         private readonly ILisClient lisClient = LisClient.Instance;
+        private TcpServerTransport transport;
         private readonly List<byte> buffer = new();
         private IConsumeTask receiveTask = new BatchConsumeTask<Object>(new ReceiveHandler());
         public async Task<Resp> Start(TcpConfig config)
         {
-            TcpServerTransport transport = new(config.Host, config.Port);
+            transport = new(config.Host, config.Port);
             await transport.StartListeningAsync();
 
             transport.DataReceived += Transport_DataReceived;
@@ -106,6 +107,10 @@ namespace DeviceHub.Yhlo
             return -1;
         }
 
+        public string GetClientRemoteEndPoint()
+        {
+            return transport.GetClientRemoteEndPoint();
+        }
         public void Stop()
         {
             throw new NotImplementedException();

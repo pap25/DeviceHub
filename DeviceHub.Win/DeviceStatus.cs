@@ -13,6 +13,8 @@ namespace DeviceHub.Win
         private readonly ILisClient lisClient = LisClient.Instance;
         private int _instrumentId;
         private bool _isReady;
+        private ITcpDeviceDriver? tcpDeviceDriver = null;
+        private ISerialDeviceDriver? serialDeviceDriver = null;
 
         public DeviceStatus()
         {
@@ -51,12 +53,12 @@ namespace DeviceHub.Win
             Resp resp;
             if (config.TcpConfig != null)
             {
-                ITcpDeviceDriver yhloTestDriver = DriverFactory.Create<ITcpDeviceDriver>();
-                resp = await yhloTestDriver.Start(config.TcpConfig);
+                tcpDeviceDriver = DriverFactory.Create<ITcpDeviceDriver>();
+                resp = await tcpDeviceDriver.Start(config.TcpConfig);
             }
             else if (config.SerialPortConfig != null)
             {
-                ISerialDeviceDriver serialDeviceDriver = DriverFactory.Create<ISerialDeviceDriver>();
+                serialDeviceDriver = DriverFactory.Create<ISerialDeviceDriver>();
                 resp = await serialDeviceDriver.Start(config.SerialPortConfig);
             }
             else

@@ -8,6 +8,8 @@ namespace DeviceHub.Abstractions
     public interface ITcpDeviceDriver
     {
         Task<Resp> Start(TcpConfig tcpConfig);
+
+        string GetClientRemoteEndPoint();
         void Stop();
     }
 }
