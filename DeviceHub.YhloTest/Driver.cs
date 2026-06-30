@@ -10,16 +10,16 @@ using System.Text;
 
 namespace DeviceHub.Yhlo
 {
-    public class TcpDriver : ITcpDeviceDriver
+    public class Driver : ITcpDeviceDriver
     {
-        private readonly string logType = nameof(TcpDriver);
+        private readonly string logType = nameof(Driver);
         private readonly IConsumeTask receiveTask = new BatchConsumeTask<ReceiveMessage>(new ReceiveHandler());
         private readonly ReceiveMessageService receiveMessageService = ReceiveMessageService.Instance;
         private long _instrumentId;
 
         private TcpServerTransport transport;
         private readonly List<byte> buffer = new();
-        public async Task<Resp> Start(long instrumentId, TcpConfig config)
+        public async Task Start(long instrumentId, TcpConfig config)
         {
             _instrumentId = instrumentId;
             transport = new(config.Host, config.Port);
@@ -29,8 +29,6 @@ namespace DeviceHub.Yhlo
             receiveTask.StartConsume();
 
             await transport.StartListeningAsync();
-
-            return Resp.Ok();
         }
 
         private void Transport_DataReceived(byte[] data)

@@ -13,6 +13,7 @@ namespace DeviceHub.Win
         private readonly ILisClient lisClient = LisClient.Instance;
         private int _instrumentId;
         private bool _isReady;
+        private bool _isError = false;
         private ITcpDeviceDriver? tcpDeviceDriver = null;
         private ISerialDeviceDriver? serialDeviceDriver = null;
 
@@ -44,31 +45,35 @@ namespace DeviceHub.Win
             this.Text += $" {instrument.InstrumentModel} {instrument.InstrumentName} {instrument.InstrumentId}"; // 窗口title
 
             DriverConfig config = await lisClient.GetDriverConfig(_instrumentId);
-            await initLisConfig(instrument, config);
+            await initLisConfig(instrument, config, _isError);
             await initReceiveMessage();
             await initSendMessage();
             await initLog();
             _isReady = true;
 
-            Resp resp;
-            if (config.TcpConfig != null)
+            try
             {
-                tcpDeviceDriver = DriverFactory.Create<ITcpDeviceDriver>();
-                resp = await tcpDeviceDriver.Start(_instrumentId, config.TcpConfig);
+                if (config.TcpConfig != null)
+                {
+                    tcpDeviceDriver = DriverFactory.Create<ITcpDeviceDriver>();
+                    await tcpDeviceDriver.Start(_instrumentId, config.TcpConfig);
+                }
+                else if (config.SerialPortConfig != null)
+                {
+                    serialDeviceDriver = DriverFactory.Create<ISerialDeviceDriver>();
+                    await serialDeviceDriver.Start(_instrumentId, config.SerialPortConfig);
+                }
+                else
+                {
+                    MessageBox.Show($"LIS上没有配置这仪器连接方式instrumentId: {_instrumentId}");
+                    return;
+                }
             }
-            else if (config.SerialPortConfig != null)
+            catch (Exception ex)
             {
-                serialDeviceDriver = DriverFactory.Create<ISerialDeviceDriver>();
-                resp = await serialDeviceDriver.Start(_instrumentId, config.SerialPortConfig);
-            }
-            else
-            {
-                MessageBox.Show($"LIS上没有配置这仪器连接方式instrumentId: {_instrumentId}");
-                return;
-            }
-            if (!resp.IsSuccess())
-            {
-                MessageBox.Show($"启动失败errorMsg: {resp.GetErrorMsg()}");
+                _isError = true;
+                await initDriverConfigStatusEmpty(config);
+                MessageBox.Show($"启动失败！请检查DLL和网络环境然后重启: {ex.Message}");
                 return;
             }
         }
@@ -87,7 +92,7 @@ namespace DeviceHub.Win
         {
             if (tabControl1.SelectedTab == tabLisConfig)
             {
-                await RefreshLisConfig();
+                await RefreshLisConfig(_isError);
             }
             else if (tabControl1.SelectedTab == tabReceiveMessage)
             {

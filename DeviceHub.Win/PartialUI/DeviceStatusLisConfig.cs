@@ -8,30 +8,55 @@ namespace DeviceHub.Win
 {
     public partial class DeviceStatus
     {
-        private async Task initLisConfig(GetInstrument instrument, DriverConfig config)
+        private void initDriverConfig(DriverConfig config)
+        {
+            ClearCommConfigGroups();
+            if (config.TcpConfig != null)
+            {
+                ShowTcpConfig(config.TcpConfig, "监听中", Color.Green);
+            }
+            else if (config.SerialPortConfig != null)
+            {
+                ShowSerialPortConfig(config.SerialPortConfig, "已打开", Color.Green);
+            }
+        }
+
+        private async Task initDriverConfigStatusEmpty(DriverConfig config)
+        {
+            ClearCommConfigGroups();
+            if (config.TcpConfig != null)
+            {
+                ShowTcpConfig(config.TcpConfig, "", Color.Green);
+            }
+            else if (config.SerialPortConfig != null)
+            {
+                ShowSerialPortConfig(config.SerialPortConfig, "", Color.Green);
+            }
+        }
+
+        private async Task initLisConfig(GetInstrument instrument, DriverConfig config, bool isError)
         {
             lblLisConfigAuthCode.Text = Helper.MaskAuthCode(instrument.AuthCode);
             lblLisConfigAuthStatus.Text = Helper.FormatAuthStatus(instrument.Status);
             lblLisConfigExpireTime.Text = Helper.FormatExpireTime(instrument.ExpireTime);
 
-            ClearCommConfigGroups();
-            if (config.TcpConfig != null)
+            if (!isError)
             {
-                ShowTcpConfig(config.TcpConfig);
+                initDriverConfig(config);
             }
-            else if (config.SerialPortConfig != null)
+            else
             {
-                ShowSerialPortConfig(config.SerialPortConfig);
+                initDriverConfigStatusEmpty(config);
             }
 
             await LoadInstrumentItemMappingPage(pagerInstrumentItemMapping.PageSize, pagerInstrumentItemMapping.PageIndex);
         }
 
-        private async Task RefreshLisConfig()
+        private async Task RefreshLisConfig(bool isError)
         {
             GetInstrument instrument = await lisClient.GetInstrument(_instrumentId);
             DriverConfig config = await lisClient.GetDriverConfig(_instrumentId);
-            await initLisConfig(instrument, config);
+            await initLisConfig(instrument, config, isError);
         }
 
         private void ClearCommConfigGroups()
@@ -61,7 +86,7 @@ namespace DeviceHub.Win
             pagerInstrumentItemMapping.SetPageInfo(page);
         }
 
-        private void ShowTcpConfig(TcpConfig tcpConfig)
+        private void ShowTcpConfig(TcpConfig tcpConfig, string status, Color statusColor)
         {
             CreateCommConfigGroup("网口参数",
             [
@@ -69,12 +94,12 @@ namespace DeviceHub.Win
                 ("端口", tcpConfig.Port.ToString(), null),
                 ("连接模式", "服务端（Server）", null),
                 ("编码方式", tcpConfig.Encoding ?? string.Empty, null),
-                ("状态", "监听中", Color.Green),
+                ("状态", status, statusColor),
                 ("已连客户端", tcpDeviceDriver!=null?tcpDeviceDriver.GetClientRemoteEndPoint():string.Empty, null),
             ]);
         }
 
-        private void ShowSerialPortConfig(SerialPortConfig serialPortConfig)
+        private void ShowSerialPortConfig(SerialPortConfig serialPortConfig, string status, Color statusColor)
         {
             CreateCommConfigGroup("串口参数",
             [
@@ -84,7 +109,7 @@ namespace DeviceHub.Win
                 ("数据位", serialPortConfig.DataBits.ToString(), null),
                 ("停止位", ((StopBits)serialPortConfig.StopBits).ToString(), null),
                 ("编码方式", serialPortConfig.Encoding ?? string.Empty, null),
-                ("串口状态", "已打开", Color.Green),
+                ("状态", status, statusColor),
             ]);
         }
 

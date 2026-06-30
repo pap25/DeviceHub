@@ -4,7 +4,7 @@ namespace DeviceHub.Abstractions
 {
     public interface ISerialDeviceDriver
     {
-        Task<Resp> Start(long instrumentId, SerialPortConfig serialPortConfig);
+        Task Start(long instrumentId, SerialPortConfig serialPortConfig);
         void Stop();
     }
 }

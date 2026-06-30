@@ -8,13 +8,13 @@ using System.Text;
 
 namespace DeviceHub.Yhlo
 {
-    public class SerialPortDriver : ISerialDeviceDriver
+    public class Driver : ISerialDeviceDriver
     {
-        private readonly string logType = nameof(SerialPortDriver);
+        private readonly string logType = nameof(Driver);
         private SerialPortTransport transport;
         private readonly List<byte> buffer = new();
         private long _instrumentId;
-        public async Task<Resp> Start(long instrumentId, SerialPortConfig config)
+        public async Task Start(long instrumentId, SerialPortConfig config)
         {
             _instrumentId = instrumentId;
             transport = new(
@@ -28,8 +28,6 @@ namespace DeviceHub.Yhlo
             transport.DataReceived += Transport_DataReceived;
 
             await transport.Open();
-
-            return Resp.Ok();
         }
 
         /// <summary>
