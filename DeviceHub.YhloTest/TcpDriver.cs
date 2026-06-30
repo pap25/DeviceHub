@@ -3,8 +3,8 @@ using DeviceHub.Abstractions.Dto;
 using DeviceHub.Base.Common;
 using DeviceHub.Base.Constant;
 using DeviceHub.Base.Transports;
-using DeviceHub.Lis;
-using DeviceHub.Lis.Impl;
+using DeviceHub.Model.Entities;
+using DeviceHub.Service;
 using DeviceHub.Yhlo.Handler;
 using System.Text;
 
@@ -13,19 +13,22 @@ namespace DeviceHub.Yhlo
     public class TcpDriver : ITcpDeviceDriver
     {
         private readonly string logType = nameof(TcpDriver);
-        private readonly ILisClient lisClient = LisClient.Instance;
+        private readonly IConsumeTask receiveTask = new BatchConsumeTask<ReceiveMessage>(new ReceiveHandler());
+        private readonly ReceiveMessageService receiveMessageService = ReceiveMessageService.Instance;
+        private long _instrumentId;
+
         private TcpServerTransport transport;
         private readonly List<byte> buffer = new();
-        private IConsumeTask receiveTask = new BatchConsumeTask<Object>(new ReceiveHandler());
-        public async Task<Resp> Start(TcpConfig config)
+        public async Task<Resp> Start(long instrumentId, TcpConfig config)
         {
+            _instrumentId = instrumentId;
             transport = new(config.Host, config.Port);
-            await transport.StartListeningAsync();
-
             transport.DataReceived += Transport_DataReceived;
 
             // 启动消费线程
             receiveTask.StartConsume();
+
+            await transport.StartListeningAsync();
 
             return Resp.Ok();
         }
@@ -38,12 +41,12 @@ namespace DeviceHub.Yhlo
 
                 while (TryExtractMessage(out List<byte> message))
                 {
-                    Logger.Info(logType, $"TCP接收完整消息: {Encoding.UTF8.GetString(message.ToArray())}");
+                    string rawMessage = Encoding.UTF8.GetString(message.ToArray());
+                    Logger.Info(logType, $"TCP接收完整消息: {rawMessage}");
 
                     //string text = Encoding.UTF8.GetString(message.GetRange(1, message.Count - 1).ToArray());
 
-
-                    // 添加队列表 receive_message、receive_message_large
+                    _ = receiveMessageService.Save(_instrumentId, rawMessage);
 
                     receiveTask.NotifyConsume();
                 }

@@ -4,9 +4,6 @@ using DeviceHub.Model.view;
 using DeviceHub.Model.Vo;
 using DeviceHub.Repository.Repositories;
 using DeviceHub.Utils;
-using SQLitePCL;
-using System.ComponentModel;
-using System.Net.NetworkInformation;
 
 namespace DeviceHub.Service;
 
@@ -16,6 +13,7 @@ public class ReceiveMessageService
     public static ReceiveMessageService Instance => _instance;
 
     private readonly ReceiveMessageRepository receiveMessageRepository = ReceiveMessageRepository.Instance;
+    private readonly ReceiveMessageLargeRepository receiveMessageLargeRepository = ReceiveMessageLargeRepository.Instance;
 
     private ReceiveMessageService()
     {
@@ -50,5 +48,28 @@ public class ReceiveMessageService
             TotalCount = totalCount,
             Data = outputList
         };
+    }
+
+    public async Task Save(long instrumentId, string rawMessage)
+    {
+        // 添加队列表 receive_message、receive_message_large
+
+        long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        ReceiveMessage receiveMessage = new()
+        {
+            InstrumentId = instrumentId,
+            Status = ReceiveMessage.StatusEnum.Pending,
+            ErrorMessage = "",
+            CreateTime = now,
+            UpdateTime = now
+        };
+        ReceiveMessageLarge receiveMessageLarge = new()
+        {
+            RawMessage = rawMessage
+        };
+
+        long receiveMessageId = await receiveMessageRepository.Insert(receiveMessage);
+        receiveMessageLarge.ReceiveMessageId = receiveMessageId;
+        receiveMessageLargeRepository.Insert(receiveMessageLarge);
     }
 }

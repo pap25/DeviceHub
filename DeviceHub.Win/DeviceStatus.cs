@@ -54,12 +54,12 @@ namespace DeviceHub.Win
             if (config.TcpConfig != null)
             {
                 tcpDeviceDriver = DriverFactory.Create<ITcpDeviceDriver>();
-                resp = await tcpDeviceDriver.Start(config.TcpConfig);
+                resp = await tcpDeviceDriver.Start(_instrumentId, config.TcpConfig);
             }
             else if (config.SerialPortConfig != null)
             {
                 serialDeviceDriver = DriverFactory.Create<ISerialDeviceDriver>();
-                resp = await serialDeviceDriver.Start(config.SerialPortConfig);
+                resp = await serialDeviceDriver.Start(_instrumentId, config.SerialPortConfig);
             }
             else
             {

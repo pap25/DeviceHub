@@ -13,18 +13,21 @@ namespace DeviceHub.Yhlo
         private readonly string logType = nameof(SerialPortDriver);
         private SerialPortTransport transport;
         private readonly List<byte> buffer = new();
-        public async Task<Resp> Start(SerialPortConfig config)
+        private long _instrumentId;
+        public async Task<Resp> Start(long instrumentId, SerialPortConfig config)
         {
+            _instrumentId = instrumentId;
             transport = new(
-                config.PortName,
-                config.BaudRate,
-                (Parity)config.Parity,
-                config.DataBits,
-                (StopBits)config.StopBits
-            );
-            await transport.Open();
+                    config.PortName,
+                    config.BaudRate,
+                    (Parity)config.Parity,
+                    config.DataBits,
+                    (StopBits)config.StopBits
+                );
 
             transport.DataReceived += Transport_DataReceived;
+
+            await transport.Open();
 
             return Resp.Ok();
         }
@@ -162,6 +165,7 @@ namespace DeviceHub.Yhlo
         private void LogFrame(List<byte> frame)
         {
             Logger.Info(logType, $"串口接收完整消息 原始={Encoding.ASCII.GetString(frame.ToArray())}");
+            // 入库
 
             int offset = 0;
             while (offset < frame.Count)
