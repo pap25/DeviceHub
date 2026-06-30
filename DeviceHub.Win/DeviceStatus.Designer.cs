@@ -28,13 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            grpLisConfigAuthInfo = new GroupBox();
-            lblLisConfigExpireTime = new Label();
-            lblLisConfigExpireTimeTitle = new Label();
-            lblLisConfigAuthStatus = new Label();
-            lblLisConfigAuthStatusTitle = new Label();
-            lblLisConfigAuthCode = new Label();
-            lblLisConfigAuthCodeTitle = new Label();
             dgvInstrumentItemMapping = new DataGridView();
             colInstrumentItemMappingInstrumentItemCode = new DataGridViewTextBoxColumn();
             colInstrumentItemMappingInstrumentItemName = new DataGridViewTextBoxColumn();
@@ -113,7 +106,6 @@
             lblLogCreateTimeTo = new Label();
             dtpLogCreateTimeEnd = new DateTimePicker();
             btnLogQuery = new Button();
-            grpLisConfigAuthInfo.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvInstrumentItemMapping).BeginInit();
             tabControl1.SuspendLayout();
             tabLisConfig.SuspendLayout();
@@ -128,79 +120,6 @@
             ((System.ComponentModel.ISupportInitialize)dgvLog).BeginInit();
             pnlLogQuery.SuspendLayout();
             SuspendLayout();
-            // 
-            // grpLisConfigAuthInfo
-            // 
-            grpLisConfigAuthInfo.Controls.Add(lblLisConfigExpireTime);
-            grpLisConfigAuthInfo.Controls.Add(lblLisConfigExpireTimeTitle);
-            grpLisConfigAuthInfo.Controls.Add(lblLisConfigAuthStatus);
-            grpLisConfigAuthInfo.Controls.Add(lblLisConfigAuthStatusTitle);
-            grpLisConfigAuthInfo.Controls.Add(lblLisConfigAuthCode);
-            grpLisConfigAuthInfo.Controls.Add(lblLisConfigAuthCodeTitle);
-            grpLisConfigAuthInfo.ForeColor = Color.DarkBlue;
-            grpLisConfigAuthInfo.Location = new Point(3, 6);
-            grpLisConfigAuthInfo.Name = "grpLisConfigAuthInfo";
-            grpLisConfigAuthInfo.Size = new Size(244, 145);
-            grpLisConfigAuthInfo.TabIndex = 0;
-            grpLisConfigAuthInfo.TabStop = false;
-            grpLisConfigAuthInfo.Text = "授权信息";
-            // 
-            // lblLisConfigExpireTime
-            // 
-            lblLisConfigExpireTime.AutoSize = true;
-            lblLisConfigExpireTime.ForeColor = SystemColors.ControlText;
-            lblLisConfigExpireTime.Location = new Point(100, 113);
-            lblLisConfigExpireTime.Name = "lblLisConfigExpireTime";
-            lblLisConfigExpireTime.Size = new Size(0, 17);
-            lblLisConfigExpireTime.TabIndex = 5;
-            // 
-            // lblLisConfigExpireTimeTitle
-            // 
-            lblLisConfigExpireTimeTitle.AutoSize = true;
-            lblLisConfigExpireTimeTitle.ForeColor = SystemColors.ControlText;
-            lblLisConfigExpireTimeTitle.Location = new Point(20, 113);
-            lblLisConfigExpireTimeTitle.Name = "lblLisConfigExpireTimeTitle";
-            lblLisConfigExpireTimeTitle.Size = new Size(68, 17);
-            lblLisConfigExpireTimeTitle.TabIndex = 4;
-            lblLisConfigExpireTimeTitle.Text = "过期时间：";
-            // 
-            // lblLisConfigAuthStatus
-            // 
-            lblLisConfigAuthStatus.AutoSize = true;
-            lblLisConfigAuthStatus.ForeColor = Color.Green;
-            lblLisConfigAuthStatus.Location = new Point(100, 78);
-            lblLisConfigAuthStatus.Name = "lblLisConfigAuthStatus";
-            lblLisConfigAuthStatus.Size = new Size(0, 17);
-            lblLisConfigAuthStatus.TabIndex = 3;
-            // 
-            // lblLisConfigAuthStatusTitle
-            // 
-            lblLisConfigAuthStatusTitle.AutoSize = true;
-            lblLisConfigAuthStatusTitle.ForeColor = SystemColors.ControlText;
-            lblLisConfigAuthStatusTitle.Location = new Point(20, 78);
-            lblLisConfigAuthStatusTitle.Name = "lblLisConfigAuthStatusTitle";
-            lblLisConfigAuthStatusTitle.Size = new Size(44, 17);
-            lblLisConfigAuthStatusTitle.TabIndex = 2;
-            lblLisConfigAuthStatusTitle.Text = "状态：";
-            // 
-            // lblLisConfigAuthCode
-            // 
-            lblLisConfigAuthCode.AutoSize = true;
-            lblLisConfigAuthCode.ForeColor = Color.Red;
-            lblLisConfigAuthCode.Location = new Point(100, 43);
-            lblLisConfigAuthCode.Name = "lblLisConfigAuthCode";
-            lblLisConfigAuthCode.Size = new Size(0, 17);
-            lblLisConfigAuthCode.TabIndex = 1;
-            // 
-            // lblLisConfigAuthCodeTitle
-            // 
-            lblLisConfigAuthCodeTitle.AutoSize = true;
-            lblLisConfigAuthCodeTitle.ForeColor = SystemColors.ControlText;
-            lblLisConfigAuthCodeTitle.Location = new Point(20, 43);
-            lblLisConfigAuthCodeTitle.Name = "lblLisConfigAuthCodeTitle";
-            lblLisConfigAuthCodeTitle.Size = new Size(56, 17);
-            lblLisConfigAuthCodeTitle.TabIndex = 0;
-            lblLisConfigAuthCodeTitle.Text = "授权码：";
             // 
             // dgvInstrumentItemMapping
             // 
@@ -293,7 +212,6 @@
             // 
             // pnlLisConfigLeft
             // 
-            pnlLisConfigLeft.Controls.Add(grpLisConfigAuthInfo);
             pnlLisConfigLeft.Dock = DockStyle.Left;
             pnlLisConfigLeft.Location = new Point(3, 3);
             pnlLisConfigLeft.Name = "pnlLisConfigLeft";
@@ -976,8 +894,6 @@
             Name = "DeviceStatus";
             Text = "DeviceStatus";
             Shown += DeviceStatus_Shown;
-            grpLisConfigAuthInfo.ResumeLayout(false);
-            grpLisConfigAuthInfo.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dgvInstrumentItemMapping).EndInit();
             tabControl1.ResumeLayout(false);
             tabLisConfig.ResumeLayout(false);
@@ -1002,13 +918,6 @@
         }
 
         #endregion
-        private GroupBox grpLisConfigAuthInfo;
-        private Label lblLisConfigExpireTime;
-        private Label lblLisConfigExpireTimeTitle;
-        private Label lblLisConfigAuthStatus;
-        private Label lblLisConfigAuthStatusTitle;
-        private Label lblLisConfigAuthCode;
-        private Label lblLisConfigAuthCodeTitle;
         private Panel pnlLisConfigLeft;
         private DataGridView dgvInstrumentItemMapping;
         private DeviceHubControl.PagerControl pagerInstrumentItemMapping;

@@ -8,6 +8,8 @@ namespace DeviceHub.Win
 {
     public partial class DeviceStatus
     {
+        private GroupBox? grpLisConfigAuthInfo;
+
         private void initDriverConfig(DriverConfig config)
         {
             ClearCommConfigGroups();
@@ -36,9 +38,10 @@ namespace DeviceHub.Win
 
         private async Task initLisConfig(GetInstrument instrument, DriverConfig config, bool isError)
         {
-            lblLisConfigAuthCode.Text = Helper.MaskAuthCode(instrument.AuthCode);
-            lblLisConfigAuthStatus.Text = Helper.FormatAuthStatus(instrument.Status);
-            lblLisConfigExpireTime.Text = Helper.FormatExpireTime(instrument.ExpireTime);
+            ShowAuthInfoGroup(
+                Helper.MaskAuthCode(instrument.AuthCode),
+                Helper.FormatAuthStatus(instrument.Status),
+                Helper.FormatExpireTime(instrument.ExpireTime));
 
             if (!isError)
             {
@@ -86,6 +89,25 @@ namespace DeviceHub.Win
             pagerInstrumentItemMapping.SetPageInfo(page);
         }
 
+        private void ShowAuthInfoGroup(string authCode, string authStatus, string expireTime)
+        {
+            if (grpLisConfigAuthInfo != null)
+            {
+                pnlLisConfigLeft.Controls.Remove(grpLisConfigAuthInfo);
+                grpLisConfigAuthInfo.Dispose();
+                grpLisConfigAuthInfo = null;
+            }
+
+            grpLisConfigAuthInfo = CreateConfigGroup("授权信息", new Point(3, 6),
+            [
+                ("授权码", authCode, Color.Red),
+                ("状态", authStatus, Color.Green),
+                ("过期时间", expireTime, null),
+            ]);
+            pnlLisConfigLeft.Controls.Add(grpLisConfigAuthInfo);
+            pnlLisConfigLeft.Controls.SetChildIndex(grpLisConfigAuthInfo, 0);
+        }
+
         private void ShowTcpConfig(TcpConfig tcpConfig, string status, Color statusColor)
         {
             CreateCommConfigGroup("网口参数",
@@ -115,6 +137,13 @@ namespace DeviceHub.Win
 
         private void CreateCommConfigGroup(string title, (string label, string value, Color? valueColor)[] fields)
         {
+            int top = grpLisConfigAuthInfo != null ? grpLisConfigAuthInfo.Bottom + 6 : 6;
+            var grp = CreateConfigGroup(title, new Point(3, top), fields);
+            pnlLisConfigLeft.Controls.Add(grp);
+        }
+
+        private static GroupBox CreateConfigGroup(string title, Point location, (string label, string value, Color? valueColor)[] fields)
+        {
             const int labelX = 20;
             const int valueX = 100;
             const int startY = 43;
@@ -125,8 +154,9 @@ namespace DeviceHub.Win
             {
                 Text = title,
                 ForeColor = Color.DarkBlue,
-                Location = new Point(3, grpLisConfigAuthInfo.Bottom + 6),
+                Location = location,
                 Size = new Size(244, startY + (fields.Length - 1) * rowHeight + bottomMargin),
+                TabStop = false,
             };
 
             for (int i = 0; i < fields.Length; i++)
@@ -154,7 +184,7 @@ namespace DeviceHub.Win
                 grp.Controls.Add(lblValue);
             }
 
-            pnlLisConfigLeft.Controls.Add(grp);
+            return grp;
         }
     }
 }
