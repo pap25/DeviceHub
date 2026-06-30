@@ -2,6 +2,7 @@
 using DeviceHub.Model.Entities;
 using DeviceHub.Model.view;
 using DeviceHub.Model.Vo;
+using DeviceHub.Repository;
 using DeviceHub.Repository.Repositories;
 using DeviceHub.Utils;
 
@@ -68,8 +69,11 @@ public class ReceiveMessageService
             RawMessage = rawMessage
         };
 
-        long receiveMessageId = await receiveMessageRepository.Insert(receiveMessage);
-        receiveMessageLarge.ReceiveMessageId = receiveMessageId;
-        receiveMessageLargeRepository.Insert(receiveMessageLarge);
+        await DbHelper.ExecuteInTransactionAsync(async (connection, transaction) =>
+        {
+            long receiveMessageId = await receiveMessageRepository.Insert(receiveMessage, connection, transaction);
+            receiveMessageLarge.ReceiveMessageId = receiveMessageId;
+            await receiveMessageLargeRepository.Insert(receiveMessageLarge, connection, transaction);
+        });
     }
 }

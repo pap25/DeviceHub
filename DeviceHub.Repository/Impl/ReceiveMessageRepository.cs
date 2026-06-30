@@ -15,7 +15,14 @@ public class ReceiveMessageRepository : IReceiveMessageRepository
     {
     }
 
-    public async Task<long> Insert(ReceiveMessage entity, CancellationToken cancellationToken = default)
+    public Task<long> Insert(ReceiveMessage entity, CancellationToken cancellationToken = default) =>
+        Insert(entity, null, null, cancellationToken);
+
+    public async Task<long> Insert(
+        ReceiveMessage entity,
+        SqliteConnection? connection,
+        SqliteTransaction? transaction,
+        CancellationToken cancellationToken = default)
     {
         const string sql = """
             INSERT INTO receive_message (instrument_id, status, error_message, create_time, update_time)
@@ -23,18 +30,22 @@ public class ReceiveMessageRepository : IReceiveMessageRepository
             RETURNING id;
             """;
 
-        var id = await DbHelper.ExecuteScalarAsync<long>(
-            sql,
-            [
-                DbHelper.Param("@instrument_id", entity.InstrumentId),
-                DbHelper.Param("@status", (byte)entity.Status),
-                DbHelper.Param("@error_message", entity.ErrorMessage),
-                DbHelper.Param("@create_time", entity.CreateTime),
-                DbHelper.Param("@update_time", entity.UpdateTime)
-            ],
-            cancellationToken);
+        var parameters = new SqliteParameter[]
+        {
+            DbHelper.Param("@instrument_id", entity.InstrumentId),
+            DbHelper.Param("@status", (byte)entity.Status),
+            DbHelper.Param("@error_message", entity.ErrorMessage),
+            DbHelper.Param("@create_time", entity.CreateTime),
+            DbHelper.Param("@update_time", entity.UpdateTime)
+        };
 
-        return id;
+        if (connection is not null && transaction is not null)
+        {
+            return await DbHelper.ExecuteScalarAsync<long>(
+                connection, transaction, sql, parameters, cancellationToken);
+        }
+
+        return await DbHelper.ExecuteScalarAsync<long>(sql, parameters, cancellationToken);
     }
 
     public async Task<bool> Update(ReceiveMessage entity, CancellationToken cancellationToken = default)

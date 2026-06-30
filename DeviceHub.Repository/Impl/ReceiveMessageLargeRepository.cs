@@ -14,20 +14,29 @@ public class ReceiveMessageLargeRepository : IReceiveMessageLargeRepository
     {
     }
 
-    public async Task<bool> Insert(ReceiveMessageLarge entity, CancellationToken cancellationToken = default)
+    public Task<bool> Insert(ReceiveMessageLarge entity, CancellationToken cancellationToken = default) =>
+        Insert(entity, null, null, cancellationToken);
+
+    public async Task<bool> Insert(
+        ReceiveMessageLarge entity,
+        SqliteConnection? connection,
+        SqliteTransaction? transaction,
+        CancellationToken cancellationToken = default)
     {
         const string sql = """
             INSERT INTO receive_message_large (receive_message_id, raw_message)
             VALUES (@receive_message_id, @raw_message);
             """;
 
-        var rows = await DbHelper.ExecuteNonQueryAsync(
-            sql,
-            [
-                DbHelper.Param("@receive_message_id", entity.ReceiveMessageId),
-                DbHelper.Param("@raw_message", entity.RawMessage)
-            ],
-            cancellationToken);
+        var parameters = new SqliteParameter[]
+        {
+            DbHelper.Param("@receive_message_id", entity.ReceiveMessageId),
+            DbHelper.Param("@raw_message", entity.RawMessage)
+        };
+
+        int rows = connection is not null && transaction is not null
+            ? await DbHelper.ExecuteNonQueryAsync(connection, transaction, sql, parameters, cancellationToken)
+            : await DbHelper.ExecuteNonQueryAsync(sql, parameters, cancellationToken);
 
         return rows > 0;
     }

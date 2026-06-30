@@ -47,6 +47,28 @@ public static class DbHelper
     }
 
     /// <summary>
+    /// 在事务中执行操作，成功时提交，异常时回滚
+    /// </summary>
+    public static async Task ExecuteInTransactionAsync(
+        Func<SqliteConnection, SqliteTransaction, Task> action,
+        CancellationToken cancellationToken = default)
+    {
+        await using var connection = await OpenConnectionAsync(cancellationToken);
+        await using var transaction = (SqliteTransaction)await connection.BeginTransactionAsync(cancellationToken);
+        try
+        {
+            await action(connection, transaction);
+            await transaction.CommitAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            Logger.Error(nameof(DbHelper), "事务执行失败，已回滚", ex);
+            throw;
+        }
+    }
+
+    /// <summary>
     /// 执行非查询 SQL
     /// </summary>
     public static async Task<int> ExecuteNonQueryAsync(
@@ -65,6 +87,20 @@ public static class DbHelper
             Logger.Error(nameof(DbHelper), $"ExecuteNonQuery 失败: {sql}", ex);
             throw;
         }
+    }
+
+    /// <summary>
+    /// 在指定连接和事务中执行非查询 SQL
+    /// </summary>
+    public static async Task<int> ExecuteNonQueryAsync(
+        SqliteConnection connection,
+        SqliteTransaction transaction,
+        string sql,
+        IEnumerable<SqliteParameter>? parameters = null,
+        CancellationToken cancellationToken = default)
+    {
+        await using var command = CreateCommand(connection, sql, parameters, transaction);
+        return await command.ExecuteNonQueryAsync(cancellationToken);
     }
 
     /// <summary>
@@ -91,6 +127,25 @@ public static class DbHelper
             Logger.Error(nameof(DbHelper), $"ExecuteScalar 失败: {sql}", ex);
             throw;
         }
+    }
+
+    /// <summary>
+    /// 在指定连接和事务中执行标量查询
+    /// </summary>
+    public static async Task<T?> ExecuteScalarAsync<T>(
+        SqliteConnection connection,
+        SqliteTransaction transaction,
+        string sql,
+        IEnumerable<SqliteParameter>? parameters = null,
+        CancellationToken cancellationToken = default)
+    {
+        await using var command = CreateCommand(connection, sql, parameters, transaction);
+        var result = await command.ExecuteScalarAsync(cancellationToken);
+
+        if (result is null or DBNull)
+            return default;
+
+        return (T)Convert.ChangeType(result, typeof(T));
     }
 
     /// <summary>
@@ -143,10 +198,12 @@ public static class DbHelper
     private static SqliteCommand CreateCommand(
         SqliteConnection connection,
         string sql,
-        IEnumerable<SqliteParameter>? parameters)
+        IEnumerable<SqliteParameter>? parameters,
+        SqliteTransaction? transaction = null)
     {
         var command = connection.CreateCommand();
         command.CommandText = sql;
+        command.Transaction = transaction;
 
         if (parameters is not null)
         {
