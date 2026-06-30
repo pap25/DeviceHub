@@ -17,6 +17,7 @@ namespace DeviceHub.Base.Transports
 
         private readonly SemaphoreSlim _sendLock = new(1, 1);
         private readonly CancellationTokenSource _cts = new();
+        private CancellationTokenSource? _connectionCts;
 
         public event Action<byte[]>? DataReceived;
         private string _clientRemoteEndPoint = string.Empty;
@@ -25,22 +26,6 @@ namespace DeviceHub.Base.Transports
         {
             return _clientRemoteEndPoint;
         }
-
-        //public bool IsConnected
-        //{
-        //    get
-        //    {
-        //        try
-        //        {
-        //            return _client != null && _client.Client != null
-        //                && !(_client.Client.Poll(1, SelectMode.SelectRead) && _client.Client.Available == 0);
-        //        }
-        //        catch
-        //        {
-        //            return false;
-        //        }
-        //    }
-        //}
 
         public TcpServerTransport(string host, int port)
         {
@@ -79,10 +64,24 @@ namespace DeviceHub.Base.Transports
                         break;
                     }
 
-                    await _sendLock.WaitAsync(_cts.Token);
+                    ConfigureClient(client);
 
                     try
                     {
+                        await _sendLock.WaitAsync(_cts.Token);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        client.Dispose();
+                        break;
+                    }
+
+                    CancellationToken receiveToken;
+
+                    try
+                    {
+                        CancelActiveConnection();
+
                         if (_client != null)
                         {
                             var oldClient = _client;
@@ -105,6 +104,9 @@ namespace DeviceHub.Base.Transports
                         _stream = client.GetStream();
                         _clientRemoteEndPoint = client.Client.RemoteEndPoint?.ToString() ?? string.Empty;
 
+                        _connectionCts = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token);
+                        receiveToken = _connectionCts.Token;
+
                         Logger.Info(logType, $"客户端已连接: {_clientRemoteEndPoint}, host:{_host}, port:{_port}");
                     }
                     finally
@@ -112,8 +114,12 @@ namespace DeviceHub.Base.Transports
                         _sendLock.Release();
                     }
 
-                    _ = Task.Run(() => ReceiveLoopAsync(client, _stream, _cts.Token));
+                    _ = Task.Run(() => ReceiveLoopAsync(client, _stream, receiveToken));
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                // Stop时正常退出
             }
             catch (ObjectDisposedException)
             {
@@ -140,10 +146,21 @@ namespace DeviceHub.Base.Transports
                 {
                     remoteEndPoin = _client.Client.RemoteEndPoint?.ToString() ?? "unknown";
                 }
-                _cts.Cancel();
 
-                _stream?.Close();
-                _client?.Close();
+                _cts.Cancel();
+                CancelActiveConnection();
+
+                _sendLock.Wait();
+                try
+                {
+                    _stream?.Close();
+                    _client?.Close();
+                }
+                finally
+                {
+                    _sendLock.Release();
+                }
+
                 _listener?.Stop();
             }
             finally
@@ -151,6 +168,7 @@ namespace DeviceHub.Base.Transports
                 _stream = null;
                 _client = null;
                 _listener = null;
+                _clientRemoteEndPoint = string.Empty;
             }
 
             Logger.Info(logType, $"TCP服务端已停止, 客户端端点:{remoteEndPoin} host:{_host}, port:{_port}");
@@ -158,14 +176,15 @@ namespace DeviceHub.Base.Transports
 
         public async Task SendAsync(byte[] data)
         {
-            if (_stream == null)
-                throw new InvalidOperationException("TCP服务未就绪或客户端尚未连接");
-
-            await _sendLock.WaitAsync();
+            await _sendLock.WaitAsync(_cts.Token);
 
             try
             {
-                await _stream.WriteAsync(data, _cts.Token);
+                var stream = _stream;
+                if (stream == null)
+                    throw new InvalidOperationException("TCP服务未就绪或客户端尚未连接");
+
+                await stream.WriteAsync(data, _cts.Token);
             }
             finally
             {
@@ -180,8 +199,31 @@ namespace DeviceHub.Base.Transports
             return SendAsync(encoding.GetBytes(message));
         }
 
+        private static void ConfigureClient(TcpClient client)
+        {
+            client.NoDelay = true;
+        }
+
+        private void CancelActiveConnection()
+        {
+            if (_connectionCts == null)
+                return;
+
+            try
+            {
+                _connectionCts.Cancel();
+            }
+            catch
+            {
+            }
+
+            _connectionCts.Dispose();
+            _connectionCts = null;
+        }
+
         private async Task ReceiveLoopAsync(TcpClient client, NetworkStream stream, CancellationToken cancellationToken)
         {
+            var remoteEndPoint = client.Client.RemoteEndPoint?.ToString() ?? "unknown";
             var buffer = new byte[4096];
 
             try
@@ -194,7 +236,7 @@ namespace DeviceHub.Base.Transports
 
                     if (len == 0)
                     {
-                        Logger.Info(logType, $"客户端已断开连接: {client.Client.RemoteEndPoint}, host:{_host}, port:{_port}");
+                        Logger.Info(logType, $"客户端已断开连接: {remoteEndPoint}, host:{_host}, port:{_port}");
                         break;
                     }
 
@@ -206,19 +248,19 @@ namespace DeviceHub.Base.Transports
             }
             catch (OperationCanceledException)
             {
-                // Stop时正常退出
+                // 连接被替换或 Stop 时正常退出
             }
             catch (ObjectDisposedException ex)
             {
-                Logger.Error(logType, $"TCP服务端 ObjectDisposedException 客户端端点:{client.Client.RemoteEndPoint}", ex);
+                Logger.Error(logType, $"TCP服务端 ObjectDisposedException 客户端端点:{remoteEndPoint}", ex);
             }
             catch (IOException ex)
             {
-                Logger.Error(logType, $"TCP服务端 IOException 客户端端点:{client.Client.RemoteEndPoint}", ex);
+                Logger.Error(logType, $"TCP服务端 IOException 客户端端点:{remoteEndPoint}", ex);
             }
             catch (Exception ex)
             {
-                Logger.Error(logType, $"TCP服务端 Exception 客户端端点:{client.Client.RemoteEndPoint}", ex);
+                Logger.Error(logType, $"TCP服务端 Exception 客户端端点:{remoteEndPoint}", ex);
             }
             finally
             {
@@ -231,14 +273,24 @@ namespace DeviceHub.Base.Transports
                 {
                 }
 
-                // 防止误清理后续连接
-                if (ReferenceEquals(client, _client))
+                await _sendLock.WaitAsync();
+
+                try
                 {
-                    _stream = null;
-                    _client = null;
+                    // 防止误清理后续连接
+                    if (ReferenceEquals(client, _client))
+                    {
+                        _stream = null;
+                        _client = null;
+                        _clientRemoteEndPoint = string.Empty;
+                    }
+                }
+                finally
+                {
+                    _sendLock.Release();
                 }
 
-                Logger.Info(logType, $"客户端资源已释放, 客户端端点:{client.Client.RemoteEndPoint}, host:{_host}, port:{_port}");
+                Logger.Info(logType, $"客户端资源已释放, 客户端端点:{remoteEndPoint}, host:{_host}, port:{_port}");
             }
         }
 
