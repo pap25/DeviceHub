@@ -42,8 +42,8 @@ namespace DeviceHub.Base.Common
             File.AppendAllText(
                 file,
                 $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] [ERROR] [{type}] {msg}{Environment.NewLine}" +
-                $"Exception: {ex}{Environment.NewLine}" +
-                $"----------------------------------------{Environment.NewLine}",
+                $"Exception: {ex}{Environment.NewLine}",
+                //$"----------------------------------------{Environment.NewLine}",
                 Encoding.UTF8);
         }
     }

@@ -19,7 +19,7 @@ namespace DeviceHub.Base.Transports
         private readonly CancellationTokenSource _cts = new();
 
         public event Action<byte[]>? DataReceived;
-        private string _clientRemoteEndPoint;
+        private string _clientRemoteEndPoint = string.Empty;
 
         public string GetClientRemoteEndPoint()
         {
@@ -79,20 +79,38 @@ namespace DeviceHub.Base.Transports
                         break;
                     }
 
-                    // 已有连接，拒绝第二个连接
-                    if (_client != null)
+                    await _sendLock.WaitAsync(_cts.Token);
+
+                    try
                     {
-                        Logger.Warn(logType, $"拒绝第二个连接: {client.Client.RemoteEndPoint}");
+                        if (_client != null)
+                        {
+                            var oldClient = _client;
+                            var oldStream = _stream;
+                            var newEndPoint = client.Client.RemoteEndPoint?.ToString() ?? "unknown";
 
-                        client.Close();
-                        continue;
+                            Logger.Warn(logType, $"新连接替换旧连接: 旧={oldClient.Client.RemoteEndPoint}, 新={newEndPoint}, host:{_host}, port:{_port}");
+
+                            try
+                            {
+                                oldStream?.Close();
+                                oldClient.Close();
+                            }
+                            catch
+                            {
+                            }
+                        }
+
+                        _client = client;
+                        _stream = client.GetStream();
+                        _clientRemoteEndPoint = client.Client.RemoteEndPoint?.ToString() ?? string.Empty;
+
+                        Logger.Info(logType, $"客户端已连接: {_clientRemoteEndPoint}, host:{_host}, port:{_port}");
                     }
-
-                    _client = client;
-                    _stream = client.GetStream();
-
-                    _clientRemoteEndPoint = client.Client.RemoteEndPoint.ToString();
-                    Logger.Info(logType, $"客户端已连接: {_clientRemoteEndPoint}, host:{_host}, port:{_port}");
+                    finally
+                    {
+                        _sendLock.Release();
+                    }
 
                     _ = Task.Run(() => ReceiveLoopAsync(client, _stream, _cts.Token));
                 }
@@ -115,8 +133,13 @@ namespace DeviceHub.Base.Transports
 
         public void Stop()
         {
+            string remoteEndPoin = string.Empty;
             try
             {
+                if (_client != null)
+                {
+                    remoteEndPoin = _client.Client.RemoteEndPoint?.ToString() ?? "unknown";
+                }
                 _cts.Cancel();
 
                 _stream?.Close();
@@ -130,7 +153,7 @@ namespace DeviceHub.Base.Transports
                 _listener = null;
             }
 
-            Logger.Info(logType, $"TCP服务端已停止 host:{_host}, port:{_port}");
+            Logger.Info(logType, $"TCP服务端已停止, 客户端端点:{remoteEndPoin} host:{_host}, port:{_port}");
         }
 
         public async Task SendAsync(byte[] data)
@@ -187,15 +210,15 @@ namespace DeviceHub.Base.Transports
             }
             catch (ObjectDisposedException ex)
             {
-                Logger.Error(logType, "TCP服务端 ObjectDisposedException", ex);
+                Logger.Error(logType, $"TCP服务端 ObjectDisposedException 客户端端点:{client.Client.RemoteEndPoint}", ex);
             }
             catch (IOException ex)
             {
-                Logger.Error(logType, "TCP服务端 IOException", ex);
+                Logger.Error(logType, "TCP服务端 IOException 客户端端点:{client.Client.RemoteEndPoint}", ex);
             }
             catch (Exception ex)
             {
-                Logger.Error(logType, "TCP服务端 Exception", ex);
+                Logger.Error(logType, "TCP服务端 Exception 客户端端点:{client.Client.RemoteEndPoint}", ex);
             }
             finally
             {
@@ -215,7 +238,7 @@ namespace DeviceHub.Base.Transports
                     _client = null;
                 }
 
-                Logger.Info(logType, $"客户端资源已释放 host:{_host}, port:{_port}");
+                Logger.Info(logType, $"客户端资源已释放, 客户端端点:{client.Client.RemoteEndPoint}, host:{_host}, port:{_port}");
             }
         }
 
