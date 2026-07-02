@@ -50,7 +50,7 @@ namespace DeviceHub.Yhlo
         {
             try
             {
-                Logger.Debug(logType, $"串口接收消息: {Encoding.UTF8.GetString(data)}");
+                Logger.Debug(logType, $"串口接收消息: {decode(data)}");
 
                 receiveBuffer.AddRange(data);
 
@@ -208,7 +208,7 @@ namespace DeviceHub.Yhlo
 
             if (receiveBuffer[frameEndIndex + 3] != ASTMProtocols.CR)
             {
-                Logger.Warn(logType, $"ASTM帧校验尾部格式异常: {Encoding.UTF8.GetString(CollectionsMarshal.AsSpan(receiveBuffer)[..Math.Min(receiveBuffer.Count, frameEndIndex + 4)])}");
+                Logger.Warn(logType, $"ASTM帧校验尾部格式异常: {decode(CollectionsMarshal.AsSpan(receiveBuffer)[..Math.Min(receiveBuffer.Count, frameEndIndex + 4)].ToArray())}");
                 frameLength = frameEndIndex + 4;
                 return true;
             }
@@ -257,7 +257,7 @@ namespace DeviceHub.Yhlo
             }
 
             int logLength = Math.Min(Constants.OneMB, receiveBuffer.Count);
-            Logger.Error(logType, $"{message}: {Encoding.ASCII.GetString(CollectionsMarshal.AsSpan(receiveBuffer)[^logLength..])}");
+            Logger.Error(logType, $"{message}: {decode(CollectionsMarshal.AsSpan(receiveBuffer)[^logLength..].ToArray())}");
             receiveBuffer.Clear();
             ResetReceiveState();
         }
@@ -286,6 +286,11 @@ namespace DeviceHub.Yhlo
         public void Stop()
         {
             transport.Close();
+        }
+
+        private string decode(byte[] data)
+        {
+            return Encoding.UTF8.GetString(data);
         }
     }
 }
