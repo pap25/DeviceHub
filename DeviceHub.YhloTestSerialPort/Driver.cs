@@ -7,6 +7,7 @@ using DeviceHub.Model.Entities;
 using DeviceHub.Service;
 using DeviceHub.Yhlo.Handler;
 using System.IO.Ports;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace DeviceHub.Yhlo
@@ -14,23 +15,25 @@ namespace DeviceHub.Yhlo
     public class Driver : ISerialDeviceDriver
     {
         private readonly string logType = nameof(Driver);
-        private IConsumeTask receiveTask;
         private readonly ReceiveMessageService receiveMessageService = ReceiveMessageService.Instance;
-        private long _instrumentId;
+        private readonly List<byte> receiveBuffer = new();
+        private readonly List<string> currentRecords = new();
+        private readonly StringBuilder recordBuilder = new();
 
-        private SerialPortTransport transport;
-        private readonly List<byte> buffer = new();
+        private IConsumeTask receiveTask = null!;
+        private SerialPortTransport transport = null!;
+        private long instrumentId;
+        private int expectedFrameNumber = 1;
 
         public async Task Start(long instrumentId, SerialPortConfig config)
         {
-            _instrumentId = instrumentId;
+            this.instrumentId = instrumentId;
             transport = new(
-                    config.PortName,
-                    config.BaudRate,
-                    (Parity)config.Parity,
-                    config.DataBits,
-                    (StopBits)config.StopBits
-                );
+                config.PortName,
+                config.BaudRate,
+                (Parity)config.Parity,
+                config.DataBits,
+                (StopBits)config.StopBits);
 
             transport.DataReceived += Transport_DataReceived;
 
@@ -41,197 +44,244 @@ namespace DeviceHub.Yhlo
         }
 
         /// <summary>
-        /// 串口数据接收事件
+        /// 串口数据接收事件（单仪器单服务，串口回调同步处理，无需加锁）
         /// </summary>
-        private async void Transport_DataReceived(byte[] data)
+        private void Transport_DataReceived(byte[] data)
         {
             try
             {
                 Logger.Debug(logType, $"串口接收消息: {Encoding.UTF8.GetString(data)}");
 
-                buffer.AddRange(data);
+                receiveBuffer.AddRange(data);
 
-                // 提取控制字符
-                while (TryExtractControlChar(out byte controlChar))
+                List<byte> responses = new();
+                List<string> completeMessages = new();
+                _ = ProcessReceiveBuffer(responses, completeMessages);
+
+                foreach (byte response in responses)
                 {
-                    await HandleControlCharAsync(controlChar);
+                    transport.Send(response);
+                    Logger.Debug(logType, $"串口发送控制符: {ToControlName(response)}");
                 }
 
-                // 按结束帧格式切分数据
-                while (TryExtractFrame(out List<byte> frame))
+                foreach (string rawMessage in completeMessages)
                 {
-                    LogFrame(frame);
+                    Logger.Info(logType, $"串口接收完整消息: {rawMessage}");
+                    _ = receiveMessageService.Save(instrumentId, rawMessage);
+                    receiveTask.NotifyConsume();
                 }
             }
             catch (Exception ex)
             {
                 Logger.Error(logType, "串口接收数据处理异常", ex);
-                buffer.Clear();
             }
         }
 
-        /// <summary>
-        /// 处理控制字符
-        /// </summary>
-        private async Task HandleControlCharAsync(byte controlChar)
+        private async Task ProcessReceiveBuffer(List<byte> responses, List<string> completeMessages)
         {
-            switch (controlChar)
+            while (receiveBuffer.Count > 0)
+            {
+                byte first = receiveBuffer[0];
+
+                if (first != ASTMProtocols.STX)
+                {
+                    // 处理控制字符情况
+                    await ProcessControlOrDiscard(first);
+                    receiveBuffer.RemoveAt(0);
+                    continue;
+                }
+
+                int frameEndIndex = IndexOfFrameEnd(2);
+                // 没有ETX/ETB
+                if (frameEndIndex < 0)
+                {
+                    ClearBufferIfTooLarge("接收数据没ETX/ETB异常");
+                    return;
+                }
+
+                // 有ETX/ETB
+                if (!TryGetFrameLength(frameEndIndex, out int frameLength)) // 继续等待
+                {
+                    ClearBufferIfTooLarge("接收数据帧未接收完整异常");
+                    return;
+                }
+
+                if (!ValidateFrameNumber(receiveBuffer[1]))
+                {
+                    Logger.Warn(logType, $"ASTM帧号错误, expected:{expectedFrameNumber}, actual:{(char)receiveBuffer[1]}");
+                    responses.Add(ASTMProtocols.NAK);
+                    receiveBuffer.RemoveRange(0, frameLength);
+                    continue;
+                }
+
+                string frameData = Encoding.ASCII.GetString(CollectionsMarshal.AsSpan(receiveBuffer)[2..frameEndIndex]);
+                AppendFrameData(frameData, completeMessages);
+
+                expectedFrameNumber = NextFrameNumber(expectedFrameNumber);
+                responses.Add(ASTMProtocols.ACK);
+                receiveBuffer.RemoveRange(0, frameLength);
+            }
+        }
+
+        private async Task ProcessControlOrDiscard(byte value)
+        {
+            switch (value)
             {
                 case ASTMProtocols.ENQ:
-                    Logger.Info(logType, "收到 ENQ");
+                    Logger.Debug(logType, "收到ENQ，回复ACK");
+                    ResetReceiveState();
                     await transport.Send(ASTMProtocols.ACK);
-                    return;
-
-                case ASTMProtocols.ACK:
-                    Logger.Info(logType, "收到 ACK");
-                    return;
-
-                case ASTMProtocols.NAK:
-                    Logger.Info(logType, "收到 NAK");
-                    await Task.Delay(10000); // 收到 NAK 等等10秒再次发ENQ
-                    await transport.Send(ASTMProtocols.ENQ);
-                    return;
-
+                    break;
                 case ASTMProtocols.EOT:
-                    Logger.Info(logType, "收到 EOT");
-                    return;
+                    Logger.Debug(logType, "收到EOT, 本次ASTM传输结束");
+                    ResetReceiveState();
+                    break;
+                case ASTMProtocols.ACK:
+                    Logger.Debug(logType, $"收到ACK"); // 后续补充下发申请单
+                    break;
+                case ASTMProtocols.NAK:
+                    Logger.Debug(logType, $"收到NAK");
+                    ScheduleEnqAfterDelay();
+                    break;
+                case ASTMProtocols.LF:
+                case ASTMProtocols.CR:
+                    break;
+                default:
+                    Logger.Warn(logType, $"丢弃非ASTM帧数据: 0x{value:X2}");
+                    break;
             }
         }
 
-        /// <summary>
-        /// 按结束帧格式切分：<STX> FN &lt;DATA&gt; &lt;ETX&gt;&lt;CS&gt; &lt;CR&gt;&lt;LF&gt;
-        /// 中间帧（ETB）不切分，累积至收到结束帧后一次性取出
-        /// </summary>
-        private bool TryExtractFrame(out List<byte> frame)
+        private void ScheduleEnqAfterDelay()
         {
-            frame = new List<byte>(0);
-
-            int startIndex = IndexOfByte(ASTMProtocols.STX);
-            if (startIndex < 0)
+            _ = Task.Run(async () =>
             {
-                if (buffer.Count > Constants.FourMB)
+                await Task.Delay(10000);
+                await transport.Send(ASTMProtocols.ENQ);
+                Logger.Debug(logType, "收到NAK后重新发送ENQ");
+            });
+        }
+
+        private void AppendFrameData(string frameData, List<string> completeMessages)
+        {
+            foreach (char item in frameData)
+            {
+                if (item == (char)ASTMProtocols.CR)
                 {
-                    Logger.Error(logType, $"接收数据无STX异常: {Encoding.ASCII.GetString(buffer.ToArray(), buffer.Count - Constants.OneMB, Constants.OneMB)}");
-                    buffer.Clear();
+                    string record = recordBuilder.ToString();
+                    recordBuilder.Clear();
+
+                    if (record.Length == 0)
+                    {
+                        continue;
+                    }
+
+                    currentRecords.Add(record);
+
+                    if (IsTerminatorRecord(record))
+                    {
+                        completeMessages.Add(string.Join("\r", currentRecords) + "\r");
+                        currentRecords.Clear();
+                    }
+
+                    continue;
                 }
+
+                if (item == (char)ASTMProtocols.LF && recordBuilder.Length == 0)
+                {
+                    continue;
+                }
+
+                recordBuilder.Append(item);
+            }
+        }
+
+        private bool TryGetFrameLength(int frameEndIndex, out int frameLength)
+        {
+            frameLength = 0;
+
+            // STX + FN + ETB/ETX + CS(2) + CR + LF 没有后面 CS + CR 则继续等待
+            if (receiveBuffer.Count <= frameEndIndex + 3)
+            {
                 return false;
             }
 
-            if (startIndex > 0)
-                buffer.RemoveRange(0, startIndex);
-
-            // STX + FN + ETX + CS(2) + CR + LF
-            if (buffer.Count < 7)
-                return false;
-
-            for (int i = 2; i < buffer.Count; i++)
+            if (receiveBuffer[frameEndIndex + 3] != ASTMProtocols.CR)
             {
-                if (buffer[i] != ASTMProtocols.ETX)
-                    continue;
-
-                if (i + 4 >= buffer.Count)
-                    return false;
-
-                if (buffer[i + 3] != ASTMProtocols.CR || buffer[i + 4] != ASTMProtocols.LF)
-                    continue;
-
-                int frameLength = i + 5;
-                frame = buffer.GetRange(0, frameLength);
-                buffer.RemoveRange(0, frameLength);
+                Logger.Warn(logType, $"ASTM帧校验尾部格式异常: {Encoding.UTF8.GetString(CollectionsMarshal.AsSpan(receiveBuffer)[..Math.Min(receiveBuffer.Count, frameEndIndex + 4)])}");
+                frameLength = frameEndIndex + 4;
                 return true;
             }
 
-            if (buffer.Count > Constants.FourMB)
+            if (receiveBuffer.Count <= frameEndIndex + 4)
             {
-                Logger.Error(logType, $"接收数据无完整结束帧异常: {Encoding.ASCII.GetString(buffer.ToArray(), buffer.Count - Constants.OneMB, Constants.OneMB)}");
-                buffer.Clear();
+                return false;
             }
 
-            return false;
-        }
+            frameLength = receiveBuffer[frameEndIndex + 4] == ASTMProtocols.LF
+                ? frameEndIndex + 5
+                : frameEndIndex + 4;
 
-        /// <summary>
-        /// 提取控制字符
-        /// </summary>
-        private bool TryExtractControlChar(out byte controlChar)
-        {
-            controlChar = 0;
-
-            if (buffer.Count == 0 || buffer[0] == ASTMProtocols.STX)
-                return false;
-
-            byte value = buffer[0];
-            if (value is not (ASTMProtocols.ENQ or ASTMProtocols.ACK or ASTMProtocols.NAK or ASTMProtocols.EOT))
-                return false;
-
-            controlChar = value;
-            buffer.RemoveAt(0);
             return true;
         }
 
-        /// <summary>
-        /// 日志记录完整消息（含中间帧与结束帧）
-        /// </summary>
-        private void LogFrame(List<byte> frame)
+        private bool ValidateFrameNumber(byte frameNumber)
         {
-            string rawMessage = Encoding.ASCII.GetString(frame.ToArray());
-            Logger.Info(logType, $"串口接收完整消息 原始={rawMessage}");
-            _ = receiveMessageService.Save(_instrumentId, rawMessage);
-
-            int offset = 0;
-            while (offset < frame.Count)
-            {
-                int stxIndex = -1;
-                for (int i = offset; i < frame.Count; i++)
-                {
-                    if (frame[i] == ASTMProtocols.STX)
-                    {
-                        stxIndex = i;
-                        break;
-                    }
-                }
-
-                if (stxIndex < 0)
-                    break;
-
-                int delimiterIndex = -1;
-                for (int i = stxIndex + 2; i < frame.Count; i++)
-                {
-                    if (frame[i] == ASTMProtocols.ETX || frame[i] == ASTMProtocols.ETB)
-                    {
-                        delimiterIndex = i;
-                        break;
-                    }
-                }
-
-                if (delimiterIndex < 0)
-                    break;
-
-                string frameType = frame[delimiterIndex] == ASTMProtocols.ETX ? "结束帧" : "中间帧";
-                string fn = frame.Count > stxIndex + 1 ? ((char)frame[stxIndex + 1]).ToString() : "?";
-                string payload = delimiterIndex > stxIndex + 2
-                    ? Encoding.ASCII.GetString(frame.ToArray(), stxIndex + 2, delimiterIndex - stxIndex - 2)
-                    : string.Empty;
-
-                Logger.Info(logType, $"  └ {frameType} FN={fn} DATA={payload}");
-
-                offset = delimiterIndex + 5;
-            }
+            return frameNumber >= (byte)'0' &&
+                   frameNumber <= (byte)'7' &&
+                   frameNumber == (byte)('0' + expectedFrameNumber);
         }
 
-        /// <summary>
-        /// 查找字节
-        /// </summary>
-        private int IndexOfByte(byte value, int startIndex = 0)
+        private static int NextFrameNumber(int frameNumber) => frameNumber == 7 ? 0 : frameNumber + 1;
+
+        private static bool IsTerminatorRecord(string record) => record.StartsWith("L|", StringComparison.Ordinal);
+
+        private int IndexOfFrameEnd(int startIndex)
         {
-            for (int i = startIndex; i < buffer.Count; i++)
+            for (int i = startIndex; i < receiveBuffer.Count; i++)
             {
-                if (buffer[i] == value)
+                if (ASTMProtocols.IsFrameEnd(receiveBuffer[i]))
+                {
                     return i;
+                }
             }
 
             return -1;
         }
+
+        private void ClearBufferIfTooLarge(string message)
+        {
+            if (receiveBuffer.Count <= Constants.FourMB)
+            {
+                return;
+            }
+
+            int logLength = Math.Min(Constants.OneMB, receiveBuffer.Count);
+            Logger.Error(logType, $"{message}: {Encoding.ASCII.GetString(CollectionsMarshal.AsSpan(receiveBuffer)[^logLength..])}");
+            receiveBuffer.Clear();
+            ResetReceiveState();
+        }
+
+        private void ResetReceiveState()
+        {
+            expectedFrameNumber = 1;
+            currentRecords.Clear();
+            recordBuilder.Clear();
+        }
+
+        private static string ToControlName(byte value) => value switch
+        {
+            ASTMProtocols.ENQ => "ENQ",
+            ASTMProtocols.ACK => "ACK",
+            ASTMProtocols.EOT => "EOT",
+            ASTMProtocols.NAK => "NAK",
+            ASTMProtocols.STX => "STX",
+            ASTMProtocols.LF => "LF",
+            ASTMProtocols.CR => "CR",
+            ASTMProtocols.ETB => "ETB",
+            ASTMProtocols.ETX => "ETX",
+            _ => $"0x{value:X2}"
+        };
 
         public void Stop()
         {

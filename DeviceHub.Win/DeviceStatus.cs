@@ -73,7 +73,7 @@ namespace DeviceHub.Win
             catch (Exception ex)
             {
                 _isError = true;
-                await initDriverConfigStatusEmpty(config);
+                initDriverConfigStatusEmpty(config);
                 Logger.Error(nameof(DeviceStatus), "启动失败！请检查DLL和网络环境然后重启", ex);
                 MessageBox.Show($"启动失败！请检查DLL和网络环境然后重启: {ex.Message}");
                 return;
