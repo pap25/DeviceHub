@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace DeviceHub.Base.Constant
 {
@@ -9,6 +7,15 @@ namespace DeviceHub.Base.Constant
     /// </summary>
     public static class ASTMProtocols
     {
+        public const char FieldSeparator = '|';
+
+        public const string TerminatorRecordType = "L";
+
+        /// <summary>
+        /// 收到 NAK 后重发 ENQ 的等待时间（秒）
+        /// </summary>
+        public const int NakRetryDelaySeconds = 10;
+
         /// <summary>
         /// ENQ (Enquiry)
         /// 请求建立通信，ASCII 0x05
@@ -76,6 +83,20 @@ namespace DeviceHub.Base.Constant
         {
             return value == ASTMProtocols.ETX ||
                    value == ASTMProtocols.ETB;
+        }
+
+        public static bool IsSessionControl(byte value)
+        {
+            return value == ASTMProtocols.ENQ ||
+                   value == ASTMProtocols.ACK ||
+                   value == ASTMProtocols.NAK ||
+                   value == ASTMProtocols.EOT;
+        }
+
+        public static bool IsTerminatorRecord(string record)
+        {
+            return record == TerminatorRecordType ||
+                   record.StartsWith($"{TerminatorRecordType}{FieldSeparator}", StringComparison.Ordinal);
         }
     }
 }
