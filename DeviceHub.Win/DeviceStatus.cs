@@ -1,5 +1,6 @@
 ﻿using DeviceHub.Abstractions;
 using DeviceHub.Abstractions.Dto;
+using DeviceHub.Base.Common;
 using DeviceHub.Lis;
 using DeviceHub.Lis.Dto;
 using DeviceHub.Lis.Impl;
@@ -73,6 +74,7 @@ namespace DeviceHub.Win
             {
                 _isError = true;
                 await initDriverConfigStatusEmpty(config);
+                Logger.Error(nameof(DeviceStatus), "启动失败！请检查DLL和网络环境然后重启", ex);
                 MessageBox.Show($"启动失败！请检查DLL和网络环境然后重启: {ex.Message}");
                 return;
             }

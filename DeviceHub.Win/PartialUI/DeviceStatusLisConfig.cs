@@ -23,7 +23,7 @@ namespace DeviceHub.Win
             }
         }
 
-        private async Task initDriverConfigStatusEmpty(DriverConfig config)
+        private void initDriverConfigStatusEmpty(DriverConfig config)
         {
             ClearCommConfigGroups();
             if (config.TcpConfig != null)
