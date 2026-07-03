@@ -37,6 +37,11 @@ namespace DeviceHub.Yhlo.Handler
             }
             string rawMessage = receiveMessageLarge.RawMessage;
 
+            // 解析开始结束符
+            // 校验<CS> CS：必须校验
+            // 验证FN FN：只检查是否合法（0~7） 不检查连续性
+            // 失败更新队列失败，并记录失败原因
+            // 验证成功则进入解析步骤
 
             //receiveMessageRepository.UpdateStatusAndUpdateTimeById(task.Id, ReceiveMessage.StatusEnum.Success, now);
         }
