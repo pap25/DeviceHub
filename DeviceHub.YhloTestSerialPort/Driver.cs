@@ -152,8 +152,11 @@ namespace DeviceHub.Yhlo
                 ackedOffset = Math.Max(0, ackedOffset - startIndex);
             }
 
-            int offset = 0;        // 当前帧 <STX> 下标；示例: 0 → 帧1，再移至帧2/帧3
+            int offset = ackedOffset; // 跳过已 ACK 的完整帧，从下一帧继续解析
             int consumeLength = 0; // 命中 L 后：buffer[0] 至 <ETB>1E<CR><LF> 的总字节数
+
+            if (offset >= buffer.Count)
+                return false;
 
             while (offset < buffer.Count)
             {
