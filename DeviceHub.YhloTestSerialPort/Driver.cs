@@ -285,7 +285,7 @@ namespace DeviceHub.Yhlo
         }
 
         /// <summary>
-        /// 发送一个完整帧，并保存为最后发送帧以便收到 NAK 时重传
+        /// 发送一个完整帧，并保存为最后发送帧以便收到 NAK 时重传 (主动向仪器下发数据（下发申请单 / 查询单）这条“发送路径”预留的，而不是接收路径)
         /// </summary>
         public async Task SendFrame(byte[] frame)
         {
