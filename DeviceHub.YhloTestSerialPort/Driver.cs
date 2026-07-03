@@ -116,14 +116,17 @@ namespace DeviceHub.Yhlo
         }
 
         /// <summary>
-        /// 按 Terminator Record（L 记录）切分完整 ASTM 消息；中间帧（ETB）不切分，累积至收到 L 记录后一次性取出。
+        /// 按 Terminator Record（L 记录）切分完整 ASTM 消息；多帧累积至含 L 记录后一次性取出。
         /// </summary>
         private bool TryExtractMessage(out List<byte> message)
         {
             message = new List<byte>(0);
 
-            // buffer 示例: <STX>FN<DATA><ETX/ETB><CS><CR><LF>
-            int startIndex = IndexOfByte(ASTMProtocols.STX); // startIndex=0
+            // buffer 三帧拼接示例：
+            //   <STX>1H|\^&|||^^||||||ASCII|PR|1394-97|20180120110408<CR><ETX>A6<CR><LF>
+            //   <STX>4R|1|TP^TP1I|^+|ResultUnit1|||+|F||||20171019114059|<CR><ETX>46<CR><LF>
+            //   <STX>7L|1|N<CR><ETB>1E<CR><LF>
+            int startIndex = IndexOfByte(ASTMProtocols.STX);
             if (startIndex < 0)
             {
                 if (buffer.Count > Constants.FourMB)
@@ -137,25 +140,29 @@ namespace DeviceHub.Yhlo
             if (startIndex > 0)
                 buffer.RemoveRange(0, startIndex); // 丢弃 STX 前的粘包前缀
 
-            int offset = 0;        // 当前解析帧起始位置，多帧时逐帧后移
-            int consumeLength = 0; // 找到 L 记录后：从 buffer 头部至末帧帧尾的总长度
+            int offset = 0;        // 当前帧 <STX> 下标；示例: 0 → 帧1，再移至帧2/帧3
+            int consumeLength = 0; // 命中 L 后：buffer[0] 至 <ETB>1E<CR><LF> 的总字节数
 
             while (offset < buffer.Count)
             {
                 if (buffer[offset] != ASTMProtocols.STX)
-                    break;
+                    break; // 帧对齐丢失，保留 buffer 等待更多数据或后续重同步
 
                 if (offset + 2 >= buffer.Count)
-                    return false; // 半包，等待 <STX>FN...
+                    return false; // 半包，如只收到 <STX>1
 
-                int payloadStart = offset + 2; // 跳过 <STX>1，指向 H|... 记录区, <DATA>的开始位置
-                int frameEndIndex = -1; // <ETX/ETB>位置
+                // offset+0=<STX> +1=帧号(1/4/7) +2=payload 首字节(H/R/L)
+                int payloadStart = offset + 2; // <DATA>的开始位置
+                int frameEndIndex = -1;  // <ETX/ETB>位置
 
                 for (int i = payloadStart; i < buffer.Count; i++)
                 {
+                    if (buffer[i] == ASTMProtocols.STX)
+                        break; // 当前帧尚无 <ETX>/<ETB> 下一帧已开始，视为半包
                     if (ASTMProtocols.IsFrameEnd(buffer[i]))
                     {
-                        frameEndIndex = i; // 单帧指向 <ETX>；中间帧指向 <ETB>
+                        // 帧1/2: 指向 <ETX>；帧3: 指向 <ETB>
+                        frameEndIndex = i;
                         break;
                     }
                 }
@@ -163,9 +170,10 @@ namespace DeviceHub.Yhlo
                 if (frameEndIndex < 0)
                     return false; // 半包，等待 <ETX>/<ETB>
 
-                // 在 payload 内按 <CR> 切记录，查找 L 终止记录
-                // 帧1 示例 payload: H|...<CR>P|...<CR>          → 无 L，继续下一帧
-                // 帧2 示例 payload: O|...<CR>R|...<CR>L|1|N<CR>  → 命中 L|1|N
+                // 在 [payloadStart, frameEndIndex) 内按 <CR> 切记录
+                // 帧1: "H|\^&|||^^||||||ASCII|PR|1394-97|20180120110408" → 非 L
+                // 帧2: "R|1|TP^TP1I|^+|ResultUnit1|||+|F||||20171019114059"   → 非 L
+                // 帧3: "L|1|N"                                                    → 命中 L|
                 int recordStart = payloadStart;
                 for (int i = payloadStart; i < frameEndIndex; i++)
                 {
@@ -175,21 +183,21 @@ namespace DeviceHub.Yhlo
                     int recordLength = i - recordStart;
                     if (ASTMProtocols.IsTerminatorRecord(CollectionsMarshal.AsSpan(buffer).Slice(recordStart, recordLength)))
                     {
-                        consumeLength = frameEndIndex + 5; // +5 = <ETX/ETB><CS><CR><LF>
+                        consumeLength = frameEndIndex + ASTMProtocols.FrameTrailerLength;
                         break;
                     }
 
-                    recordStart = i + 1; // 下一条记录起始
+                    recordStart = i + 1; // 一帧多记录时，下一条从 <CR> 之后开始
                 }
 
                 if (consumeLength > 0)
                     break;
 
-                // 中间帧未含 L 记录，跳过整帧继续
-                // 帧1: <ETX/ETB><CS><CR><LF><STX> → offset 移到帧2 的 <STX>
-                offset = frameEndIndex + 5;
+                // 跳过整帧：<ETX/ETB><CS><CR><LF>
+                // 帧1 → offset 指向帧2 <STX>；帧2 → offset 指向帧3 <STX>
+                offset = frameEndIndex + ASTMProtocols.FrameTrailerLength;
                 if (offset > buffer.Count)
-                    return false; // 半包，等待下一帧
+                    return false; // 半包，帧尾校验未收齐
             }
 
             if (consumeLength <= 0)
@@ -203,9 +211,9 @@ namespace DeviceHub.Yhlo
             }
 
             if (consumeLength > buffer.Count)
-                return false; // 半包，等待 <ETX><CS>\r\n 帧尾
+                return false; // 半包，如帧3 已有 L|1|N<CR> 但 <ETB>1E<CR><LF> 未齐
 
-            // message = 完整 ASTM 原始报文（含各帧 STX/帧号/ETX|ETB/校验/CR/LF，至末帧帧尾）
+            // message = 三帧完整原始报文，至 <STX>7L|1|N<CR><ETB>1E<CR><LF>
             message = buffer.GetRange(0, consumeLength);
             buffer.RemoveRange(0, consumeLength);
             return true;

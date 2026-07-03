@@ -75,28 +75,21 @@ namespace DeviceHub.Base.Constant
         /// </summary>
         public const byte ETX = 0x03;
 
+        /// <summary>
+        /// 帧尾固定 5 字节：<ETX/ETB> + 2 字节校验 + <CR> + <LF>，若仪器只发 <CR> 无 <LF>，需改为 4 字节。
+        /// </summary>
+        public const int FrameTrailerLength = 5;
+
         public static bool IsFrameEnd(byte value)
         {
             return value == ASTMProtocols.ETX || value == ASTMProtocols.ETB;
         }
-
-        /// <summary>
-        /// 终止记录示例：L|1|N
-        /// </summary>
-        public const string TerminatorRecordType = "L|1|N";
 
         public static bool IsTerminatorRecord(ReadOnlySpan<byte> record)
         {
             return record.Length >= 2
                 && record[0] == (byte)'L'
                 && record[1] == (byte)'|';
-        }
-
-        public static bool IsTerminatorRecord(string record)
-        {
-            return record.Length >= 2
-                && record[0] == 'L'
-                && record[1] == '|';
         }
     }
 }
