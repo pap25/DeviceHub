@@ -23,9 +23,9 @@ namespace DeviceHub.Yhlo
         private readonly List<byte> buffer = new();
 
         /// <summary>
-        /// buffer 中已对完整帧回复 ACK 的字节位置（下次从该位置起才 ACK 新帧）
+        /// buffer 中下一待解析帧的起始位置（此前完整帧均已 ACK）
         /// </summary>
-        private int ackedOffset;
+        private int processedOffset;
 
         /// <summary>
         /// 收到 NAK 后重发最后发送帧的最大次数，超过后断开连接
@@ -87,8 +87,7 @@ namespace DeviceHub.Yhlo
             catch (Exception ex)
             {
                 Logger.Error(logType, "串口接收数据处理异常", ex);
-                buffer.Clear();
-                ackedOffset = 0;
+                ResetReceiveBuffer();
             }
         }
 
@@ -117,8 +116,7 @@ namespace DeviceHub.Yhlo
 
                 case ASTMProtocols.EOT:
                     Logger.Info(logType, "收到 EOT，本次传输结束，清理未完成消息");
-                    buffer.Clear();
-                    ackedOffset = 0;
+                    ResetReceiveBuffer();
                     return;
             }
         }
@@ -140,8 +138,7 @@ namespace DeviceHub.Yhlo
                 if (buffer.Count > Constants.FourMB)
                 {
                     Logger.Error(logType, $"接收数据无STX异常: {Decode(buffer, buffer.Count - Constants.OneMB, Constants.OneMB)}");
-                    buffer.Clear();
-                    ackedOffset = 0;
+                    ResetReceiveBuffer();
                 }
                 return false;
             }
@@ -149,25 +146,21 @@ namespace DeviceHub.Yhlo
             if (startIndex > 0)
             {
                 buffer.RemoveRange(0, startIndex); // 丢弃 STX 前的粘包前缀
-                ackedOffset = Math.Max(0, ackedOffset - startIndex);
+                processedOffset = Math.Max(0, processedOffset - startIndex);
             }
 
-            int offset = ackedOffset; // 跳过已 ACK 的完整帧，从下一帧继续解析
-            int consumeLength = 0; // 命中 L 后：buffer[0] 至 <ETB>1E<CR><LF> 的总字节数
+            int consumeLength = 0; // 命中 L 后：buffer[0] 至帧尾的总字节数
 
-            if (offset >= buffer.Count)
-                return false;
-
-            while (offset < buffer.Count)
+            while (processedOffset < buffer.Count)
             {
-                if (buffer[offset] != ASTMProtocols.STX)
+                if (buffer[processedOffset] != ASTMProtocols.STX)
                     break; // 帧对齐丢失，保留 buffer 等待更多数据或后续重同步
 
-                if (offset + 2 >= buffer.Count)
+                if (processedOffset + 2 >= buffer.Count)
                     return false; // 半包，如只收到 <STX>1
 
-                // offset+0=<STX> +1=帧号(1/4/7) +2=payload 首字节(H/R/L)
-                int payloadStart = offset + 2; // <DATA>的开始位置
+                // processedOffset+0=<STX> +1=帧号 +2=payload 首字节(H/R/L)
+                int payloadStart = processedOffset + 2;
                 int frameEndIndex = -1;  // <ETX/ETB>位置
 
                 for (int i = payloadStart; i < buffer.Count; i++)
@@ -176,7 +169,6 @@ namespace DeviceHub.Yhlo
                         break; // 当前帧尚无 <ETX>/<ETB> 下一帧已开始，视为半包
                     if (ASTMProtocols.IsFrameEnd(buffer[i]))
                     {
-                        // 帧1/2: 指向 <ETX>；帧3: 指向 <ETB>
                         frameEndIndex = i;
                         break;
                     }
@@ -189,17 +181,11 @@ namespace DeviceHub.Yhlo
                 if (frameTrailerEnd > buffer.Count)
                     return false; // 半包，帧尾未收齐
 
-                if (frameTrailerEnd > ackedOffset)
-                {
-                    transport.Send(ASTMProtocols.ACK);
-                    Logger.Debug(logType, "收到完整帧，回复ACK");
-                    ackedOffset = frameTrailerEnd;
-                }
+                transport.Send(ASTMProtocols.ACK);
+                Logger.Debug(logType, "收到完整帧，回复ACK");
+                processedOffset = frameTrailerEnd;
 
-                // 在 [payloadStart, frameEndIndex) 内按 <CR> 切记录
-                // 帧1: "H|\^&|||^^||||||ASCII|PR|1394-97|20180120110408" → 非 L
-                // 帧2: "R|1|TP^TP1I|^+|ResultUnit1|||+|F||||20171019114059"   → 非 L
-                // 帧3: "L|1|N"                                                    → 命中 L|
+                // 在 [payloadStart, frameEndIndex) 内按 <CR> 切记录，查找 L 记录
                 int recordStart = payloadStart;
                 for (int i = payloadStart; i < frameEndIndex; i++)
                 {
@@ -213,15 +199,11 @@ namespace DeviceHub.Yhlo
                         break;
                     }
 
-                    recordStart = i + 1; // 一帧多记录时，下一条从 <CR> 之后开始
+                    recordStart = i + 1;
                 }
 
                 if (consumeLength > 0)
                     break;
-
-                // 跳过整帧：<ETX/ETB><CS><CR><LF>
-                // 帧1 → offset 指向帧2 <STX>；帧2 → offset 指向帧3 <STX>
-                offset = frameTrailerEnd;
             }
 
             if (consumeLength <= 0)
@@ -229,20 +211,21 @@ namespace DeviceHub.Yhlo
                 if (buffer.Count > Constants.FourMB)
                 {
                     Logger.Error(logType, $"接收数据无完整消息(L记录结束)异常: {Decode(buffer, buffer.Count - Constants.OneMB, Constants.OneMB)}");
-                    buffer.Clear();
-                    ackedOffset = 0;
+                    ResetReceiveBuffer();
                 }
                 return false;
             }
 
-            if (consumeLength > buffer.Count)
-                return false; // 半包，如帧3 已有 L|1|N<CR> 但 <ETB>1E<CR><LF> 未齐
-
-            // message = 三帧完整原始报文，至 <STX>7L|1|N<CR><ETB>1E<CR><LF>
             message = buffer.GetRange(0, consumeLength);
             buffer.RemoveRange(0, consumeLength);
-            ackedOffset = Math.Max(0, ackedOffset - consumeLength);
+            processedOffset = 0;
             return true;
+        }
+
+        private void ResetReceiveBuffer()
+        {
+            buffer.Clear();
+            processedOffset = 0;
         }
 
         /// <summary>
@@ -340,8 +323,7 @@ namespace DeviceHub.Yhlo
         {
             transport.DataReceived -= Transport_DataReceived;
             receiveTask.Shutdown();
-            buffer.Clear();
-            ackedOffset = 0;
+            ResetReceiveBuffer();
             transport.Close();
         }
     }
