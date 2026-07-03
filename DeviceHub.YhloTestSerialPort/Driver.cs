@@ -7,6 +7,7 @@ using DeviceHub.Model.Entities;
 using DeviceHub.Service;
 using DeviceHub.Yhlo.Handler;
 using System.IO.Ports;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace DeviceHub.Yhlo
@@ -121,7 +122,7 @@ namespace DeviceHub.Yhlo
         {
             message = new List<byte>(0);
 
-            // buffer 示例: <STX>1H|...\rP|...\rL|1|N\r<ETX>84\r\n
+            // buffer 示例: <STX>FN<DATA><ETX/ETB><CS><CR><LF>
             int startIndex = IndexOfByte(ASTMProtocols.STX); // startIndex=0
             if (startIndex < 0)
             {
@@ -147,8 +148,8 @@ namespace DeviceHub.Yhlo
                 if (offset + 2 >= buffer.Count)
                     return false; // 半包，等待 <STX>FN...
 
-                int payloadStart = offset + 2; // 跳过 <STX>1，指向 H|... 记录区
-                int frameEndIndex = -1;
+                int payloadStart = offset + 2; // 跳过 <STX>1，指向 H|... 记录区, <DATA>的开始位置
+                int frameEndIndex = -1; // <ETX/ETB>位置
 
                 for (int i = payloadStart; i < buffer.Count; i++)
                 {
@@ -163,18 +164,18 @@ namespace DeviceHub.Yhlo
                     return false; // 半包，等待 <ETX>/<ETB>
 
                 // 在 payload 内按 <CR> 切记录，查找 L 终止记录
-                // 帧1 示例 payload: H|...\rP|...\r          → 无 L，继续下一帧
-                // 帧2 示例 payload: O|...\rR|...\rL|1|N\r  → 命中 L|1|N
+                // 帧1 示例 payload: H|...<CR>P|...<CR>          → 无 L，继续下一帧
+                // 帧2 示例 payload: O|...<CR>R|...<CR>L|1|N<CR>  → 命中 L|1|N
                 int recordStart = payloadStart;
                 for (int i = payloadStart; i < frameEndIndex; i++)
                 {
                     if (buffer[i] != ASTMProtocols.CR)
                         continue;
 
-                    string record = Decode(buffer, recordStart, i - recordStart); // 如 "H|..." / "P|..." / "L|1|N"
-                    if (ASTMProtocols.IsTerminatorRecord(record)) // "L|1|N" → true
+                    int recordLength = i - recordStart;
+                    if (ASTMProtocols.IsTerminatorRecord(CollectionsMarshal.AsSpan(buffer).Slice(recordStart, recordLength)))
                     {
-                        consumeLength = frameEndIndex + 5; // +5 = <ETX>B5\r\n 或 <ETB>A3\r\n
+                        consumeLength = frameEndIndex + 5; // +5 = <ETX/ETB><CS><CR><LF>
                         break;
                     }
 

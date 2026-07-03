@@ -85,9 +85,18 @@ namespace DeviceHub.Base.Constant
         /// </summary>
         public const string TerminatorRecordType = "L|1|N";
 
+        public static bool IsTerminatorRecord(ReadOnlySpan<byte> record)
+        {
+            return record.Length >= 2
+                && record[0] == (byte)'L'
+                && record[1] == (byte)'|';
+        }
+
         public static bool IsTerminatorRecord(string record)
         {
-            return record == TerminatorRecordType || record.StartsWith("L|", StringComparison.Ordinal);
+            return record.Length >= 2
+                && record[0] == 'L'
+                && record[1] == '|';
         }
     }
 }
