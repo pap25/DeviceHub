@@ -136,9 +136,8 @@ namespace DeviceHub.Yhlo
             if (startIndex > 0)
                 buffer.RemoveRange(0, startIndex); // 丢弃 STX 前的粘包前缀
 
-            int offset = 0;              // 当前解析帧起始位置，多帧时逐帧后移
-            int terminatorEndIndex = -1; // L|1|N 后 <CR> 的下标
-            int consumeLength = 0;       // 从 buffer 头部移除的总长度（含帧尾校验）
+            int offset = 0;        // 当前解析帧起始位置，多帧时逐帧后移
+            int consumeLength = 0; // 找到 L 记录后：从 buffer 头部至末帧帧尾的总长度
 
             while (offset < buffer.Count)
             {
@@ -175,15 +174,14 @@ namespace DeviceHub.Yhlo
                     string record = Decode(buffer, recordStart, i - recordStart); // 如 "H|..." / "P|..." / "L|1|N"
                     if (ASTMProtocols.IsTerminatorRecord(record)) // "L|1|N" → true
                     {
-                        terminatorEndIndex = i;              // 指向 L|1|N 后的 <CR>
-                        consumeLength = frameEndIndex + 5;   // +5 = <ETX>B5\r\n 或 <ETB>A3\r\n
+                        consumeLength = frameEndIndex + 5; // +5 = <ETX>B5\r\n 或 <ETB>A3\r\n
                         break;
                     }
 
                     recordStart = i + 1; // 下一条记录起始
                 }
 
-                if (terminatorEndIndex >= 0)
+                if (consumeLength > 0)
                     break;
 
                 // 中间帧未含 L 记录，跳过整帧继续
@@ -193,7 +191,7 @@ namespace DeviceHub.Yhlo
                     return false; // 半包，等待下一帧
             }
 
-            if (terminatorEndIndex < 0)
+            if (consumeLength <= 0)
             {
                 if (buffer.Count > Constants.FourMB)
                 {
@@ -206,9 +204,8 @@ namespace DeviceHub.Yhlo
             if (consumeLength > buffer.Count)
                 return false; // 半包，等待 <ETX><CS>\r\n 帧尾
 
-            // message = <STX>1H|...\rP|...\r<STX>2O|...\rR|...\rL|1|N\r（至 L 记录 <CR>，不含帧尾）
-            message = buffer.GetRange(0, terminatorEndIndex + 1);
-            // buffer 移除 message + 末帧尾，如再移除 <ETX>B5\r\n
+            // message = 完整 ASTM 原始报文（含各帧 STX/帧号/ETX|ETB/校验/CR/LF，至末帧帧尾）
+            message = buffer.GetRange(0, consumeLength);
             buffer.RemoveRange(0, consumeLength);
             return true;
         }
@@ -233,7 +230,7 @@ namespace DeviceHub.Yhlo
         }
 
         /// <summary>
-        /// 日志记录完整消息（至 L 记录&lt;CR&gt;，含中间帧）
+        /// 日志记录完整 ASTM 原始报文（含多帧帧尾）
         /// </summary>
         private void LogCompleteMessage(List<byte> message)
         {

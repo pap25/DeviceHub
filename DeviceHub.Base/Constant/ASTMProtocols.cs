@@ -80,9 +80,14 @@ namespace DeviceHub.Base.Constant
             return value == ASTMProtocols.ETX || value == ASTMProtocols.ETB;
         }
 
+        /// <summary>
+        /// 终止记录示例：L|1|N
+        /// </summary>
+        public const string TerminatorRecordType = "L|1|N";
+
         public static bool IsTerminatorRecord(string record)
         {
-            return record == TerminatorRecordType || record.StartsWith($"L|", StringComparison.Ordinal);
+            return record == TerminatorRecordType || record.StartsWith("L|", StringComparison.Ordinal);
         }
     }
 }
