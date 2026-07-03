@@ -111,6 +111,7 @@ namespace DeviceHub.Yhlo
 
                 case ASTMProtocols.EOT:
                     Logger.Info(logType, "收到 EOT，本次传输结束，清理未完成消息");
+                    buffer.Clear();
                     return;
             }
         }
@@ -120,10 +121,6 @@ namespace DeviceHub.Yhlo
         /// </summary>
         private bool TryExtractMessage(out List<byte> message)
         {
-            /** 1 先找到<DATA>索引
-             *  2 <DATA>里面找CR，有的话在看<DATA>是否有L|
-             *  3 有L|的话提取数据并把提取数据从buffer删除
-             * **/
             message = new List<byte>(0);
 
             // buffer 三帧拼接示例：
@@ -248,8 +245,9 @@ namespace DeviceHub.Yhlo
         private void LogCompleteMessage(List<byte> message)
         {
             string rawMessage = Decode(message);
-            Logger.Info(logType, $"串口接收完整消息 原始={rawMessage}");
+            Logger.Info(logType, $"串口接收完整消息{rawMessage}");
             _ = receiveMessageService.Save(_instrumentId, rawMessage);
+            receiveTask.NotifyConsume();
         }
 
         private int IndexOfByte(byte value, int startIndex = 0)
@@ -315,6 +313,9 @@ namespace DeviceHub.Yhlo
 
         public void Stop()
         {
+            transport.DataReceived -= Transport_DataReceived;
+            receiveTask.Shutdown();
+            buffer.Clear();
             transport.Close();
         }
     }
