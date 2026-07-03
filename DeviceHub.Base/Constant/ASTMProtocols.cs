@@ -7,10 +7,6 @@ namespace DeviceHub.Base.Constant
     /// </summary>
     public static class ASTMProtocols
     {
-        public const char FieldSeparator = '|';
-
-        public const string TerminatorRecordType = "L";
-
         /// <summary>
         /// 收到 NAK 后重发 ENQ 的等待时间（秒）
         /// </summary>
@@ -81,22 +77,12 @@ namespace DeviceHub.Base.Constant
 
         public static bool IsFrameEnd(byte value)
         {
-            return value == ASTMProtocols.ETX ||
-                   value == ASTMProtocols.ETB;
-        }
-
-        public static bool IsSessionControl(byte value)
-        {
-            return value == ASTMProtocols.ENQ ||
-                   value == ASTMProtocols.ACK ||
-                   value == ASTMProtocols.NAK ||
-                   value == ASTMProtocols.EOT;
+            return value == ASTMProtocols.ETX || value == ASTMProtocols.ETB;
         }
 
         public static bool IsTerminatorRecord(string record)
         {
-            return record == TerminatorRecordType ||
-                   record.StartsWith($"{TerminatorRecordType}{FieldSeparator}", StringComparison.Ordinal);
+            return record == TerminatorRecordType || record.StartsWith($"L|", StringComparison.Ordinal);
         }
     }
 }

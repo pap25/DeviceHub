@@ -25,35 +25,31 @@ namespace DeviceHub.Base.Transports
         /// <summary>
         /// 打开串口
         /// </summary>
-        public Task Open()
+        public void Open()
         {
             if (!_serialPort.IsOpen)
             {
                 _serialPort.Open();
                 Logger.Info(logType, $"串口已打开: {_serialPort.PortName}");
             }
-
-            return Task.CompletedTask;
         }
 
         /// <summary>
         /// 关闭串口
         /// </summary>
-        public Task Close()
+        public void Close()
         {
             if (_serialPort.IsOpen)
             {
                 _serialPort.Close();
                 Logger.Info(logType, $"串口已关闭: {_serialPort.PortName}");
             }
-
-            return Task.CompletedTask;
         }
 
         /// <summary>
         /// 发送字节
         /// </summary>
-        public Task Send(byte[] data)
+        public void Send(byte[] data)
         {
             if (!_serialPort.IsOpen)
             {
@@ -61,23 +57,21 @@ namespace DeviceHub.Base.Transports
             }
 
             _serialPort.Write(data, 0, data.Length);
-
-            return Task.CompletedTask;
         }
 
-        public Task Send(byte data)
+        public void Send(byte data)
         {
-            return Send([data]);
+            Send([data]);
         }
 
         /// <summary>
         /// 发送字符串
         /// </summary>
-        public Task Send(string message, Encoding? encoding = null)
+        public void Send(string message, Encoding? encoding = null)
         {
             encoding ??= Encoding.ASCII;
 
-            return Send(encoding.GetBytes(message));
+            Send(encoding.GetBytes(message));
         }
 
         private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
