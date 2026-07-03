@@ -171,6 +171,13 @@ namespace DeviceHub.Yhlo
                 if (frameEndIndex < 0)
                     return false; // 半包，等待 <ETX>/<ETB>
 
+                int frameTrailerEnd = frameEndIndex + ASTMProtocols.FrameTrailerLength;
+                if (frameTrailerEnd > buffer.Count)
+                    return false; // 半包，帧尾未收齐
+
+                transport.Send(ASTMProtocols.ACK);
+                Logger.Debug(logType, "收到完整帧，回复ACK");
+
                 // 在 [payloadStart, frameEndIndex) 内按 <CR> 切记录
                 // 帧1: "H|\^&|||^^||||||ASCII|PR|1394-97|20180120110408" → 非 L
                 // 帧2: "R|1|TP^TP1I|^+|ResultUnit1|||+|F||||20171019114059"   → 非 L
@@ -184,7 +191,7 @@ namespace DeviceHub.Yhlo
                     int recordLength = i - recordStart;
                     if (ASTMProtocols.IsTerminatorRecord(CollectionsMarshal.AsSpan(buffer).Slice(recordStart, recordLength)))
                     {
-                        consumeLength = frameEndIndex + ASTMProtocols.FrameTrailerLength;
+                        consumeLength = frameTrailerEnd;
                         break;
                     }
 
@@ -196,9 +203,7 @@ namespace DeviceHub.Yhlo
 
                 // 跳过整帧：<ETX/ETB><CS><CR><LF>
                 // 帧1 → offset 指向帧2 <STX>；帧2 → offset 指向帧3 <STX>
-                offset = frameEndIndex + ASTMProtocols.FrameTrailerLength;
-                if (offset > buffer.Count)
-                    return false; // 半包，帧尾校验未收齐
+                offset = frameTrailerEnd;
             }
 
             if (consumeLength <= 0)
