@@ -186,7 +186,7 @@ namespace DeviceHub.Yhlo
                     break;
 
                 // 中间帧未含 L 记录，跳过整帧继续
-                // 帧1: <STX>1H|...\rP|...\r<ETB>A3\r\n → offset 移到帧2 的 <STX>
+                // 帧1: <ETX/ETB><CS><CR><LF><STX> → offset 移到帧2 的 <STX>
                 offset = frameEndIndex + 5;
                 if (offset > buffer.Count)
                     return false; // 半包，等待下一帧
