@@ -120,6 +120,10 @@ namespace DeviceHub.Yhlo
         /// </summary>
         private bool TryExtractMessage(out List<byte> message)
         {
+            /** 1 先找到<DATA>索引
+             *  2 <DATA>里面找CR，有的话在看<DATA>是否有L|
+             *  3 有L|的话提取数据并把提取数据从buffer删除
+             * **/
             message = new List<byte>(0);
 
             // buffer 三帧拼接示例：
