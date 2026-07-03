@@ -23,6 +23,11 @@ namespace DeviceHub.Yhlo
         private readonly List<byte> buffer = new();
 
         /// <summary>
+        /// buffer 中已对完整帧回复 ACK 的字节位置（下次从该位置起才 ACK 新帧）
+        /// </summary>
+        private int ackedOffset;
+
+        /// <summary>
         /// 收到 NAK 后重发最后发送帧的最大次数，超过后断开连接
         /// </summary>
         private const int MaxRetransmitCount = 6;
@@ -83,6 +88,7 @@ namespace DeviceHub.Yhlo
             {
                 Logger.Error(logType, "串口接收数据处理异常", ex);
                 buffer.Clear();
+                ackedOffset = 0;
             }
         }
 
@@ -112,6 +118,7 @@ namespace DeviceHub.Yhlo
                 case ASTMProtocols.EOT:
                     Logger.Info(logType, "收到 EOT，本次传输结束，清理未完成消息");
                     buffer.Clear();
+                    ackedOffset = 0;
                     return;
             }
         }
@@ -134,12 +141,16 @@ namespace DeviceHub.Yhlo
                 {
                     Logger.Error(logType, $"接收数据无STX异常: {Decode(buffer, buffer.Count - Constants.OneMB, Constants.OneMB)}");
                     buffer.Clear();
+                    ackedOffset = 0;
                 }
                 return false;
             }
 
             if (startIndex > 0)
+            {
                 buffer.RemoveRange(0, startIndex); // 丢弃 STX 前的粘包前缀
+                ackedOffset = Math.Max(0, ackedOffset - startIndex);
+            }
 
             int offset = 0;        // 当前帧 <STX> 下标；示例: 0 → 帧1，再移至帧2/帧3
             int consumeLength = 0; // 命中 L 后：buffer[0] 至 <ETB>1E<CR><LF> 的总字节数
@@ -175,8 +186,12 @@ namespace DeviceHub.Yhlo
                 if (frameTrailerEnd > buffer.Count)
                     return false; // 半包，帧尾未收齐
 
-                transport.Send(ASTMProtocols.ACK);
-                Logger.Debug(logType, "收到完整帧，回复ACK");
+                if (frameTrailerEnd > ackedOffset)
+                {
+                    transport.Send(ASTMProtocols.ACK);
+                    Logger.Debug(logType, "收到完整帧，回复ACK");
+                    ackedOffset = frameTrailerEnd;
+                }
 
                 // 在 [payloadStart, frameEndIndex) 内按 <CR> 切记录
                 // 帧1: "H|\^&|||^^||||||ASCII|PR|1394-97|20180120110408" → 非 L
@@ -212,6 +227,7 @@ namespace DeviceHub.Yhlo
                 {
                     Logger.Error(logType, $"接收数据无完整消息(L记录结束)异常: {Decode(buffer, buffer.Count - Constants.OneMB, Constants.OneMB)}");
                     buffer.Clear();
+                    ackedOffset = 0;
                 }
                 return false;
             }
@@ -222,6 +238,7 @@ namespace DeviceHub.Yhlo
             // message = 三帧完整原始报文，至 <STX>7L|1|N<CR><ETB>1E<CR><LF>
             message = buffer.GetRange(0, consumeLength);
             buffer.RemoveRange(0, consumeLength);
+            ackedOffset = Math.Max(0, ackedOffset - consumeLength);
             return true;
         }
 
@@ -321,6 +338,7 @@ namespace DeviceHub.Yhlo
             transport.DataReceived -= Transport_DataReceived;
             receiveTask.Shutdown();
             buffer.Clear();
+            ackedOffset = 0;
             transport.Close();
         }
     }
