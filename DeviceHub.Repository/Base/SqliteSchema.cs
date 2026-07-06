@@ -26,25 +26,29 @@ internal static class SqliteSchema
         CREATE TABLE IF NOT EXISTS receive_message_decode (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             receive_message_id INTEGER NOT NULL,
+            external_no TEXT NOT NULL DEFAULT '',
             type INTEGER NOT NULL,
             sample_no TEXT NOT NULL DEFAULT '',
             barcode TEXT NOT NULL DEFAULT '',
             result_json TEXT NOT NULL,
             create_time INTEGER NOT NULL,
             update_time INTEGER NOT NULL,
-            UNIQUE(receive_message_id)
+            UNIQUE(receive_message_id),
+            UNIQUE(external_no)
         );
 
         CREATE TABLE IF NOT EXISTS send_message (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             instrument_id INTEGER NOT NULL,
             type INTEGER NOT NULL,
+            external_no TEXT NOT NULL DEFAULT '',
             sample_no TEXT NOT NULL DEFAULT '',
             barcode TEXT NOT NULL DEFAULT '',
             status INTEGER NOT NULL,
             error_message TEXT NOT NULL DEFAULT '',
             create_time INTEGER NOT NULL,
-            update_time INTEGER NOT NULL
+            update_time INTEGER NOT NULL,
+            UNIQUE(external_no)
         );
 
         CREATE INDEX IF NOT EXISTS idx_send_message_status ON send_message(status);

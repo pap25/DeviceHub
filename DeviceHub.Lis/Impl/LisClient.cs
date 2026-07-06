@@ -1,8 +1,6 @@
 ﻿using DeviceHub.Abstractions.Dto;
 using DeviceHub.Base.Common;
-using DeviceHub.Lis.dto;
 using DeviceHub.Lis.Dto;
-using System.Reflection.Metadata.Ecma335;
 using System.Text.Json;
 using static DeviceHub.Lis.Dto.GetInstrument;
 
@@ -120,12 +118,12 @@ namespace DeviceHub.Lis.Impl
 
         public Task<Resp<UploadSpecimenTestResultOutput>> UploadSpecimenTestResult(UploadSpecimenTestResultInput uploadSpecimenTestResultInput)
         {
-            Logger.Debug(logType, $"准备上传检验结果{JsonSerializer.Deserialize(uploadSpecimenTestResultInput)}");
+            Logger.Debug(logType, $"准备上传检验结果 {JsonSerializer.Serialize(uploadSpecimenTestResultInput)}");
 
-            string resultId = Guid.NewGuid().ToString(); // 后续调用LIS接口替换
+            string resultId = Guid.NewGuid().ToString(); // 后续调用LIS接口替换，作为 external_no 回写
 
-            Logger.Debug(logType, $"已上传检验结果LIS resultId={resultId}");
-            return Task.FromResult(Resp<UploadSpecimenTestResultOutput>.Ok(new UploadSpecimenTestResultOutput() { ResultId = resultId }));
+            Logger.Debug(logType, $"已上传检验结果 LIS resultId={resultId}");
+            return Task.FromResult(Resp<UploadSpecimenTestResultOutput>.Ok(new UploadSpecimenTestResultOutput { ResultId = resultId }));
         }
 
         public Task<GetSampleApplyItemOutput> GetSampleApplyItem(string sampleNo, string barcode)

@@ -1,5 +1,4 @@
 ﻿using DeviceHub.Abstractions.Dto;
-using DeviceHub.Lis.dto;
 using DeviceHub.Lis.Dto;
 
 namespace DeviceHub.Lis

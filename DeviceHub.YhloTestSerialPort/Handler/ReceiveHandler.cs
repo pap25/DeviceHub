@@ -1,6 +1,6 @@
 ﻿using DeviceHub.Base.Common;
 using DeviceHub.Lis;
-using DeviceHub.Lis.dto;
+using DeviceHub.Lis.Dto;
 using DeviceHub.Lis.Impl;
 using DeviceHub.Model.Entities;
 using DeviceHub.Repository.Repositories;

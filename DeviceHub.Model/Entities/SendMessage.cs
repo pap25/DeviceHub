@@ -23,6 +23,11 @@ public class SendMessage
     public TypeEnum Type { get; set; }
 
     /// <summary>
+    /// 外部编号（LIS 侧唯一标识）
+    /// </summary>
+    public string ExternalNo { get; set; }
+
+    /// <summary>
     /// 样本号
     /// </summary>
     public string SampleNo { get; set; }

@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace DeviceHub.Lis.Dto;
 
-namespace DeviceHub.Lis.dto
+public class UploadSpecimenTestResultInput
 {
-    public class UploadSpecimenTestResultInput
-    {
-    }
+
 }

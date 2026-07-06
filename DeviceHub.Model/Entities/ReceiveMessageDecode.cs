@@ -18,6 +18,11 @@ public class ReceiveMessageDecode
     public long ReceiveMessageId { get; set; }
 
     /// <summary>
+    /// 外部编号（LIS 侧唯一标识）
+    /// </summary>
+    public string ExternalNo { get; set; }
+
+    /// <summary>
     /// 解码类型
     /// </summary>
     public TypeEnum Type { get; set; }

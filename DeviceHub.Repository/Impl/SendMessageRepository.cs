@@ -18,8 +18,8 @@ public class SendMessageRepository : ISendMessageRepository
     public async Task<long> Insert(SendMessage entity, CancellationToken cancellationToken = default)
     {
         const string sql = """
-            INSERT INTO send_message (instrument_id, type, sample_no, barcode, status, error_message, create_time, update_time)
-            VALUES (@instrument_id, @type, @sample_no, @barcode, @status, @error_message, @create_time, @update_time)
+            INSERT INTO send_message (instrument_id, type, external_no, sample_no, barcode, status, error_message, create_time, update_time)
+            VALUES (@instrument_id, @type, @external_no, @sample_no, @barcode, @status, @error_message, @create_time, @update_time)
             RETURNING id;
             """;
 
@@ -28,6 +28,7 @@ public class SendMessageRepository : ISendMessageRepository
             [
                 DbHelper.Param("@instrument_id", entity.InstrumentId),
                 DbHelper.Param("@type", (byte)entity.Type),
+                DbHelper.Param("@external_no", entity.ExternalNo),
                 DbHelper.Param("@sample_no", entity.SampleNo),
                 DbHelper.Param("@barcode", entity.Barcode),
                 DbHelper.Param("@status", (byte)entity.Status),
@@ -46,6 +47,7 @@ public class SendMessageRepository : ISendMessageRepository
             UPDATE send_message
             SET instrument_id = @instrument_id,
                 type = @type,
+                external_no = @external_no,
                 sample_no = @sample_no,
                 barcode = @barcode,
                 status = @status,
@@ -61,6 +63,7 @@ public class SendMessageRepository : ISendMessageRepository
                 DbHelper.Param("@id", entity.Id),
                 DbHelper.Param("@instrument_id", entity.InstrumentId),
                 DbHelper.Param("@type", (byte)entity.Type),
+                DbHelper.Param("@external_no", entity.ExternalNo),
                 DbHelper.Param("@sample_no", entity.SampleNo),
                 DbHelper.Param("@barcode", entity.Barcode),
                 DbHelper.Param("@status", (byte)entity.Status),
@@ -183,19 +186,20 @@ public class SendMessageRepository : ISendMessageRepository
     }
 
     private const string SelectColumns =
-        "SELECT id, instrument_id, type, sample_no, barcode, status, error_message, create_time, update_time FROM send_message";
+        "SELECT id, instrument_id, type, external_no, sample_no, barcode, status, error_message, create_time, update_time FROM send_message";
 
     private static SendMessage Map(SqliteDataReader reader) => new()
     {
         Id = reader.GetInt64(0),
         InstrumentId = reader.GetInt64(1),
         Type = (SendMessage.TypeEnum)reader.GetByte(2),
-        SampleNo = reader.GetString(3),
-        Barcode = reader.GetString(4),
-        Status = (SendMessage.StatusEnum)reader.GetByte(5),
-        ErrorMessage = reader.GetString(6),
-        CreateTime = reader.GetInt64(7),
-        UpdateTime = reader.GetInt64(8)
+        ExternalNo = reader.GetString(3),
+        SampleNo = reader.GetString(4),
+        Barcode = reader.GetString(5),
+        Status = (SendMessage.StatusEnum)reader.GetByte(6),
+        ErrorMessage = reader.GetString(7),
+        CreateTime = reader.GetInt64(8),
+        UpdateTime = reader.GetInt64(9)
     };
 
     private static SendMessageView MapView(SqliteDataReader reader) => new()
