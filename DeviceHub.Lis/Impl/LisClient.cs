@@ -118,11 +118,11 @@ namespace DeviceHub.Lis.Impl
 
         public Task<Resp<UploadSpecimenTestResultOutput>> UploadSpecimenTestResult(UploadSpecimenTestResultInput uploadSpecimenTestResultInput)
         {
-            Logger.Debug(logType, $"准备上传检验结果 {JsonSerializer.Serialize(uploadSpecimenTestResultInput)}");
+            Logger.Debug(logType, $"准备上传LIS检验结果 {JsonSerializer.Serialize(uploadSpecimenTestResultInput)}");
 
             string resultId = Guid.NewGuid().ToString(); // 后续调用LIS接口替换，作为 external_no 回写
 
-            Logger.Debug(logType, $"已上传检验结果 LIS resultId={resultId}");
+            Logger.Debug(logType, $"已上传LIS检验结果 resultId={resultId}");
             return Task.FromResult(Resp<UploadSpecimenTestResultOutput>.Ok(new UploadSpecimenTestResultOutput { ResultId = resultId }));
         }
 

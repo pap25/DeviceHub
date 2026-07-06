@@ -16,6 +16,7 @@ public class ReceiveMessageService
 
     private readonly ReceiveMessageRepository receiveMessageRepository = ReceiveMessageRepository.Instance;
     private readonly ReceiveMessageLargeRepository receiveMessageLargeRepository = ReceiveMessageLargeRepository.Instance;
+    private readonly ReceiveMessageDecodeRepository receiveMessageDecodeRepository = ReceiveMessageDecodeRepository.Instance;
 
     private ReceiveMessageService()
     {
@@ -76,5 +77,26 @@ public class ReceiveMessageService
             receiveMessageLarge.ReceiveMessageId = receiveMessageId;
             await receiveMessageLargeRepository.Insert(receiveMessageLarge, connection, transaction);
         });
+    }
+
+    public void UpdateSuccess(long id, ReceiveMessageDecode.TypeEnum type, string externalNo, string sampleNo, string barcode, string resultJson)
+    {
+        // 更新 receive_message 新增 receive_message_decode
+
+        long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        ReceiveMessageDecode receiveMessageDecode = new()
+        {
+            ReceiveMessageId = id,
+            ExternalNo = externalNo,
+            Type = type,
+            SampleNo = sampleNo,
+            Barcode = barcode,
+            ResultJson = resultJson,
+            CreateTime = now,
+            UpdateTime = now
+        };
+
+        receiveMessageRepository.UpdateStatusAndUpdateTimeById(id, ReceiveMessage.StatusEnum.Success, now);
+        receiveMessageDecodeRepository.Insert(receiveMessageDecode);
     }
 }

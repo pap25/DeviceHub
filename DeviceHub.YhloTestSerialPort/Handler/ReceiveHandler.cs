@@ -1,10 +1,14 @@
-﻿using DeviceHub.Base.Common;
+﻿using DeviceHub.Abstractions.Dto;
+using DeviceHub.Base.Common;
 using DeviceHub.Lis;
 using DeviceHub.Lis.Dto;
 using DeviceHub.Lis.Impl;
 using DeviceHub.Model.Entities;
 using DeviceHub.Repository.Repositories;
+using DeviceHub.Service;
 using DeviceHub.Yhlo.Protocol;
+using System.Text.Json;
+using static DeviceHub.Yhlo.Protocol.AstmMessageParser;
 
 namespace DeviceHub.Yhlo.Handler
 {
@@ -14,6 +18,7 @@ namespace DeviceHub.Yhlo.Handler
         private long _instrumentId;
         private readonly ReceiveMessageRepository receiveMessageRepository = ReceiveMessageRepository.Instance;
         private readonly ReceiveMessageLargeRepository receiveMessageLargeRepository = ReceiveMessageLargeRepository.Instance;
+        private readonly ReceiveMessageService receiveMessageService = ReceiveMessageService.Instance;
         private readonly ILisClient lisClient = LisClient.Instance;
 
         public ReceiveHandler(long instrumentId)
@@ -30,22 +35,29 @@ namespace DeviceHub.Yhlo.Handler
 
         public void HandleTask(ReceiveMessage task)
         {
-            ReceiveMessageLarge? receiveMessageLarge = receiveMessageLargeRepository.GetByReceiveMessageId(task.Id).GetAwaiter().GetResult();
-            long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            if (receiveMessageLarge == null)
+            try
             {
-                MarkFailed(task.Id, "数据异常", now);
-                return;
-            }
+                ReceiveMessageLarge? receiveMessageLarge = receiveMessageLargeRepository.GetByReceiveMessageId(task.Id).GetAwaiter().GetResult();
+                long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                if (receiveMessageLarge == null)
+                {
+                    MarkFailed(task.Id, "数据异常", now);
+                    return;
+                }
 
-            AstmMessageParser.ParseResult parseResult = AstmMessageParser.TryParse(receiveMessageLarge.RawMessage);
-            if (!parseResult.Success)
+                AstmMessageVerify.VerifyParseResult parseResult = AstmMessageVerify.VerifyParse(receiveMessageLarge.RawMessage);
+                if (!parseResult.Success)
+                {
+                    MarkFailed(task.Id, parseResult.ErrorMessage, now);
+                    return;
+                }
+
+                _ = ParseData(parseResult.ParsedData, task);
+            }
+            catch (Exception e)
             {
-                MarkFailed(task.Id, parseResult.ErrorMessage, now);
-                return;
+                MarkFailed(task.Id, "HandleTask异常" + e.Message, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
             }
-
-            ParseData(parseResult.ParsedData, task);
         }
 
         private void MarkFailed(long id, string errorMessage, long now)
@@ -61,13 +73,25 @@ namespace DeviceHub.Yhlo.Handler
         /// <summary>
         /// DATA 解析
         /// </summary>
-        private void ParseData(List<string> dataList, ReceiveMessage task)
+        private async Task ParseData(List<string> dataList, ReceiveMessage task)
         {
-            UploadSpecimenTestResultInput uploadSpecimenTestResultInput = null;
-            lisClient.UploadSpecimenTestResult(uploadSpecimenTestResultInput);
-            // TODO: 解析 ASTM 记录并上传检验结果
-            // receiveMessageRepository.UpdateStatusAndUpdateTimeById(task.Id, ReceiveMessage.StatusEnum.Success, now);
-            // 解码后保存 receive_message_decode，更新 receive_message
+            ParseResult parseResult = AstmMessageParser.Parse(dataList);
+            UploadSpecimenTestResultInput uploadSpecimenTestResultInput = ToUploadSpecimenTestResultInput(parseResult);
+
+            Resp<UploadSpecimenTestResultOutput> resp = await lisClient.UploadSpecimenTestResult(uploadSpecimenTestResultInput);
+            if (!resp.IsSuccess())
+            {
+                MarkFailed(task.Id, resp.GetErrorMsg() ?? "", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+                return;
+            }
+            string resultId = resp.GetData().ResultId;
+
+            receiveMessageService.UpdateSuccess(task.Id, ReceiveMessageDecode.TypeEnum.TestResult, resultId, "", "", JsonSerializer.Serialize(uploadSpecimenTestResultInput));
+        }
+
+        private UploadSpecimenTestResultInput ToUploadSpecimenTestResultInput(ParseResult parseResult)
+        {
+            return new UploadSpecimenTestResultInput();
         }
     }
 }
