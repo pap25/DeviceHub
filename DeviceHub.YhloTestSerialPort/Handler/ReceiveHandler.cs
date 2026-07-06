@@ -8,7 +8,7 @@ using DeviceHub.Repository.Repositories;
 using DeviceHub.Service;
 using DeviceHub.Yhlo.Protocol;
 using System.Text.Json;
-using static DeviceHub.Yhlo.Protocol.AstmMessageParser;
+using static DeviceHub.Yhlo.Protocol.AstmMessageDecode;
 
 namespace DeviceHub.Yhlo.Handler
 {
@@ -75,7 +75,7 @@ namespace DeviceHub.Yhlo.Handler
         /// </summary>
         private async Task ParseData(List<string> dataList, ReceiveMessage task)
         {
-            ParseResult parseResult = AstmMessageParser.Parse(dataList);
+            ParseResult parseResult = AstmMessageDecode.Parse(dataList);
             UploadSpecimenTestResultInput uploadSpecimenTestResultInput = ToUploadSpecimenTestResultInput(parseResult);
 
             Resp<UploadSpecimenTestResultOutput> resp = await lisClient.UploadSpecimenTestResult(uploadSpecimenTestResultInput);
