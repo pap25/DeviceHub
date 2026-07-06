@@ -79,7 +79,7 @@ public class ReceiveMessageService
         });
     }
 
-    public void UpdateSuccess(long id, ReceiveMessageDecode.TypeEnum type, string externalNo, string sampleNo, string barcode, string resultJson)
+    public async Task UpdateSuccess(long id, ReceiveMessageDecode.TypeEnum type, string externalNo, string sampleNo, string barcode, string resultJson)
     {
         // 更新 receive_message 新增 receive_message_decode
 
@@ -96,7 +96,11 @@ public class ReceiveMessageService
             UpdateTime = now
         };
 
-        receiveMessageRepository.UpdateStatusAndUpdateTimeById(id, ReceiveMessage.StatusEnum.Success, now);
-        receiveMessageDecodeRepository.Insert(receiveMessageDecode);
+        await DbHelper.ExecuteInTransactionAsync(async (connection, transaction) =>
+        {
+            await receiveMessageRepository.UpdateStatusAndUpdateTimeById(
+                id, ReceiveMessage.StatusEnum.Success, now, connection, transaction);
+            await receiveMessageDecodeRepository.Insert(receiveMessageDecode, connection, transaction);
+        });
     }
 }

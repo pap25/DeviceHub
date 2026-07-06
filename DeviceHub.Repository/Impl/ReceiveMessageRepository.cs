@@ -103,10 +103,19 @@ public class ReceiveMessageRepository : IReceiveMessageRepository
         return rows > 0;
     }
 
+    public Task<bool> UpdateStatusAndUpdateTimeById(
+        long id,
+        ReceiveMessage.StatusEnum status,
+        long updateTime,
+        CancellationToken cancellationToken = default) =>
+        UpdateStatusAndUpdateTimeById(id, status, updateTime, null, null, cancellationToken);
+
     public async Task<bool> UpdateStatusAndUpdateTimeById(
         long id,
         ReceiveMessage.StatusEnum status,
         long updateTime,
+        SqliteConnection? connection,
+        SqliteTransaction? transaction,
         CancellationToken cancellationToken = default)
     {
         const string sql = """
@@ -116,14 +125,16 @@ public class ReceiveMessageRepository : IReceiveMessageRepository
             WHERE id = @id;
             """;
 
-        var rows = await DbHelper.ExecuteNonQueryAsync(
-            sql,
-            [
-                DbHelper.Param("@id", id),
-                DbHelper.Param("@status", (byte)status),
-                DbHelper.Param("@update_time", updateTime)
-            ],
-            cancellationToken);
+        var parameters = new SqliteParameter[]
+        {
+            DbHelper.Param("@id", id),
+            DbHelper.Param("@status", (byte)status),
+            DbHelper.Param("@update_time", updateTime)
+        };
+
+        int rows = connection is not null && transaction is not null
+            ? await DbHelper.ExecuteNonQueryAsync(connection, transaction, sql, parameters, cancellationToken)
+            : await DbHelper.ExecuteNonQueryAsync(sql, parameters, cancellationToken);
 
         return rows > 0;
     }

@@ -86,7 +86,7 @@ namespace DeviceHub.Yhlo.Handler
             }
             string resultId = resp.GetData().ResultId;
 
-            receiveMessageService.UpdateSuccess(task.Id, ReceiveMessageDecode.TypeEnum.TestResult, resultId, "", "", JsonSerializer.Serialize(uploadSpecimenTestResultInput));
+            await receiveMessageService.UpdateSuccess(task.Id, ReceiveMessageDecode.TypeEnum.TestResult, resultId, "", "", JsonSerializer.Serialize(uploadSpecimenTestResultInput));
         }
 
         private UploadSpecimenTestResultInput ToUploadSpecimenTestResultInput(ParseResult parseResult)

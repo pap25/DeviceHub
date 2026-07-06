@@ -14,7 +14,14 @@ public class ReceiveMessageDecodeRepository : IReceiveMessageDecodeRepository
     {
     }
 
-    public async Task<long> Insert(ReceiveMessageDecode entity, CancellationToken cancellationToken = default)
+    public Task<long> Insert(ReceiveMessageDecode entity, CancellationToken cancellationToken = default) =>
+        Insert(entity, null, null, cancellationToken);
+
+    public async Task<long> Insert(
+        ReceiveMessageDecode entity,
+        SqliteConnection? connection,
+        SqliteTransaction? transaction,
+        CancellationToken cancellationToken = default)
     {
         const string sql = """
             INSERT INTO receive_message_decode (receive_message_id, external_no, type, sample_no, barcode, result_json, create_time, update_time)
@@ -22,21 +29,25 @@ public class ReceiveMessageDecodeRepository : IReceiveMessageDecodeRepository
             RETURNING id;
             """;
 
-        var id = await DbHelper.ExecuteScalarAsync<long>(
-            sql,
-            [
-                DbHelper.Param("@receive_message_id", entity.ReceiveMessageId),
-                DbHelper.Param("@external_no", entity.ExternalNo),
-                DbHelper.Param("@type", (byte)entity.Type),
-                DbHelper.Param("@sample_no", entity.SampleNo),
-                DbHelper.Param("@barcode", entity.Barcode),
-                DbHelper.Param("@result_json", entity.ResultJson),
-                DbHelper.Param("@create_time", entity.CreateTime),
-                DbHelper.Param("@update_time", entity.UpdateTime)
-            ],
-            cancellationToken);
+        var parameters = new SqliteParameter[]
+        {
+            DbHelper.Param("@receive_message_id", entity.ReceiveMessageId),
+            DbHelper.Param("@external_no", entity.ExternalNo),
+            DbHelper.Param("@type", (byte)entity.Type),
+            DbHelper.Param("@sample_no", entity.SampleNo),
+            DbHelper.Param("@barcode", entity.Barcode),
+            DbHelper.Param("@result_json", entity.ResultJson),
+            DbHelper.Param("@create_time", entity.CreateTime),
+            DbHelper.Param("@update_time", entity.UpdateTime)
+        };
 
-        return id;
+        if (connection is not null && transaction is not null)
+        {
+            return await DbHelper.ExecuteScalarAsync<long>(
+                connection, transaction, sql, parameters, cancellationToken);
+        }
+
+        return await DbHelper.ExecuteScalarAsync<long>(sql, parameters, cancellationToken);
     }
 
     public async Task<bool> Update(ReceiveMessageDecode entity, CancellationToken cancellationToken = default)
