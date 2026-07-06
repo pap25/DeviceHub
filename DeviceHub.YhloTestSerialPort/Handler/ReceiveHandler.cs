@@ -1,7 +1,7 @@
 ﻿using DeviceHub.Base.Common;
-using DeviceHub.Base.Protocol;
 using DeviceHub.Model.Entities;
 using DeviceHub.Repository.Repositories;
+using DeviceHub.Yhlo.Protocol;
 
 namespace DeviceHub.Yhlo.Handler
 {

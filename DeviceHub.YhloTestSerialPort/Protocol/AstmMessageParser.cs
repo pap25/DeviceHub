@@ -2,7 +2,7 @@ using DeviceHub.Base.Constant;
 using System;
 using System.Text;
 
-namespace DeviceHub.Base.Protocol
+namespace DeviceHub.Yhlo.Protocol
 {
     /// <summary>
     /// ASTM 多帧报文解析：<STX> FN DATA <ETB/ETX> CS <CR><LF>
@@ -13,12 +13,12 @@ namespace DeviceHub.Base.Protocol
         {
             public bool Success { get; init; }
 
-            public string ErrorMessage { get; init; }
+            public string ErrorMessage { get; init; } = string.Empty;
 
             /// <summary>
             /// 各帧 DATA 拼接结果（不含 STX、FN、帧尾）
             /// </summary>
-            public string ParsedData { get; init; }
+            public string ParsedData { get; init; } = string.Empty;
         }
 
         public static ParseResult TryParse(string rawMessage)
@@ -147,7 +147,6 @@ namespace DeviceHub.Base.Protocol
                 sum += value;
             }
 
-            //return (byte)((256 - (sum & 0xFF)) & 0xFF);
             return (byte)(sum & 0xFF);
         }
 
