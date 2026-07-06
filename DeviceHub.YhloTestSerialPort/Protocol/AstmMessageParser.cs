@@ -147,7 +147,8 @@ namespace DeviceHub.Base.Protocol
                 sum += value;
             }
 
-            return (byte)((256 - (sum & 0xFF)) & 0xFF);
+            //return (byte)((256 - (sum & 0xFF)) & 0xFF);
+            return (byte)(sum & 0xFF);
         }
 
         private static bool TryParseHexByte(byte high, byte low, out byte value)
