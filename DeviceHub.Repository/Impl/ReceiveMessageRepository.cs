@@ -287,7 +287,7 @@ public class ReceiveMessageRepository : IReceiveMessageRepository
     private static ReceiveMessageView MapView(SqliteDataReader reader) => new()
     {
         Status = (ReceiveMessage.StatusEnum)reader.GetByte(0),
-        RawMessage = reader.GetString(1),
+        RawMessage = reader.IsDBNull(1) ? [] : reader.GetFieldValue<byte[]>(1),
         ResultJson = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),
         Type = reader.IsDBNull(3) ? null : (ReceiveMessageDecode.TypeEnum)reader.GetByte(3),
         Barcode = reader.IsDBNull(4) ? string.Empty : reader.GetString(4),

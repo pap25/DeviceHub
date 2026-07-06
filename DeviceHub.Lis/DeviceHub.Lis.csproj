@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DeviceHub.Abstractions\DeviceHub.Abstractions.csproj" />
+    <ProjectReference Include="..\DeviceHub.Utils\DeviceHub.Utils.csproj" />
   </ItemGroup>
 
 </Project>

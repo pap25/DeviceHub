@@ -5,6 +5,7 @@ using DeviceHub.Model.Vo;
 using DeviceHub.Repository;
 using DeviceHub.Repository.Repositories;
 using DeviceHub.Utils;
+using System.Text;
 
 namespace DeviceHub.Service;
 
@@ -33,7 +34,7 @@ public class ReceiveMessageService
             {
                 StatusName = row.Status.GetDescription(),
                 TypeName = row.Type == null ? string.Empty : row.Type.GetDescription(),
-                RawMessage = row.RawMessage,
+                RawMessage = Encoding.UTF8.GetString(row.RawMessage),
                 DecodeResult = row.ResultJson,
                 Barcode = row.Barcode,
                 SampleNo = row.SampleNo,
@@ -51,7 +52,7 @@ public class ReceiveMessageService
         };
     }
 
-    public async Task Save(long instrumentId, string rawMessage)
+    public async Task Save(long instrumentId, byte[] rawMessage)
     {
         // 添加队列表 receive_message、receive_message_large
 

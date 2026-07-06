@@ -41,10 +41,8 @@ namespace DeviceHub.Yhlo
 
                 while (TryExtractMessage(out List<byte> message))
                 {
-                    string rawMessage = Encoding.UTF8.GetString(message.ToArray());
-                    Logger.Info(logType, $"TCP接收完整消息: {rawMessage}");
-
-                    //string text = Encoding.UTF8.GetString(message.GetRange(1, message.Count - 1).ToArray());
+                    byte[] rawMessage = message.ToArray();
+                    Logger.Info(logType, $"TCP接收完整消息: {Encoding.UTF8.GetString(rawMessage)}");
 
                     _ = receiveMessageService.Save(_instrumentId, rawMessage);
 

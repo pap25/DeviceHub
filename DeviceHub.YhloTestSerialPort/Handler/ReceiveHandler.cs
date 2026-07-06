@@ -1,4 +1,7 @@
 ﻿using DeviceHub.Base.Common;
+using DeviceHub.Lis;
+using DeviceHub.Lis.dto;
+using DeviceHub.Lis.Impl;
 using DeviceHub.Model.Entities;
 using DeviceHub.Repository.Repositories;
 using DeviceHub.Yhlo.Protocol;
@@ -11,6 +14,7 @@ namespace DeviceHub.Yhlo.Handler
         private long _instrumentId;
         private readonly ReceiveMessageRepository receiveMessageRepository = ReceiveMessageRepository.Instance;
         private readonly ReceiveMessageLargeRepository receiveMessageLargeRepository = ReceiveMessageLargeRepository.Instance;
+        private readonly ILisClient lisClient = LisClient.Instance;
 
         public ReceiveHandler(long instrumentId)
         {
@@ -57,8 +61,10 @@ namespace DeviceHub.Yhlo.Handler
         /// <summary>
         /// DATA 解析
         /// </summary>
-        private void ParseData(string data, ReceiveMessage task)
+        private void ParseData(List<string> dataList, ReceiveMessage task)
         {
+            UploadSpecimenTestResultInput uploadSpecimenTestResultInput = null;
+            lisClient.UploadSpecimenTestResult(uploadSpecimenTestResultInput);
             // TODO: 解析 ASTM 记录并上传检验结果
             // receiveMessageRepository.UpdateStatusAndUpdateTimeById(task.Id, ReceiveMessage.StatusEnum.Success, now);
             // 解码后保存 receive_message_decode，更新 receive_message

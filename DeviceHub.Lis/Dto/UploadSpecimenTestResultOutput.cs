@@ -6,5 +6,6 @@ namespace DeviceHub.Lis.Dto
 {
     public class UploadSpecimenTestResultOutput
     {
+        public string ResultId { get; set; }
     }
 }

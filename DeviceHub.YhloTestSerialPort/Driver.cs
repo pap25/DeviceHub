@@ -252,8 +252,8 @@ namespace DeviceHub.Yhlo
         /// </summary>
         private void LogCompleteMessage(List<byte> message)
         {
-            string rawMessage = Decode(message);
-            Logger.Info(logType, $"串口接收完整消息{rawMessage}");
+            byte[] rawMessage = message.ToArray();
+            Logger.Info(logType, $"串口接收完整消息{Decode(message)}");
             _ = receiveMessageService.Save(_instrumentId, rawMessage);
             receiveTask.NotifyConsume();
         }

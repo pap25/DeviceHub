@@ -16,9 +16,9 @@ public class SendMessageEncoder
     public long SendMessageId { get; set; }
 
     /// <summary>
-    /// 发送报文内容
+    /// 发送报文内容（二进制）
     /// </summary>
-    public string SendContent { get; set; }
+    public byte[] SendContent { get; set; } = [];
 
     /// <summary>
     /// 创建时间（Unix 毫秒时间戳）

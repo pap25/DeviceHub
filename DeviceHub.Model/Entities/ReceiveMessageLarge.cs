@@ -11,7 +11,7 @@ public class ReceiveMessageLarge
     public long ReceiveMessageId { get; set; }
 
     /// <summary>
-    /// 原始报文
+    /// 原始报文（二进制）
     /// </summary>
-    public string RawMessage { get; set; }
+    public byte[] RawMessage { get; set; } = [];
 }

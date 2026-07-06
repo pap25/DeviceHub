@@ -20,7 +20,7 @@ internal static class SqliteSchema
 
         CREATE TABLE IF NOT EXISTS receive_message_large (
             receive_message_id INTEGER PRIMARY KEY,
-            raw_message TEXT NOT NULL
+            raw_message BLOB NOT NULL
         );
 
         CREATE TABLE IF NOT EXISTS receive_message_decode (
@@ -57,7 +57,7 @@ internal static class SqliteSchema
         CREATE TABLE IF NOT EXISTS send_message_encoder (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             send_message_id INTEGER NOT NULL,
-            send_content TEXT NOT NULL,
+            send_content BLOB NOT NULL,
             create_time INTEGER NOT NULL,
             update_time INTEGER NOT NULL,
             UNIQUE(send_message_id)

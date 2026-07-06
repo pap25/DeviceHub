@@ -88,6 +88,6 @@ public class ReceiveMessageLargeRepository : IReceiveMessageLargeRepository
     private static ReceiveMessageLarge Map(SqliteDataReader reader) => new()
     {
         ReceiveMessageId = reader.GetInt64(0),
-        RawMessage = reader.GetString(1)
+        RawMessage = reader.IsDBNull(1) ? [] : reader.GetFieldValue<byte[]>(1)
     };
 }

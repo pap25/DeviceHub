@@ -1,5 +1,6 @@
 using DeviceHub.Base.Constant;
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace DeviceHub.Yhlo.Protocol
@@ -16,25 +17,25 @@ namespace DeviceHub.Yhlo.Protocol
             public string ErrorMessage { get; init; } = string.Empty;
 
             /// <summary>
-            /// 各帧 DATA 拼接结果（不含 STX、FN、帧尾）
+            /// 各帧 DATA 列表（不含 STX、FN、帧尾）
             /// </summary>
-            public string ParsedData { get; init; } = string.Empty;
+            public List<string> ParsedData { get; init; } = [];
         }
 
-        public static ParseResult TryParse(string rawMessage)
+        public static ParseResult TryParse(byte[] rawMessage)
         {
-            if (string.IsNullOrEmpty(rawMessage))
+            if (rawMessage is null || rawMessage.Length == 0)
             {
                 return Fail("报文为空");
             }
 
-            byte[] buffer = Encoding.UTF8.GetBytes(rawMessage);
+            byte[] buffer = rawMessage;
             if (buffer[0] != ASTMProtocols.STX)
             {
                 return Fail("报文缺少STX");
             }
 
-            StringBuilder parsedData = new();
+            List<string> parsedData = [];
             int offset = 0;
 
             while (offset < buffer.Length)
@@ -45,14 +46,14 @@ namespace DeviceHub.Yhlo.Protocol
                     return frameResult;
                 }
 
-                parsedData.Append(frameData);
+                parsedData.Add(frameData);
                 offset += frameLength;
             }
 
             return new ParseResult
             {
                 Success = true,
-                ParsedData = parsedData.ToString()
+                ParsedData = parsedData
             };
         }
 

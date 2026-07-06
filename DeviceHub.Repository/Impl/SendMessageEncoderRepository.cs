@@ -99,7 +99,7 @@ public class SendMessageEncoderRepository : ISendMessageEncoderRepository
     {
         Id = reader.GetInt64(0),
         SendMessageId = reader.GetInt64(1),
-        SendContent = reader.GetString(2),
+        SendContent = reader.IsDBNull(2) ? [] : reader.GetFieldValue<byte[]>(2),
         CreateTime = reader.GetInt64(3),
         UpdateTime = reader.GetInt64(4)
     };

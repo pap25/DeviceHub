@@ -35,7 +35,7 @@ namespace DeviceHub.Yhlo.Handler
                 //receiveMessageRepository.UpdateStatusAndErrorMessageAndUpdateTimeById(task.Id, ReceiveMessage.StatusEnum.Failed, "数据异常", now);
                 return;
             }
-            string rawMessage = receiveMessageLarge.RawMessage;
+            byte[] rawMessage = receiveMessageLarge.RawMessage;
 
 
             //receiveMessageRepository.UpdateStatusAndUpdateTimeById(task.Id, ReceiveMessage.StatusEnum.Success, now);
