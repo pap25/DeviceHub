@@ -26,8 +26,6 @@ namespace DeviceHub.Yhlo.Handler
         }
         public void HandleTask(ReceiveMessage task)
         {
-            // 调用接口上传检验结果
-            // 解码后保存 receive_message_decode 更新receive_message
             ReceiveMessageLarge? receiveMessageLarge = receiveMessageLargeRepository.GetByReceiveMessageId(task.Id).GetAwaiter().GetResult();
             if (receiveMessageLarge == null)
             {
@@ -37,6 +35,7 @@ namespace DeviceHub.Yhlo.Handler
             }
             string rawMessage = receiveMessageLarge.RawMessage;
 
+
             // 解析开始结束符
             // 校验<CS> CS：必须校验
             // 验证FN FN：只检查是否合法（0~7） 不检查连续性
@@ -44,6 +43,8 @@ namespace DeviceHub.Yhlo.Handler
             // 验证成功则进入解析步骤
 
             //receiveMessageRepository.UpdateStatusAndUpdateTimeById(task.Id, ReceiveMessage.StatusEnum.Success, now);
+            // 调用接口上传检验结果
+            // 解码后保存 receive_message_decode 更新receive_message
         }
     }
 }
