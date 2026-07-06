@@ -12,6 +12,19 @@ public interface IReceiveMessageRepository
 
     Task<bool> Update(ReceiveMessage entity, CancellationToken cancellationToken = default);
 
+    Task<bool> UpdateStatusAndErrorMessageAndUpdateTimeById(
+        long id,
+        ReceiveMessage.StatusEnum status,
+        string errorMessage,
+        long updateTime,
+        CancellationToken cancellationToken = default);
+
+    Task<bool> UpdateStatusAndUpdateTimeById(
+        long id,
+        ReceiveMessage.StatusEnum status,
+        long updateTime,
+        CancellationToken cancellationToken = default);
+
     Task<bool> DeleteById(long id, CancellationToken cancellationToken = default);
 
     Task<ReceiveMessage?> GetById(long id, CancellationToken cancellationToken = default);
