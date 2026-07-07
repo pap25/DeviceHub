@@ -80,7 +80,7 @@ namespace DeviceHub.Yhlo.Handler
 
             // 判断是检验结果还是查询检验信息
             // 如果是检验结果上报检验信息
-            // 如果是查询检验信息，调用LIS接口查询信息，在发送信息给仪器
+            // 如果是查询检验信息，调用LIS接口查询信息，添加发送队列
 
             Resp<UploadSpecimenTestResultOutput> resp = await lisClient.UploadSpecimenTestResult(uploadSpecimenTestResultInput);
             if (!resp.IsSuccess())
