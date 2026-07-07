@@ -52,7 +52,7 @@ namespace DeviceHub.Yhlo.Handler
                     return;
                 }
 
-                _ = ParseData(parseResult.ParsedData, task);
+                ParseData(parseResult.ParsedRecord, task).GetAwaiter().GetResult();
             }
             catch (Exception e)
             {
@@ -73,15 +73,14 @@ namespace DeviceHub.Yhlo.Handler
         /// <summary>
         /// DATA 解析
         /// </summary>
-        private async Task ParseData(List<string> dataList, ReceiveMessage task)
+        private async Task ParseData(List<string> recordList, ReceiveMessage task)
         {
-            ParseResult parseResult = AstmMessageDecode.Parse(dataList);
-            UploadSpecimenTestResultInput uploadSpecimenTestResultInput = ToUploadSpecimenTestResultInput(parseResult);
-
+            ParseResult parseResult = AstmMessageDecode.Parse(recordList);
             // 判断是检验结果还是查询检验信息
             // 如果是检验结果上报检验信息
             // 如果是查询检验信息，调用LIS接口查询信息，添加发送队列
 
+            UploadSpecimenTestResultInput uploadSpecimenTestResultInput = ToUploadSpecimenTestResultInput(parseResult);
             Resp<UploadSpecimenTestResultOutput> resp = await lisClient.UploadSpecimenTestResult(uploadSpecimenTestResultInput);
             if (!resp.IsSuccess())
             {

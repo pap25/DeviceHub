@@ -19,7 +19,7 @@ namespace DeviceHub.Yhlo.Protocol
             /// <summary>
             /// 各帧 DATA 列表（不含 STX、FN、帧尾）
             /// </summary>
-            public List<string> ParsedData { get; init; } = [];
+            public List<string> ParsedRecord { get; init; } = [];
         }
 
         public static VerifyParseResult VerifyParse(byte[] rawMessage)
@@ -53,7 +53,7 @@ namespace DeviceHub.Yhlo.Protocol
             return new VerifyParseResult
             {
                 Success = true,
-                ParsedData = parsedData
+                ParsedRecord = parsedData
             };
         }
 
@@ -111,7 +111,7 @@ namespace DeviceHub.Yhlo.Protocol
                 return Fail($"第{GetFrameIndex(buffer, offset)}帧校验失败");
             }
 
-            frameData = Encoding.UTF8.GetString(buffer, payloadStart, frameEndIndex - payloadStart);
+            frameData = Encoding.UTF8.GetString(buffer, payloadStart, frameEndIndex - payloadStart - 1); // 把CR也去掉了
             frameLength = frameTrailerEnd - offset;
             return null;
         }
