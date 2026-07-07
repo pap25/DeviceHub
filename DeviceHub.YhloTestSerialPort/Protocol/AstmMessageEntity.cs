@@ -1,4 +1,6 @@
-﻿namespace DeviceHub.YhloTestSerialPort.Protocol;
+﻿using System.ComponentModel;
+
+namespace DeviceHub.YhloTestSerialPort.Protocol;
 
 /// <summary>
 /// ASTM 应用层消息记录实体（H/P/O/R/C/L）
@@ -10,42 +12,58 @@ public class AstmMessageEntity
     /// </summary>
     public class HeaderRecord
     {
-        /// <summary>记录类型标识</summary>
+        /// <summary>字段1，记录类型 ID（H）</summary>
         public string RecordTypeId { get; set; } = string.Empty;
-        /// <summary>分隔符定义</summary>
+        /// <summary>字段2，分隔符定义（字段分隔符|、重复分隔符\、成份分隔符^、换码分隔符&amp;）</summary>
         public string DelimiterDefinition { get; set; } = string.Empty;
-        /// <summary>消息控制 ID</summary>
+        /// <summary>字段3，置空，保留</summary>
         public string MessageControlId { get; set; } = string.Empty;
-        /// <summary>密码</summary>
+        /// <summary>字段4，置空，保留</summary>
         public string Password { get; set; } = string.Empty;
-        /// <summary>发送方名称或 ID</summary>
+        /// <summary>字段5，仪器名称^软件版本^仪器序列号</summary>
         public string SenderNameOrId { get; set; } = string.Empty;
-        /// <summary>仪器型号</summary>
+        /// <summary>字段5组件1，仪器名称</summary>
         public string InstrumentModel { get; set; } = string.Empty;
-        /// <summary>软件版本</summary>
+        /// <summary>字段5组件2，软件版本</summary>
         public string SoftwareVersion { get; set; } = string.Empty;
-        /// <summary>序列号</summary>
+        /// <summary>字段5组件3，仪器序列号</summary>
         public string SerialNumber { get; set; } = string.Empty;
-        /// <summary>发送方街道地址</summary>
+        /// <summary>字段6，置空，保留</summary>
         public string SenderStreetAddress { get; set; } = string.Empty;
-        /// <summary>保留字段 7</summary>
+        /// <summary>字段7，置空，保留</summary>
         public string ReservedField7 { get; set; } = string.Empty;
-        /// <summary>发送方电话号码</summary>
+        /// <summary>字段8，置空，保留</summary>
         public string SenderTelephoneNumber { get; set; } = string.Empty;
-        /// <summary>发送方特征</summary>
+        /// <summary>字段9，置空，保留</summary>
         public string CharacteristicsOfSender { get; set; } = string.Empty;
-        /// <summary>接收方 ID</summary>
+        /// <summary>字段10，置空，保留</summary>
         public string ReceiverId { get; set; } = string.Empty;
-        /// <summary>字符编码集</summary>
+        /// <summary>字段11，字符集（ASCII 代表操作系统默认字符编码，WIN7 中文操作系统一般为 GBK；UTF8 代表 UTF8 编码）</summary>
         public string CharacterCodingSet { get; set; } = string.Empty;
-        /// <summary>处理标识</summary>
+        /// <summary>字段12，消息类型（PR-病人测试结果，QR-质控测试结果，CR-定标结果，RQ-样本请求查询，QA-样本查询回应，SA-样本申请信息）</summary>
         public string ProcessingId { get; set; } = string.Empty;
-        /// <summary>版本号</summary>
+        /// <summary>字段13，协议版本编号，固定为 1394-97</summary>
         public string VersionNumber { get; set; } = string.Empty;
-        /// <summary>字符集</summary>
+        /// <summary>字段12解析映射原始值（消息类型，同 ProcessingId）</summary>
         public string CharacterSet { get; set; } = string.Empty;
-        /// <summary>日期和时间</summary>
+        /// <summary>字段14，消息创建的日期和时间（格式 YYYYMMDDHHMMSS）</summary>
         public string DateAndTime { get; set; } = string.Empty;
+
+        public enum MessageType
+        {
+            [Description("病人测试结果")]
+            PR,
+            [Description("质控测试结果")]
+            QR,
+            [Description("定标结果")]
+            CR,
+            [Description("样本请求查询")]
+            RQ,
+            [Description("样本查询回应")]
+            QA,
+            [Description("样本申请信息")]
+            SA
+        }
     }
 
     /// <summary>
@@ -53,55 +71,55 @@ public class AstmMessageEntity
     /// </summary>
     public class PatientRecord
     {
-        /// <summary>记录类型标识</summary>
+        /// <summary>字段1，记录类型 ID（P）</summary>
         public string RecordTypeId { get; set; } = string.Empty;
-        /// <summary>序号</summary>
+        /// <summary>字段2，序列号（指示病人信息记录在当前层的序列号，从 1 起连续递增）</summary>
         public string SequenceNumber { get; set; } = string.Empty;
-        /// <summary>医疗机构分配的患者 ID</summary>
+        /// <summary>字段3，置空，保留</summary>
         public string PracticeAssignedPatientId { get; set; } = string.Empty;
-        /// <summary>患者 ID</summary>
+        /// <summary>字段4，病历号</summary>
         public string PatientId { get; set; } = string.Empty;
-        /// <summary>患者 ID（第 3 字段）</summary>
+        /// <summary>字段5，住院号</summary>
         public string PatientId3 { get; set; } = string.Empty;
-        /// <summary>患者姓名</summary>
+        /// <summary>字段6，病人姓名</summary>
         public string PatientName { get; set; } = string.Empty;
-        /// <summary>保留字段 7</summary>
+        /// <summary>字段7，置空，保留</summary>
         public string ReservedField7 { get; set; } = string.Empty;
-        /// <summary>出生日期或年龄</summary>
+        /// <summary>字段8，出生日期^年龄^年龄单位（Y-年，M-月，W-周，D-天，H-小时，空默认年）</summary>
         public string BirthDateOrAge { get; set; } = string.Empty;
-        /// <summary>患者性别</summary>
+        /// <summary>字段9，病人性别（M-女，F-男，U-未知）</summary>
         public string PatientSex { get; set; } = string.Empty;
-        /// <summary>患者种族</summary>
+        /// <summary>字段10，民族</summary>
         public string PatientRace { get; set; } = string.Empty;
-        /// <summary>患者地址</summary>
+        /// <summary>字段11，病人地址</summary>
         public string PatientAddress { get; set; } = string.Empty;
-        /// <summary>保留字段 12</summary>
+        /// <summary>字段12，血型（A/B/O/AB/其他自定义）</summary>
         public string ReservedField12 { get; set; } = string.Empty;
-        /// <summary>患者电话</summary>
+        /// <summary>字段13，联系方式</summary>
         public string PatientTelephone { get; set; } = string.Empty;
-        /// <summary>主治医生姓名</summary>
+        /// <summary>字段14，置空，保留</summary>
         public string AttendingPhysicianName { get; set; } = string.Empty;
-        /// <summary>特殊字段 1</summary>
+        /// <summary>字段15，置空，保留</summary>
         public string SpecialField1 { get; set; } = string.Empty;
-        /// <summary>体表面积</summary>
+        /// <summary>字段16，医保帐号</summary>
         public string BodySurfaceArea { get; set; } = string.Empty;
-        /// <summary>患者身高</summary>
+        /// <summary>字段17，置空，保留</summary>
         public string PatientHeight { get; set; } = string.Empty;
-        /// <summary>患者体重</summary>
+        /// <summary>字段18，置空，保留</summary>
         public string PatientWeight { get; set; } = string.Empty;
-        /// <summary>患者诊断</summary>
+        /// <summary>字段19，置空，保留</summary>
         public string PatientDiagnosis { get; set; } = string.Empty;
-        /// <summary>患者用药</summary>
+        /// <summary>字段20，置空，保留</summary>
         public string PatientMedications { get; set; } = string.Empty;
-        /// <summary>患者饮食</summary>
+        /// <summary>字段21，血袋编号</summary>
         public string PatientDiet { get; set; } = string.Empty;
-        /// <summary>医疗机构字段 1</summary>
+        /// <summary>字段22，置空，保留</summary>
         public string PracticeField1 { get; set; } = string.Empty;
-        /// <summary>医疗机构字段 2</summary>
+        /// <summary>字段23，置空，保留</summary>
         public string PracticeField2 { get; set; } = string.Empty;
-        /// <summary>入院状态</summary>
+        /// <summary>字段25，置空，保留</summary>
         public string AdmissionStatus { get; set; } = string.Empty;
-        /// <summary>位置</summary>
+        /// <summary>字段26，病区</summary>
         public string Location { get; set; } = string.Empty;
     }
 
@@ -110,71 +128,71 @@ public class AstmMessageEntity
     /// </summary>
     public class TestOrderRecord
     {
-        /// <summary>记录类型标识</summary>
+        /// <summary>字段1，记录类型 ID（O）</summary>
         public string RecordTypeId { get; set; } = string.Empty;
-        /// <summary>序号</summary>
+        /// <summary>字段2，序列号（指示测试订单记录在当前层的序列号，从 1 起连续递增）</summary>
         public string SequenceNumber { get; set; } = string.Empty;
-        /// <summary>样本 ID</summary>
+        /// <summary>字段3，样本编号^样本架号/盘号^样本位置号（LIS 下发时仪器忽略架号/位置）</summary>
         public string SampleId { get; set; } = string.Empty;
-        /// <summary>样本盘号</summary>
+        /// <summary>字段3组件1，样本架号/样本盘号</summary>
         public string SampleTrayNo { get; set; } = string.Empty;
-        /// <summary>样本位置号</summary>
+        /// <summary>字段3组件2，样本在架上/盘上的位置</summary>
         public string SamplePosNo { get; set; } = string.Empty;
-        /// <summary>仪器标本 ID</summary>
+        /// <summary>字段4，样本条码</summary>
         public string InstrumentSpecimenId { get; set; } = string.Empty;
-        /// <summary>检测项目编号</summary>
+        /// <summary>字段5，项目通道号^项目名称^稀释倍数^重测标志（多项目用\分隔，最多 160 个）</summary>
         public string AssayNo { get; set; } = string.Empty;
-        /// <summary>优先级</summary>
+        /// <summary>字段6，是否急诊（R-常规，S-STAT 测试）</summary>
         public string Priority { get; set; } = string.Empty;
-        /// <summary>申请日期时间</summary>
+        /// <summary>字段7，样本申请时间（格式 YYYYMMDDHHMMSS）</summary>
         public string RequestedDateTime { get; set; } = string.Empty;
-        /// <summary>标本采集日期时间</summary>
+        /// <summary>字段8，样本采集时间（格式 YYYYMMDDHHMMSS）</summary>
         public string SpecimenCollectionDateTime { get; set; } = string.Empty;
-        /// <summary>采集结束时间</summary>
+        /// <summary>字段9，置空，保留</summary>
         public string CollectionEndTime { get; set; } = string.Empty;
-        /// <summary>采集量</summary>
+        /// <summary>字段10，采集量</summary>
         public string CollectionVolume { get; set; } = string.Empty;
-        /// <summary>采集人</summary>
+        /// <summary>字段11，采集者</summary>
         public string CollectedBy { get; set; } = string.Empty;
-        /// <summary>操作代码</summary>
+        /// <summary>字段12，置空，保留</summary>
         public string ActionCode { get; set; } = string.Empty;
-        /// <summary>危险代码</summary>
+        /// <summary>字段13，置空，保留</summary>
         public string DangerCode { get; set; } = string.Empty;
-        /// <summary>相关临床信息</summary>
+        /// <summary>字段14，置空，保留</summary>
         public string RelevantClinicalInformation { get; set; } = string.Empty;
-        /// <summary>标本接收日期时间</summary>
+        /// <summary>字段15，送检时间（格式 YYYYMMDDHHMMSS）</summary>
         public string SpecimenReceivedDateTime { get; set; } = string.Empty;
-        /// <summary>标本类型</summary>
+        /// <summary>字段16，样本类型（serum/urine/CSF/plasma/timed/other/blood/amniotic/urethral/saliva/cervical/synovial，大小写敏感）</summary>
         public string SpecimenType { get; set; } = string.Empty;
-        /// <summary>申请医生</summary>
+        /// <summary>字段17，送检医生</summary>
         public string OrderingPhysician { get; set; } = string.Empty;
-        /// <summary>医生电话号码</summary>
+        /// <summary>字段18，送检科室</summary>
         public string PhysicianPhoneNumber { get; set; } = string.Empty;
-        /// <summary>离线稀释因子</summary>
+        /// <summary>字段19，手工稀释因子</summary>
         public string OfflineDilutionFactor { get; set; } = string.Empty;
-        /// <summary>用户字段 2</summary>
+        /// <summary>字段20，检验医生</summary>
         public string UserField2 { get; set; } = string.Empty;
-        /// <summary>实验室字段 1</summary>
+        /// <summary>字段21，置空，保留</summary>
         public string LaboratoryField1 { get; set; } = string.Empty;
-        /// <summary>实验室字段 2</summary>
+        /// <summary>字段22，置空，保留</summary>
         public string LaboratoryField2 { get; set; } = string.Empty;
-        /// <summary>结果报告日期时间</summary>
+        /// <summary>字段23，置空，保留</summary>
         public string ResultsReportedDateTime { get; set; } = string.Empty;
-        /// <summary>仪器计费到计算机</summary>
+        /// <summary>字段24，置空，保留</summary>
         public string InstrumentChargeToComputer { get; set; } = string.Empty;
-        /// <summary>仪器部门 ID</summary>
+        /// <summary>字段25，置空，保留</summary>
         public string InstrumentSectionId { get; set; } = string.Empty;
-        /// <summary>报告类型</summary>
+        /// <summary>字段26，报告类型（O-来自 LIS 的请求，Q-查询响应，F-最终结果）</summary>
         public string ReportType { get; set; } = string.Empty;
-        /// <summary>保留字段 27</summary>
+        /// <summary>字段27，置空，保留</summary>
         public string ReservedField27 { get; set; } = string.Empty;
-        /// <summary>位置</summary>
+        /// <summary>字段28，置空，保留</summary>
         public string Location { get; set; } = string.Empty;
-        /// <summary>医院感染标志</summary>
+        /// <summary>字段29，置空，保留</summary>
         public string NosocomialInfectionFlag { get; set; } = string.Empty;
-        /// <summary>标本服务</summary>
+        /// <summary>字段30，置空，保留</summary>
         public string SpecimenService { get; set; } = string.Empty;
-        /// <summary>标本机构</summary>
+        /// <summary>字段31，置空，保留</summary>
         public string SpecimenInstitution { get; set; } = string.Empty;
     }
 
@@ -183,43 +201,43 @@ public class AstmMessageEntity
     /// </summary>
     public class ResultRecord
     {
-        /// <summary>记录类型标识</summary>
+        /// <summary>字段1，记录类型 ID（R）</summary>
         public string RecordTypeId { get; set; } = string.Empty;
-        /// <summary>序号</summary>
+        /// <summary>字段2，序列号</summary>
         public string SequenceNumber { get; set; } = string.Empty;
-        /// <summary>检测项目编号</summary>
+        /// <summary>字段3，项目通道号^项目名称^结果重复次数编号^结果类型（I-定性，F-定量，B-定量+定性）</summary>
         public string AssayNo { get; set; } = string.Empty;
-        /// <summary>检测项目名称</summary>
+        /// <summary>字段3组件2，项目名称</summary>
         public string AssayName { get; set; } = string.Empty;
-        /// <summary>重复次数编号</summary>
+        /// <summary>字段3组件3，结果重复次数编号</summary>
         public string ReplicateNumber { get; set; } = string.Empty;
-        /// <summary>结果类型（I=仪器原始值，F=最终结果，B=两者）</summary>
+        /// <summary>字段3组件4，结果类型（I-定性结果，F-定量结果，B-定量结果+定性描述）</summary>
         public string ResultType { get; set; } = string.Empty;
-        /// <summary>测量值</summary>
+        /// <summary>字段4，测量值（F/B 时为浓度值，可含 &lt;/&gt; 标记；I/B 时为定性结果如阴性(-)、阳性(+)）</summary>
         public string MeasurementValue { get; set; } = string.Empty;
-        /// <summary>单位</summary>
+        /// <summary>字段5，结果单位</summary>
         public string Unit { get; set; } = string.Empty;
-        /// <summary>参考范围</summary>
+        /// <summary>字段6，参考范围上限^参考范围下限</summary>
         public string ReferenceRange { get; set; } = string.Empty;
-        /// <summary>异常标志</summary>
+        /// <summary>字段7，异常结果标记（L-偏低，H-偏高，N-正常）</summary>
         public string AbnormalFlag { get; set; } = string.Empty;
-        /// <summary>异常检测性质</summary>
+        /// <summary>字段8，定性参考值（结果类型为 I 或 B 时有效）</summary>
         public string NatureOfAbnormalTest { get; set; } = string.Empty;
-        /// <summary>结果状态</summary>
+        /// <summary>字段9，结果状态（F-最终结果）</summary>
         public string ResultStatus { get; set; } = string.Empty;
-        /// <summary>仪器参考值变更日期</summary>
+        /// <summary>字段10，结果追溯信息（发光值^试剂批号^试剂瓶号^试剂规格^校准时间^预激发液批号^预激发液瓶号^激发液批号^激发液瓶号^稀释液批号^稀释液瓶号）</summary>
         public string DateOfChangeInInstrumentNormativeValues { get; set; } = string.Empty;
-        /// <summary>操作员标识</summary>
+        /// <summary>字段11，置空，保留</summary>
         public string OperatorIdentification { get; set; } = string.Empty;
-        /// <summary>检测开始日期时间</summary>
+        /// <summary>字段12，置空，保留</summary>
         public string TestStartedDateTime { get; set; } = string.Empty;
-        /// <summary>检测完成日期时间</summary>
+        /// <summary>字段13，测试完成时间（格式 YYYYMMDDHHMMSS）</summary>
         public string TestCompletedDateTime { get; set; } = string.Empty;
-        /// <summary>仪器标识</summary>
+        /// <summary>字段14，测试模块（级联产品中表示级联中哪一个模块测试的，例如 M1）</summary>
         public string InstrumentIdentification { get; set; } = string.Empty;
-        /// <summary>保留字段 16</summary>
+        /// <summary>字段15，置空，保留</summary>
         public string ReservedField16 { get; set; } = string.Empty;
-        /// <summary>保留字段 17</summary>
+        /// <summary>字段16，置空，保留</summary>
         public string ReservedField17 { get; set; } = string.Empty;
     }
 
@@ -228,15 +246,15 @@ public class AstmMessageEntity
     /// </summary>
     public class ResultsCommentRecord
     {
-        /// <summary>记录类型标识</summary>
+        /// <summary>字段1，记录类型 ID（C）</summary>
         public string RecordTypeId { get; set; } = string.Empty;
-        /// <summary>序号</summary>
+        /// <summary>字段2，序列号</summary>
         public string SequenceNumber { get; set; } = string.Empty;
-        /// <summary>注释来源</summary>
+        /// <summary>字段3，注释来源（I-分析仪发送，L-LIS 主机发送）</summary>
         public string CommentSource { get; set; } = string.Empty;
-        /// <summary>注释文本</summary>
+        /// <summary>字段4，注释文本</summary>
         public string CommentText { get; set; } = string.Empty;
-        /// <summary>注释类型</summary>
+        /// <summary>字段5，注释类型（G-结果注释，I-异常字符串）</summary>
         public string CommentType { get; set; } = string.Empty;
     }
 
@@ -245,11 +263,11 @@ public class AstmMessageEntity
     /// </summary>
     public class MessageTerminatorRecord
     {
-        /// <summary>记录类型标识</summary>
+        /// <summary>字段1，记录类型 ID（L）</summary>
         public string RecordTypeId { get; set; } = string.Empty;
-        /// <summary>序号</summary>
+        /// <summary>字段2，序列号</summary>
         public string SequenceNumber { get; set; } = string.Empty;
-        /// <summary>终止代码</summary>
+        /// <summary>字段3，结束码（N-正常终止，I-上次查询无信息，Q-上次请求出错）</summary>
         public string TerminationCode { get; set; } = string.Empty;
     }
 }

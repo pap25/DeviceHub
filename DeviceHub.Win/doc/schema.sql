@@ -38,7 +38,7 @@ create table receive_message_decode (
 create table send_message (
     id bigint not null auto_increment comment '主键ID',
     instrument_id bigint not null comment '仪器ID',
-    type tinyint not null comment '类型(0:申请单)',
+    type tinyint not null comment '类型(0:LIS下发申请信息, 1:请求查询申请信息)',
     external_no varchar(50) not null comment '外部编号',
     sample_no varchar(30) not null comment '样本号',
     barcode varchar(50) not null comment '条形码',

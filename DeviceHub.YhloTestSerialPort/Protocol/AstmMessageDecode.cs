@@ -235,7 +235,7 @@ public static class AstmMessageDecode
 
     public sealed class ParseResult
     {
-        public HeaderRecord? HeaderRecord { get; set; }
+        public HeaderRecord HeaderRecord { get; set; } = new HeaderRecord();
         public PatientRecord? PatientRecord { get; set; }
         public TestOrderRecord? TestOrderRecord { get; set; }
         public List<ResultRecord> ResultRecordList { get; set; } = [];

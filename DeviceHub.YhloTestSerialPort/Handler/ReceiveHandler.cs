@@ -9,6 +9,7 @@ using DeviceHub.Service;
 using DeviceHub.Yhlo.Protocol;
 using System.Text.Json;
 using static DeviceHub.Yhlo.Protocol.AstmMessageDecode;
+using static DeviceHub.YhloTestSerialPort.Protocol.AstmMessageEntity;
 
 namespace DeviceHub.Yhlo.Handler
 {
@@ -52,7 +53,7 @@ namespace DeviceHub.Yhlo.Handler
                     return;
                 }
 
-                ParseData(parseResult.ParsedRecord, task).GetAwaiter().GetResult();
+                ParseData(parseResult.ParsedRecord, task);
             }
             catch (Exception e)
             {
@@ -73,23 +74,36 @@ namespace DeviceHub.Yhlo.Handler
         /// <summary>
         /// DATA 解析
         /// </summary>
-        private async Task ParseData(List<string> recordList, ReceiveMessage task)
+        private void ParseData(List<string> recordList, ReceiveMessage task)
         {
             ParseResult parseResult = AstmMessageDecode.Parse(recordList);
-            // 判断是检验结果还是查询检验信息
-            // 如果是检验结果上报检验信息
-            // 如果是查询检验信息，调用LIS接口查询信息，添加发送队列
-
-            UploadSpecimenTestResultInput uploadSpecimenTestResultInput = ToUploadSpecimenTestResultInput(parseResult);
-            Resp<UploadSpecimenTestResultOutput> resp = await lisClient.UploadSpecimenTestResult(uploadSpecimenTestResultInput);
-            if (!resp.IsSuccess())
+            if (parseResult.HeaderRecord.ProcessingId == HeaderRecord.MessageType.PR.ToString())
             {
-                MarkFailed(task.Id, resp.GetErrorMsg() ?? "", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+                // 检验结果 1 上传到LIS 2 更新状态并记录
+                UploadSpecimenTestResultInput uploadSpecimenTestResultInput = ToUploadSpecimenTestResultInput(parseResult);
+                Resp<UploadSpecimenTestResultOutput> resp = lisClient.UploadSpecimenTestResult(uploadSpecimenTestResultInput).GetAwaiter().GetResult();
+                if (!resp.IsSuccess())
+                {
+                    MarkFailed(task.Id, resp.GetErrorMsg() ?? "", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+                    return;
+                }
+                string resultId = resp.GetData().ResultId;
+
+                receiveMessageService.UpdateSuccess(task.Id, ReceiveMessageDecode.TypeEnum.TestResult, resultId, "", "", JsonSerializer.Serialize(uploadSpecimenTestResultInput)).GetAwaiter();
                 return;
             }
-            string resultId = resp.GetData().ResultId;
+            else if (parseResult.HeaderRecord.ProcessingId == HeaderRecord.MessageType.RQ.ToString())
+            {
+                if (parseResult.TestOrderRecord == null)
+                {
+                    MarkFailed(task.Id, "数据异常没有订单记录", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+                    return;
+                }
+                receiveMessageService.SaveSampleQuery(_instrumentId, task.Id, parseResult.TestOrderRecord.SampleId, parseResult.TestOrderRecord.InstrumentSpecimenId);
+                return;
+            }
 
-            await receiveMessageService.UpdateSuccess(task.Id, ReceiveMessageDecode.TypeEnum.TestResult, resultId, "", "", JsonSerializer.Serialize(uploadSpecimenTestResultInput));
+            MarkFailed(task.Id, $"不支持消息类型 {parseResult.HeaderRecord.ProcessingId}", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
         }
 
         private UploadSpecimenTestResultInput ToUploadSpecimenTestResultInput(ParseResult parseResult)

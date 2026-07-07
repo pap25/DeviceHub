@@ -29,7 +29,7 @@ namespace DeviceHub.Lis
         Task<Resp<UploadSpecimenTestResultOutput>> UploadSpecimenTestResult(UploadSpecimenTestResultInput uploadSpecimenTestResultInput);
 
         // 查询样本信息
-        Task<GetSampleApplyItemOutput> GetSampleApplyItem(string sampleNo, string barcode);
+        Task<GetSampleApplyItemOutput> GetSampleApplyItem(GetSampleApplyItemInput getSampleApplyItemInput);
 
         // 下载申请单
         Task<List<GetSampleApplyListOutput>> GetSampleApplyList(long instrumentId, long lastId, int pageSize);

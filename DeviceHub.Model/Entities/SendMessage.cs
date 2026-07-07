@@ -63,10 +63,12 @@ public class SendMessage
     public enum TypeEnum : byte
     {
         /// <summary>
-        /// 申请单
+        /// 下发申请信息
         /// </summary>
-        [Description("申请单")]
-        Application = 0
+        [Description("LIS下发申请信息")]
+        IssueApplication = 0,
+        [Description("请求查询申请信息")]
+        RequestApplication = 1
     }
 
     /// <summary>

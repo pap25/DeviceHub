@@ -1,5 +1,8 @@
 ﻿using DeviceHub.Abstractions.Dto;
 using DeviceHub.Base.Common;
+using DeviceHub.Lis;
+using DeviceHub.Lis.Dto;
+using DeviceHub.Lis.Impl;
 using DeviceHub.Model.Entities;
 using DeviceHub.Model.view;
 using DeviceHub.Model.Vo;
@@ -7,6 +10,7 @@ using DeviceHub.Repository;
 using DeviceHub.Repository.Repositories;
 using DeviceHub.Utils;
 using System.Text;
+using System.Text.Json;
 
 namespace DeviceHub.Service;
 
@@ -18,6 +22,9 @@ public class ReceiveMessageService
     private readonly ReceiveMessageRepository receiveMessageRepository = ReceiveMessageRepository.Instance;
     private readonly ReceiveMessageLargeRepository receiveMessageLargeRepository = ReceiveMessageLargeRepository.Instance;
     private readonly ReceiveMessageDecodeRepository receiveMessageDecodeRepository = ReceiveMessageDecodeRepository.Instance;
+    private readonly SendMessageRepository sendMessageRepository = SendMessageRepository.Instance;
+    private readonly SendMessageLargeRepository sendMessageLargeRepository = SendMessageLargeRepository.Instance;
+    private readonly ILisClient lisClient = LisClient.Instance;
 
     private ReceiveMessageService()
     {
@@ -103,5 +110,57 @@ public class ReceiveMessageService
                 id, ReceiveMessage.StatusEnum.Success, now, connection, transaction);
             await receiveMessageDecodeRepository.Insert(receiveMessageDecode, connection, transaction);
         });
+    }
+
+    public void SaveSampleQuery(long instrumentId, long receiveMessageId, string sampleNo, string barcode)
+    {
+        // 1 到LIS接口查询检验信息
+        /** 1 到LIS接口查询检验信息
+         *  2 构建Send对象
+         *  3 新增 receive_message_decode send_message send_message_large
+         * **/
+        GetSampleApplyItemInput getSampleApplyItemInput = new()
+        {
+            SampleNo = sampleNo,
+            Barcode = barcode,
+        };
+        GetSampleApplyItemOutput getSampleApplyItemOutput = lisClient.GetSampleApplyItem(getSampleApplyItemInput).GetAwaiter().GetResult();
+
+        string externalNo = Convert.ToString(receiveMessageId);
+        long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        ReceiveMessageDecode receiveMessageDecode = new()
+        {
+            ReceiveMessageId = receiveMessageId,
+            ExternalNo = externalNo,
+            Type = ReceiveMessageDecode.TypeEnum.SampleQuery,
+            SampleNo = sampleNo,
+            Barcode = barcode,
+            ResultJson = JsonSerializer.Serialize(getSampleApplyItemOutput),
+            CreateTime = now,
+            UpdateTime = now
+        };
+
+        SendMessage sendMessage = new()
+        {
+            InstrumentId = instrumentId,
+            Type = SendMessage.TypeEnum.RequestApplication,
+            ExternalNo = externalNo,
+            SampleNo = sampleNo,
+            Barcode = barcode,
+            Status = SendMessage.StatusEnum.Pending,
+            ErrorMessage = string.Empty,
+            CreateTime = now,
+            UpdateTime = now
+        };
+
+        SendMessageLarge sendMessageLarge = new()
+        {
+            SendJson = JsonSerializer.Serialize(getSampleApplyItemOutput),
+        };
+
+        receiveMessageDecodeRepository.Insert(receiveMessageDecode);
+        long sendMessageId = sendMessageRepository.Insert(sendMessage).GetAwaiter().GetResult();
+        sendMessageLarge.SendMessageId = sendMessageId;
+        sendMessageLargeRepository.Insert(sendMessageLarge);
     }
 }

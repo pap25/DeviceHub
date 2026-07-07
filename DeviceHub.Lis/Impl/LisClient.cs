@@ -126,7 +126,7 @@ namespace DeviceHub.Lis.Impl
             return Task.FromResult(Resp<UploadSpecimenTestResultOutput>.Ok(new UploadSpecimenTestResultOutput { ResultId = resultId }));
         }
 
-        public Task<GetSampleApplyItemOutput> GetSampleApplyItem(string sampleNo, string barcode)
+        public Task<GetSampleApplyItemOutput> GetSampleApplyItem(GetSampleApplyItemInput getSampleApplyItemInput)
         {
             throw new NotImplementedException();
         }
