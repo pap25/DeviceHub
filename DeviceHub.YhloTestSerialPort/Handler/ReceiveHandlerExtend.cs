@@ -37,6 +37,7 @@ namespace DeviceHub.YhloTestSerialPort.Handler
 
         private UploadSpecimenTestResultInput ToUploadSpecimenTestResultInput(ParseResult parseResult)
         {
+            // TODO
             return new UploadSpecimenTestResultInput();
         }
 
