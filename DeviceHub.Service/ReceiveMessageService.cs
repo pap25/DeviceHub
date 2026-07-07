@@ -81,7 +81,7 @@ public class ReceiveMessageService
         });
     }
 
-    public async Task UpdateSuccess(long id, ReceiveMessageDecode.TypeEnum type, string externalNo, string sampleNo, string barcode, string resultJson)
+    public async Task UpdateSuccessTestResult(long id, string externalNo, string sampleNo, string barcode, string resultJson)
     {
         // 更新 receive_message 新增 receive_message_decode
 
@@ -90,7 +90,7 @@ public class ReceiveMessageService
         {
             ReceiveMessageId = id,
             ExternalNo = externalNo,
-            Type = type,
+            Type = ReceiveMessageDecode.TypeEnum.TestResult,
             SampleNo = sampleNo,
             Barcode = barcode,
             ResultJson = resultJson,

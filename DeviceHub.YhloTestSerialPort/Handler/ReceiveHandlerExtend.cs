@@ -31,7 +31,7 @@ namespace DeviceHub.YhloTestSerialPort.Handler
             }
             string resultId = resp.GetData().ResultId;
 
-            receiveMessageService.UpdateSuccess(task.Id, ReceiveMessageDecode.TypeEnum.TestResult, resultId, parseResult.TestOrderRecord.SampleId,
+            receiveMessageService.UpdateSuccessTestResult(task.Id, resultId, parseResult.TestOrderRecord.SampleId,
                 parseResult.TestOrderRecord.InstrumentSpecimenId, JsonSerializer.Serialize(uploadSpecimenTestResultInput)).GetAwaiter();
         }
 

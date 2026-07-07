@@ -34,23 +34,37 @@ namespace DeviceHub.YhloTestSerialPort.Handler
         {
             try
             {
-                SendMessageLarge? receiveMessageLarge = sendMessageLargeRepository.GetByReceiveMessageId(task.Id).GetAwaiter().GetResult();
+                SendMessageLarge? receiveMessageLarge = sendMessageLargeRepository.GetBySendMessageId(task.Id).GetAwaiter().GetResult();
                 long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                 if (receiveMessageLarge == null)
                 {
                     MarkFailed(task.Id, "数据异常", now);
                     return;
                 }
-                GetSampleApplyItemOutput? getSampleApplyItemOutput = JsonSerializer.Deserialize<GetSampleApplyItemOutput>(receiveMessageLarge.SendJson);
-                if (getSampleApplyItemOutput == null)
-                {
-                    MarkFailed(task.Id, "数据异常", now);
-                    return;
-                }
-                string sendContent = AstmMessageEncoder.EncoderIssueApplication(getSampleApplyItemOutput);
 
-                // 发送 发时候先看看在收没，没有收的话在发
-                // 保存 send_message_encoder
+                if (task.Type == SendMessage.TypeEnum.RequestApplication)
+                {
+                    GetSampleApplyItemOutput? getSampleApplyItemOutput = JsonSerializer.Deserialize<GetSampleApplyItemOutput>(receiveMessageLarge.SendJson);
+                    if (getSampleApplyItemOutput == null)
+                    {
+                        MarkFailed(task.Id, "数据异常", now);
+                        return;
+                    }
+
+                    byte[] sendContent = AstmMessageEncoder.EncoderRequestApplication(getSampleApplyItemOutput);
+
+                    // 发送 发时候先看看在收没，没有收的话在发
+
+                    sendMessageService.UpdateSuccessRequestApplication(task.Id, sendContent).GetAwaiter();
+                }
+                else if (task.Type == SendMessage.TypeEnum.IssueApplication)
+                {
+
+                }
+                else
+                {
+                    MarkFailed(task.Id, "不支持的类型 " + task.Type, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+                }
             }
             catch (Exception e)
             {

@@ -14,7 +14,14 @@ public class SendMessageEncoderRepository : ISendMessageEncoderRepository
     {
     }
 
-    public async Task<long> Insert(SendMessageEncoder entity, CancellationToken cancellationToken = default)
+    public Task<long> Insert(SendMessageEncoder entity, CancellationToken cancellationToken = default) =>
+        Insert(entity, null, null, cancellationToken);
+
+    public async Task<long> Insert(
+        SendMessageEncoder entity,
+        SqliteConnection? connection,
+        SqliteTransaction? transaction,
+        CancellationToken cancellationToken = default)
     {
         const string sql = """
             INSERT INTO send_message_encoder (send_message_id, send_content, create_time, update_time)
@@ -22,17 +29,21 @@ public class SendMessageEncoderRepository : ISendMessageEncoderRepository
             RETURNING id;
             """;
 
-        var id = await DbHelper.ExecuteScalarAsync<long>(
-            sql,
-            [
-                DbHelper.Param("@send_message_id", entity.SendMessageId),
-                DbHelper.Param("@send_content", entity.SendContent),
-                DbHelper.Param("@create_time", entity.CreateTime),
-                DbHelper.Param("@update_time", entity.UpdateTime)
-            ],
-            cancellationToken);
+        var parameters = new SqliteParameter[]
+        {
+            DbHelper.Param("@send_message_id", entity.SendMessageId),
+            DbHelper.Param("@send_content", entity.SendContent),
+            DbHelper.Param("@create_time", entity.CreateTime),
+            DbHelper.Param("@update_time", entity.UpdateTime)
+        };
 
-        return id;
+        if (connection is not null && transaction is not null)
+        {
+            return await DbHelper.ExecuteScalarAsync<long>(
+                connection, transaction, sql, parameters, cancellationToken);
+        }
+
+        return await DbHelper.ExecuteScalarAsync<long>(sql, parameters, cancellationToken);
     }
 
     public async Task<bool> Update(SendMessageEncoder entity, CancellationToken cancellationToken = default)

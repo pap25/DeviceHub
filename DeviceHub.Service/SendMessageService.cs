@@ -2,6 +2,7 @@
 using DeviceHub.Model.Entities;
 using DeviceHub.Model.view;
 using DeviceHub.Model.Vo;
+using DeviceHub.Repository;
 using DeviceHub.Repository.Repositories;
 using DeviceHub.Utils;
 
@@ -13,6 +14,7 @@ public class SendMessageService
     public static SendMessageService Instance => _instance;
 
     private readonly SendMessageRepository sendMessageRepository = SendMessageRepository.Instance;
+    private readonly SendMessageEncoderRepository sendMessageEncoderRepository = SendMessageEncoderRepository.Instance;
 
     private SendMessageService()
     {
@@ -46,5 +48,25 @@ public class SendMessageService
             TotalCount = totalCount,
             Data = outputList
         };
+    }
+
+    public async Task UpdateSuccessRequestApplication(long sendMessageId, byte[] sendContent)
+    {
+        // 保存 send_message_encoder 更新 send_message
+        long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        SendMessageEncoder sendMessageEncoder = new()
+        {
+            SendMessageId = sendMessageId,
+            SendContent = sendContent,
+            CreateTime = now,
+            UpdateTime = now
+        };
+
+        await DbHelper.ExecuteInTransactionAsync(async (connection, transaction) =>
+        {
+            await sendMessageRepository.UpdateStatusAndUpdateTimeById(
+                sendMessageId, SendMessage.StatusEnum.Success, now, connection, transaction);
+            await sendMessageEncoderRepository.Insert(sendMessageEncoder, connection, transaction);
+        });
     }
 }

@@ -8,15 +8,17 @@ namespace DeviceHub.YhloTestSerialPort.Protocol
 {
     public class AstmMessageEncoder
     {
-        public static string EncoderIssueApplication(GetSampleApplyItemOutput sampleApplyItem)
+        // 请求查询申请信息
+        public static byte[] EncoderRequestApplication(GetSampleApplyItemOutput sampleApplyItem)
         {
-            // SampleQuery TestResult
-            return "";
+            return [];
         }
-        public static string EncoderRequestApplication(Object frameDataList)
+
+        // LIS下发申请信息
+        public static byte[] EncoderIssueApplication(object obj)
         {
             // SampleQuery TestResult
-            return "";
+            return [];
         }
     }
 }

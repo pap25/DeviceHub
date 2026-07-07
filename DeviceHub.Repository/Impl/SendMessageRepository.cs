@@ -76,6 +76,70 @@ public class SendMessageRepository : ISendMessageRepository
         return rows > 0;
     }
 
+    public async Task<bool> UpdateStatusAndErrorMessageAndUpdateTimeById(
+        long id,
+        SendMessage.StatusEnum status,
+        string errorMessage,
+        long updateTime,
+        CancellationToken cancellationToken = default)
+    {
+        const string sql = """
+            UPDATE send_message
+            SET status = @status,
+                error_message = @error_message,
+                update_time = @update_time
+            WHERE id = @id;
+            """;
+
+        var rows = await DbHelper.ExecuteNonQueryAsync(
+            sql,
+            [
+                DbHelper.Param("@id", id),
+                DbHelper.Param("@status", (byte)status),
+                DbHelper.Param("@error_message", errorMessage),
+                DbHelper.Param("@update_time", updateTime)
+            ],
+            cancellationToken);
+
+        return rows > 0;
+    }
+
+    public Task<bool> UpdateStatusAndUpdateTimeById(
+        long id,
+        SendMessage.StatusEnum status,
+        long updateTime,
+        CancellationToken cancellationToken = default) =>
+        UpdateStatusAndUpdateTimeById(id, status, updateTime, null, null, cancellationToken);
+
+    public async Task<bool> UpdateStatusAndUpdateTimeById(
+        long id,
+        SendMessage.StatusEnum status,
+        long updateTime,
+        SqliteConnection? connection,
+        SqliteTransaction? transaction,
+        CancellationToken cancellationToken = default)
+    {
+        const string sql = """
+            UPDATE send_message
+            SET status = @status,
+                update_time = @update_time
+            WHERE id = @id;
+            """;
+
+        var parameters = new SqliteParameter[]
+        {
+            DbHelper.Param("@id", id),
+            DbHelper.Param("@status", (byte)status),
+            DbHelper.Param("@update_time", updateTime)
+        };
+
+        int rows = connection is not null && transaction is not null
+            ? await DbHelper.ExecuteNonQueryAsync(connection, transaction, sql, parameters, cancellationToken)
+            : await DbHelper.ExecuteNonQueryAsync(sql, parameters, cancellationToken);
+
+        return rows > 0;
+    }
+
     public async Task<bool> DeleteById(long id, CancellationToken cancellationToken = default)
     {
         const string sql = "DELETE FROM send_message WHERE id = @id;";

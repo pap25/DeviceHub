@@ -12,6 +12,19 @@ public interface ISendMessageRepository
 
     Task<bool> Update(SendMessage entity, CancellationToken cancellationToken = default);
 
+    Task<bool> UpdateStatusAndErrorMessageAndUpdateTimeById(
+        long id,
+        SendMessage.StatusEnum status,
+        string errorMessage,
+        long updateTime,
+        CancellationToken cancellationToken = default);
+
+    Task<bool> UpdateStatusAndUpdateTimeById(
+        long id,
+        SendMessage.StatusEnum status,
+        long updateTime,
+        CancellationToken cancellationToken = default);
+
     Task<bool> DeleteById(long id, CancellationToken cancellationToken = default);
 
     Task<SendMessage?> GetById(long id, CancellationToken cancellationToken = default);
