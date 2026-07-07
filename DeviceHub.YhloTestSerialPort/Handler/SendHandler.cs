@@ -51,11 +51,15 @@ namespace DeviceHub.YhloTestSerialPort.Handler
                         return;
                     }
 
-                    byte[] sendContent = AstmMessageEncoder.EncoderRequestApplication(getSampleApplyItemOutput);
+                    List<byte[]> sendFrameList = AstmMessageEncoder.EncoderRequestApplication(getSampleApplyItemOutput);
 
                     // 发送 发时候先看看在收没，没有收的话在发
+                    foreach (byte[] sendFrame in sendFrameList)
+                    {
 
-                    sendMessageService.UpdateSuccessRequestApplication(task.Id, sendContent).GetAwaiter();
+                    }
+
+                    sendMessageService.UpdateSuccessRequestApplication(task.Id, merge(sendFrameList)).GetAwaiter();
                 }
                 else if (task.Type == SendMessage.TypeEnum.IssueApplication)
                 {
@@ -80,6 +84,23 @@ namespace DeviceHub.YhloTestSerialPort.Handler
                 errorMessage,
                 now).GetAwaiter().GetResult();
             Logger.Warn(logType, $"消息处理失败 id={id}: {errorMessage}");
+        }
+
+        private byte[] merge(List<byte[]> sendFrameList)
+        {
+            int totalLength = sendFrameList.Sum(x => x.Length);
+
+            byte[] result = new byte[totalLength];
+
+            int offset = 0;
+
+            foreach (var frame in sendFrameList)
+            {
+                Buffer.BlockCopy(frame, 0, result, offset, frame.Length);
+                offset += frame.Length;
+            }
+
+            return result;
         }
     }
 }

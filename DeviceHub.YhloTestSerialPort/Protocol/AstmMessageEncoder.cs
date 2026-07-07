@@ -9,13 +9,13 @@ namespace DeviceHub.YhloTestSerialPort.Protocol
     public class AstmMessageEncoder
     {
         // 请求查询申请信息
-        public static byte[] EncoderRequestApplication(GetSampleApplyItemOutput sampleApplyItem)
+        public static List<byte[]> EncoderRequestApplication(GetSampleApplyItemOutput sampleApplyItem)
         {
             return [];
         }
 
         // LIS下发申请信息
-        public static byte[] EncoderIssueApplication(object obj)
+        public static List<byte[]> EncoderIssueApplication(object obj)
         {
             // SampleQuery TestResult
             return [];

@@ -326,5 +326,15 @@ namespace DeviceHub.Yhlo
             ResetReceiveBuffer();
             transport.Close();
         }
+
+        // Driver 定义LineState/Send/Receive，
+        public enum LineState
+        {
+            Idle, // 空闲
+            WaitAck, // 我方申请发送(已发送ENQ)
+            Sending, // 我方正在发送
+            Receiving, // 对方正在发送
+            WaitEot, // 等待EOT
+        }
     }
 }
