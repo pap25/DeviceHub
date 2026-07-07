@@ -11,6 +11,8 @@ namespace DeviceHub.YhloTestSerialPort.Handler
         {
             // 发送
             // 保存 send_message_encoder
+
+            // 发时候先看看在收没，没有收的话在发
             throw new NotImplementedException();
         }
 
