@@ -5,7 +5,7 @@ using DeviceHub.Base.Constant;
 using DeviceHub.Base.Transports;
 using DeviceHub.Model.Entities;
 using DeviceHub.Service;
-using DeviceHub.Yhlo.Handler;
+using DeviceHub.YhloTestSerialPort.Handler;
 using System.IO.Ports;
 using System.Runtime.InteropServices;
 using System.Text;

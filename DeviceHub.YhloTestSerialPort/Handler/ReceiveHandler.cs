@@ -1,19 +1,16 @@
-﻿using DeviceHub.Abstractions.Dto;
-using DeviceHub.Base.Common;
+﻿using DeviceHub.Base.Common;
 using DeviceHub.Lis;
-using DeviceHub.Lis.Dto;
 using DeviceHub.Lis.Impl;
 using DeviceHub.Model.Entities;
 using DeviceHub.Repository.Repositories;
 using DeviceHub.Service;
 using DeviceHub.Yhlo.Protocol;
-using System.Text.Json;
 using static DeviceHub.Yhlo.Protocol.AstmMessageDecode;
 using static DeviceHub.YhloTestSerialPort.Protocol.AstmMessageEntity;
 
-namespace DeviceHub.Yhlo.Handler
+namespace DeviceHub.YhloTestSerialPort.Handler
 {
-    public class ReceiveHandler : IBatchTaskHandler<ReceiveMessage>
+    public partial class ReceiveHandler : IBatchTaskHandler<ReceiveMessage>
     {
         private readonly string logType = nameof(ReceiveHandler);
         private long _instrumentId;
@@ -79,36 +76,16 @@ namespace DeviceHub.Yhlo.Handler
             ParseResult parseResult = AstmMessageDecode.Parse(recordList);
             if (parseResult.HeaderRecord.ProcessingId == HeaderRecord.MessageType.PR.ToString())
             {
-                // 检验结果 1 上传到LIS 2 更新状态并记录
-                UploadSpecimenTestResultInput uploadSpecimenTestResultInput = ToUploadSpecimenTestResultInput(parseResult);
-                Resp<UploadSpecimenTestResultOutput> resp = lisClient.UploadSpecimenTestResult(uploadSpecimenTestResultInput).GetAwaiter().GetResult();
-                if (!resp.IsSuccess())
-                {
-                    MarkFailed(task.Id, resp.GetErrorMsg() ?? "", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
-                    return;
-                }
-                string resultId = resp.GetData().ResultId;
-
-                receiveMessageService.UpdateSuccess(task.Id, ReceiveMessageDecode.TypeEnum.TestResult, resultId, "", "", JsonSerializer.Serialize(uploadSpecimenTestResultInput)).GetAwaiter();
+                UploadSpecimenTestResult(task, parseResult);
                 return;
             }
             else if (parseResult.HeaderRecord.ProcessingId == HeaderRecord.MessageType.RQ.ToString())
             {
-                if (parseResult.TestOrderRecord == null)
-                {
-                    MarkFailed(task.Id, "数据异常没有订单记录", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
-                    return;
-                }
-                receiveMessageService.SaveSampleQuery(_instrumentId, task.Id, parseResult.TestOrderRecord.SampleId, parseResult.TestOrderRecord.InstrumentSpecimenId);
+                SaveSampleQuery(task, parseResult);
                 return;
             }
 
             MarkFailed(task.Id, $"不支持消息类型 {parseResult.HeaderRecord.ProcessingId}", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
-        }
-
-        private UploadSpecimenTestResultInput ToUploadSpecimenTestResultInput(ParseResult parseResult)
-        {
-            return new UploadSpecimenTestResultInput();
         }
     }
 }
