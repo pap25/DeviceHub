@@ -10,7 +10,7 @@ using System.IO.Ports;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace DeviceHub.Yhlo
+namespace DeviceHub.YhloTestSerialPort
 {
     public class Driver : ISerialDeviceDriver
     {
