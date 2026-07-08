@@ -274,7 +274,7 @@ namespace DeviceHub.YhloTestSerialPort
         {
             byte[] rawMessage = message.ToArray();
             Logger.Info(logType, $"串口接收完整消息{Decode(message)}");
-            _ = receiveMessageService.Save(_instrumentId, rawMessage);
+            receiveMessageService.Save(_instrumentId, rawMessage).GetAwaiter().GetResult();
             receiveTask.NotifyConsume();
         }
 
@@ -361,9 +361,6 @@ namespace DeviceHub.YhloTestSerialPort
                 {
                     if (now - lastReceiveTime < ReceiveIdleTimeoutSeconds * 1000L)
                         return;
-
-                    if (lineState == LineState.Receiving)
-                        ResetReceiveBuffer();
 
                     if (lineState != LineState.Idle)
                     {
