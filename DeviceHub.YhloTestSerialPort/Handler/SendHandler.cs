@@ -17,7 +17,6 @@ namespace DeviceHub.YhloTestSerialPort.Handler
         private readonly SendMessageLargeRepository sendMessageLargeRepository = SendMessageLargeRepository.Instance;
         private readonly SendMessageService sendMessageService = SendMessageService.Instance;
         private long sendMessageId;
-        //private readonly ILisClient lisClient = LisClient.Instance;
 
         public SendHandler(long instrumentId)
         {

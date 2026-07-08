@@ -69,4 +69,25 @@ public class SendMessageService
             await sendMessageEncoderRepository.Insert(sendMessageEncoder, connection, transaction);
         });
     }
+
+    public void SaveIssueApplication(long instrumentId, string externalNo, string sampleNo, string barcode, string sendJson)
+    {
+        long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        SendMessage sendMessage = new()
+        {
+            InstrumentId = instrumentId,
+            Type = SendMessage.TypeEnum.IssueApplication,
+            ExternalNo = externalNo,
+            SampleNo = sampleNo,
+            Barcode = barcode,
+            Status = SendMessage.StatusEnum.Pending,
+            ErrorMessage = string.Empty,
+            CreateTime = now,
+            UpdateTime = now
+        };
+        SendMessageLarge receiveMessageLarge = new()
+        {
+            SendJson = sendJson
+        };
+    }
 }

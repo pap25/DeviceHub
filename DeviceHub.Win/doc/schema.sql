@@ -75,3 +75,9 @@ create table client_log (
     create_time bigint not null comment '创建时间',
     primary key(id)
 ) engine=innodb default charset=utf8mb4 comment '仪器通信日志表';
+
+create table dictionary (
+    ckey varchar(100) not null comment '配置key(LisIssueApplicationLastId)',
+    value varchar(100) not null comment '配置值',
+    primary key(ckey)
+) engine = InnoDB default charset = utf8mb4 comment '数据字典';
