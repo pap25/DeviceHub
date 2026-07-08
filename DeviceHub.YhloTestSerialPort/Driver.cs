@@ -110,7 +110,7 @@ namespace DeviceHub.YhloTestSerialPort
                     case ASTMProtocols.ACK:
                         Logger.Debug(logType, "收到 ACK");
                         lineState = LineState.Sending;
-                        SendFrame();
+                        SendFrameUnlocked();
                         return;
 
                     case ASTMProtocols.NAK:
@@ -122,7 +122,7 @@ namespace DeviceHub.YhloTestSerialPort
                         Logger.Info(logType, "收到 EOT，本次传输结束，清理未完成消息");
                         ResetReceiveBuffer();
                         lineState = LineState.Idle;
-                        SendFrame();
+                        SendFrameUnlocked();
                         return;
                 }
             }
@@ -299,43 +299,41 @@ namespace DeviceHub.YhloTestSerialPort
         private int sendFrameOffset = 0;
         /// <summary>
         /// 发送一个完整帧 (主动向仪器下发数据（下发申请单 / 查询单）这条“发送路径”预留的，而不是接收路径)
+        /// 调用方须已持有 stateLock。
         /// </summary>
-        private void SendFrame()
+        private void SendFrameUnlocked()
         {
-            lock (stateLock)
+            switch (lineState)
             {
-                switch (lineState)
-                {
-                    case LineState.Idle:
-                        sendFrameList = senderTaskHandler.SearchEncoderTask();
-                        if (sendFrameList.Count > 0)
-                        {
-                            sendFrameOffset = 0;
-                            transport.Send(ASTMProtocols.ENQ);
-                        }
-                        break;
-                    case LineState.Sending:
-                        if (sendFrameList.Count > sendFrameOffset)
-                        {
-                            byte[] frame = sendFrameList[sendFrameOffset];
-                            sendFrameOffset++;
-                            transport.Send(frame);
-                            Logger.Debug(logType, $"串口发送帧: {Decode(frame)}");
-                        }
-                        else if (sendFrameList.Count > 0)
-                        {
-                            senderTaskHandler.Completed(sendFrameList);
-                            sendFrameList = [];
-                            sendFrameOffset = 0;
-                            lineState = LineState.Idle;
-                            transport.Send(ASTMProtocols.EOT);
-                        }
-                        break;
-                    case LineState.Receiving:
-                        break;
-                    default:
-                        break;
-                }
+                case LineState.Idle:
+                    sendFrameList = senderTaskHandler.SearchEncoderTask();
+                    if (sendFrameList.Count > 0)
+                    {
+                        sendFrameOffset = 0;
+                        transport.Send(ASTMProtocols.ENQ);
+                    }
+                    break;
+                case LineState.Sending:
+                    if (sendFrameList.Count > sendFrameOffset)
+                    {
+                        byte[] frame = sendFrameList[sendFrameOffset];
+                        sendFrameOffset++;
+                        transport.Send(frame);
+                        Logger.Debug(logType, $"串口发送帧: {Decode(frame)}");
+                    }
+                    else if (sendFrameList.Count > 0)
+                    {
+                        senderTaskHandler.Completed(sendFrameList);
+                        sendFrameList = [];
+                        sendFrameOffset = 0;
+                        lineState = LineState.Idle;
+                        transport.Send(ASTMProtocols.EOT);
+                    }
+                    break;
+                case LineState.Receiving:
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -360,7 +358,7 @@ namespace DeviceHub.YhloTestSerialPort
                     }
 
                     lineState = LineState.Idle;
-                    SendFrame();
+                    SendFrameUnlocked();
                 }
             }
             catch (Exception ex)
