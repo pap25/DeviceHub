@@ -11,6 +11,7 @@ namespace DeviceHub.YhloTestSerialPort.Protocol
         // 请求查询申请信息
         public static List<byte[]> EncoderRequestApplication(GetSampleApplyItemOutput sampleApplyItem)
         {
+            // TODO 等待实现
             return [];
         }
 

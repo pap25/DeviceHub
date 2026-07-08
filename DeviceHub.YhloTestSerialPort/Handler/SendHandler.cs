@@ -96,7 +96,14 @@ namespace DeviceHub.YhloTestSerialPort.Handler
 
         public void Completed(List<byte[]> sendFrameList)
         {
-            sendMessageService.UpdateSuccessRequestApplication(sendMessageId, merge(sendFrameList)).GetAwaiter();
+            try
+            {
+                sendMessageService.UpdateSuccessRequestApplication(sendMessageId, merge(sendFrameList)).GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(logType, $"消息发送完成回写异常 id={sendMessageId}", ex);
+            }
         }
 
         private byte[] merge(List<byte[]> sendFrameList)

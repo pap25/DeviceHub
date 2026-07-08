@@ -24,6 +24,9 @@ namespace DeviceHub.YhloTestSerialPort
         private long lastReceiveTime;
         private SerialPortTransport transport;
         private readonly List<byte> buffer = new();
+        private readonly object stateLock = new();
+        private Timer? idleCheckTimer;
+        private const int ReceiveIdleTimeoutSeconds = 15;
 
         /// <summary>
         /// buffer 中下一待解析帧的起始位置（此前完整帧均已 ACK）
@@ -47,6 +50,13 @@ namespace DeviceHub.YhloTestSerialPort
             receiveTask.StartConsume();
 
             senderTaskHandler = new SendHandler(instrumentId);
+
+            lastReceiveTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            idleCheckTimer = new Timer(
+                CheckReceiveIdleTimeout,
+                null,
+                TimeSpan.FromSeconds(5),
+                TimeSpan.FromSeconds(5));
 
             transport.Open();
         }
@@ -87,31 +97,34 @@ namespace DeviceHub.YhloTestSerialPort
         /// </summary>
         private void HandleControlCharAsync(byte controlChar)
         {
-            switch (controlChar)
+            lock (stateLock)
             {
-                case ASTMProtocols.ENQ:
-                    Logger.Info(logType, "收到 ENQ，回复ACK");
-                    lineState = LineState.Receiving;
-                    transport.Send(ASTMProtocols.ACK);
-                    return;
+                switch (controlChar)
+                {
+                    case ASTMProtocols.ENQ:
+                        Logger.Info(logType, "收到 ENQ，回复ACK");
+                        lineState = LineState.Receiving;
+                        transport.Send(ASTMProtocols.ACK);
+                        return;
 
-                case ASTMProtocols.ACK:
-                    Logger.Debug(logType, "收到 ACK");
-                    lineState = LineState.Sending;
-                    SendFrame();
-                    return;
+                    case ASTMProtocols.ACK:
+                        Logger.Debug(logType, "收到 ACK");
+                        lineState = LineState.Sending;
+                        SendFrame();
+                        return;
 
-                case ASTMProtocols.NAK:
-                    Logger.Info(logType, "收到 NAK");
-                    lineState = LineState.Receiving;
-                    return;
+                    case ASTMProtocols.NAK:
+                        Logger.Info(logType, "收到 NAK");
+                        lineState = LineState.Receiving;
+                        return;
 
-                case ASTMProtocols.EOT:
-                    Logger.Info(logType, "收到 EOT，本次传输结束，清理未完成消息");
-                    ResetReceiveBuffer();
-                    lineState = LineState.Idle;
-                    SendFrame();
-                    return;
+                    case ASTMProtocols.EOT:
+                        Logger.Info(logType, "收到 EOT，本次传输结束，清理未完成消息");
+                        ResetReceiveBuffer();
+                        lineState = LineState.Idle;
+                        SendFrame();
+                        return;
+                }
             }
         }
 
@@ -175,7 +188,10 @@ namespace DeviceHub.YhloTestSerialPort
                 if (frameTrailerEnd > buffer.Count)
                     return false; // 半包，帧尾未收齐
 
-                lineState = LineState.Receiving;
+                lock (stateLock)
+                {
+                    lineState = LineState.Receiving;
+                }
                 transport.Send(ASTMProtocols.ACK);
                 Logger.Debug(logType, "收到完整帧，回复ACK");
                 processedOffset = frameTrailerEnd;
@@ -284,43 +300,79 @@ namespace DeviceHub.YhloTestSerialPort
         /// <summary>
         /// 发送一个完整帧 (主动向仪器下发数据（下发申请单 / 查询单）这条“发送路径”预留的，而不是接收路径)
         /// </summary>
-        public void SendFrame()
+        private void SendFrame()
         {
-            switch (lineState)
+            lock (stateLock)
             {
-                case LineState.Idle:
-                    sendFrameList = senderTaskHandler.SearchEncoderTask();
-                    if (sendFrameList.Count > 0)
+                switch (lineState)
+                {
+                    case LineState.Idle:
+                        sendFrameList = senderTaskHandler.SearchEncoderTask();
+                        if (sendFrameList.Count > 0)
+                        {
+                            sendFrameOffset = 0;
+                            transport.Send(ASTMProtocols.ENQ);
+                        }
+                        break;
+                    case LineState.Sending:
+                        if (sendFrameList.Count > sendFrameOffset)
+                        {
+                            byte[] frame = sendFrameList[sendFrameOffset];
+                            sendFrameOffset++;
+                            transport.Send(frame);
+                            Logger.Debug(logType, $"串口发送帧: {Decode(frame)}");
+                        }
+                        else if (sendFrameList.Count > 0)
+                        {
+                            senderTaskHandler.Completed(sendFrameList);
+                            sendFrameList = [];
+                            sendFrameOffset = 0;
+                            lineState = LineState.Idle;
+                            transport.Send(ASTMProtocols.EOT);
+                        }
+                        break;
+                    case LineState.Receiving:
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        private void CheckReceiveIdleTimeout(object? state)
+        {
+            try
+            {
+                long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                if (now - lastReceiveTime < ReceiveIdleTimeoutSeconds * 1000L)
+                    return;
+
+                lock (stateLock)
+                {
+                    if (now - lastReceiveTime < ReceiveIdleTimeoutSeconds * 1000L)
+                        return;
+
+                    if (lineState != LineState.Idle)
                     {
-                        sendFrameOffset = 0;
-                        transport.Send(ASTMProtocols.ENQ);
-                    }
-                    break;
-                case LineState.Sending:
-                    if (sendFrameList.Count > sendFrameOffset)
-                    {
-                        byte[] frame = sendFrameList[sendFrameOffset];
-                        sendFrameOffset++;
-                        transport.Send(frame);
-                        Logger.Debug(logType, $"串口发送帧: {Decode(frame)}");
-                    }
-                    else
-                    {
-                        senderTaskHandler.Completed(sendFrameList);
+                        Logger.Info(logType, $"超过{ReceiveIdleTimeoutSeconds}秒未收到消息，重置为Idle并尝试发送");
                         sendFrameList = [];
                         sendFrameOffset = 0;
-                        transport.Send(ASTMProtocols.EOT);
                     }
-                    break;
-                case LineState.Receiving:
-                    break;
-                default:
-                    break;
+
+                    lineState = LineState.Idle;
+                    SendFrame();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(logType, "空闲超时检查异常", ex);
             }
         }
 
         public void Stop()
         {
+            idleCheckTimer?.Dispose();
+            idleCheckTimer = null;
             transport.DataReceived -= Transport_DataReceived;
             receiveTask.Shutdown();
             ResetReceiveBuffer();
