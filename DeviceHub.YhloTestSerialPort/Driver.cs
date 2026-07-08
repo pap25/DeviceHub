@@ -9,6 +9,7 @@ using DeviceHub.YhloTestSerialPort.Handler;
 using System.IO.Ports;
 using System.Runtime.InteropServices;
 using System.Text;
+using static DeviceHub.YhloTestSerialPort.Driver;
 
 namespace DeviceHub.YhloTestSerialPort
 {
@@ -16,6 +17,7 @@ namespace DeviceHub.YhloTestSerialPort
     {
         private readonly string logType = nameof(Driver);
         private IConsumeTask receiveTask;
+        private ISenderTaskHandler senderTaskHandler;
         private readonly ReceiveMessageService receiveMessageService = ReceiveMessageService.Instance;
         private long _instrumentId;
 
@@ -44,6 +46,8 @@ namespace DeviceHub.YhloTestSerialPort
 
             receiveTask = new BatchConsumeTask<ReceiveMessage>(new ReceiveHandler(instrumentId));
             receiveTask.StartConsume();
+
+            senderTaskHandler = new SendHandler(instrumentId);
 
             transport.Open();
         }
@@ -276,6 +280,8 @@ namespace DeviceHub.YhloTestSerialPort
             return count == 0 ? string.Empty : Decode(data.GetRange(startIndex, count).ToArray());
         }
 
+        private List<byte[]> sendFrameList = [];
+        private int sendFrameOffset = 0;
         /// <summary>
         /// 发送一个完整帧 (主动向仪器下发数据（下发申请单 / 查询单）这条“发送路径”预留的，而不是接收路径)
         /// </summary>
@@ -284,15 +290,28 @@ namespace DeviceHub.YhloTestSerialPort
             switch (lineState)
             {
                 case LineState.Idle:
-                    // 查询队列还有则EOT，没有则跳过
-                    transport.Send(ASTMProtocols.ENQ);
+                    sendFrameList = senderTaskHandler.SearchEncoderTask();
+                    if (sendFrameList.Count > 0)
+                    {
+                        sendFrameOffset = 0;
+                        transport.Send(ASTMProtocols.ENQ);
+                    }
                     break;
                 case LineState.Sending:
-                    byte[] frame = null;
-                    transport.Send(frame);
-                    Logger.Debug(logType, $"串口发送帧: {Decode(frame)}");
-                    // 完后要EOT
-                    transport.Send(ASTMProtocols.EOT);
+                    if (sendFrameList.Count > sendFrameOffset)
+                    {
+                        byte[] frame = sendFrameList[sendFrameOffset];
+                        sendFrameOffset++;
+                        transport.Send(frame);
+                        Logger.Debug(logType, $"串口发送帧: {Decode(frame)}");
+                    }
+                    else
+                    {
+                        senderTaskHandler.Completed(sendFrameList);
+                        sendFrameList = [];
+                        sendFrameOffset = 0;
+                        transport.Send(ASTMProtocols.EOT);
+                    }
                     break;
                 case LineState.Receiving:
                     break;
@@ -314,6 +333,11 @@ namespace DeviceHub.YhloTestSerialPort
             Idle,
             Sending,
             Receiving
+        }
+        public interface ISenderTaskHandler
+        {
+            List<byte[]> SearchEncoderTask();
+            void Completed(List<byte[]> sendFrameList);
         }
     }
 }

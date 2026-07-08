@@ -7,10 +7,11 @@ using DeviceHub.Repository.Repositories;
 using DeviceHub.Service;
 using DeviceHub.YhloTestSerialPort.Protocol;
 using System.Text.Json;
+using static DeviceHub.YhloTestSerialPort.Driver;
 
 namespace DeviceHub.YhloTestSerialPort.Handler
 {
-    public class SendHandler : IBatchTaskHandler<SendMessage>
+    public class SendHandler : ISenderTaskHandler
     {
         private readonly string logType = nameof(SendHandler);
         private long _instrumentId;
@@ -24,14 +25,15 @@ namespace DeviceHub.YhloTestSerialPort.Handler
             _instrumentId = instrumentId;
         }
 
-        public IEnumerable<SendMessage> SearchTask()
+        public SendMessage? SearchTask()
         {
             List<SendMessage> taskList = sendMessageRepository
-                .FindByInstrumentIdAndStatusOrderAsc(_instrumentId, SendMessage.StatusEnum.Pending, 15).GetAwaiter().GetResult();
-            return taskList;
+                .FindByInstrumentIdAndStatusOrderAsc(_instrumentId, SendMessage.StatusEnum.Pending, 1).GetAwaiter().GetResult();
+            return taskList[0];
         }
-        public void HandleTask(SendMessage task)
+        public List<byte[]> SearchEncoderTask()
         {
+            SendMessage task = null;
             try
             {
                 SendMessageLarge? receiveMessageLarge = sendMessageLargeRepository.GetBySendMessageId(task.Id).GetAwaiter().GetResult();
@@ -39,7 +41,7 @@ namespace DeviceHub.YhloTestSerialPort.Handler
                 if (receiveMessageLarge == null)
                 {
                     MarkFailed(task.Id, "数据异常", now);
-                    return;
+                    return null;
                 }
 
                 if (task.Type == SendMessage.TypeEnum.RequestApplication)
@@ -48,7 +50,7 @@ namespace DeviceHub.YhloTestSerialPort.Handler
                     if (getSampleApplyItemOutput == null)
                     {
                         MarkFailed(task.Id, "数据异常", now);
-                        return;
+                        return null;
                     }
 
                     List<byte[]> sendFrameList = AstmMessageEncoder.EncoderRequestApplication(getSampleApplyItemOutput);
@@ -74,6 +76,7 @@ namespace DeviceHub.YhloTestSerialPort.Handler
             {
                 MarkFailed(task.Id, "HandleTask异常" + e.Message, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
             }
+            return null;
         }
 
         private void MarkFailed(long id, string errorMessage, long now)
@@ -101,6 +104,11 @@ namespace DeviceHub.YhloTestSerialPort.Handler
             }
 
             return result;
+        }
+
+        public void Completed(List<byte[]> sendFrameList)
+        {
+            throw new NotImplementedException();
         }
     }
 }
