@@ -26,7 +26,7 @@ namespace DeviceHub.YhloTestSerialPort.Handler
         }
         public void HandleTask(GetSampleApplyListOutput task)
         {
-            sendMessageService.SaveIssueApplication(_instrumentId, "", "", "", JsonSerializer.Serialize(task));
+            sendMessageService.SaveIssueApplication(task.Id, _instrumentId, "", "", "", JsonSerializer.Serialize(task));
         }
     }
 }

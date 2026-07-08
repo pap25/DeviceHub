@@ -70,7 +70,7 @@ public class SendMessageService
         });
     }
 
-    public void SaveIssueApplication(long instrumentId, string externalNo, string sampleNo, string barcode, string sendJson)
+    public void SaveIssueApplication(long lastId, long instrumentId, string externalNo, string sampleNo, string barcode, string sendJson)
     {
         long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         SendMessage sendMessage = new()
