@@ -27,9 +27,9 @@ namespace DeviceHub.YhloTestSerialPort.Handler
 
         public SendMessage? SearchTask()
         {
-            List<SendMessage> taskList = sendMessageRepository
-                .FindByInstrumentIdAndStatusOrderAsc(_instrumentId, SendMessage.StatusEnum.Pending, 1).GetAwaiter().GetResult();
-            return taskList[0];
+            return sendMessageRepository
+                .FindFirstByInstrumentIdAndStatusOrderAsc(_instrumentId, SendMessage.StatusEnum.Pending)
+                .GetAwaiter().GetResult();
         }
         public List<byte[]> SearchEncoderTask()
         {

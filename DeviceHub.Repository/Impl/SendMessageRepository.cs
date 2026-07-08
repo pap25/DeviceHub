@@ -172,6 +172,25 @@ public class SendMessageRepository : ISendMessageRepository
             [DbHelper.Param("@status", (byte)status)],
             cancellationToken);
 
+    public Task<SendMessage?> FindFirstByInstrumentIdAndStatusOrderAsc(
+        long instrumentId,
+        SendMessage.StatusEnum status,
+        CancellationToken cancellationToken = default) =>
+        DbHelper.QuerySingleAsync(
+            """
+            SELECT id, instrument_id, type, external_no, sample_no, barcode, status, error_message, create_time, update_time
+            FROM send_message
+            WHERE instrument_id = @instrument_id AND status = @status
+            ORDER BY id ASC
+            LIMIT 1;
+            """,
+            Map,
+            [
+                DbHelper.Param("@instrument_id", instrumentId),
+                DbHelper.Param("@status", (byte)status)
+            ],
+            cancellationToken);
+
     public async Task<List<SendMessage>> FindByInstrumentIdAndStatusOrderAsc(
         long instrumentId,
         SendMessage.StatusEnum status,
