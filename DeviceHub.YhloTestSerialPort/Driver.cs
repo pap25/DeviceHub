@@ -19,6 +19,7 @@ namespace DeviceHub.Yhlo
         private readonly ReceiveMessageService receiveMessageService = ReceiveMessageService.Instance;
         private long _instrumentId;
 
+        private LineState lineState = LineState.Idle;
         private SerialPortTransport transport;
         private readonly List<byte> buffer = new();
 
@@ -100,23 +101,27 @@ namespace DeviceHub.Yhlo
             {
                 case ASTMProtocols.ENQ:
                     Logger.Info(logType, "收到 ENQ，回复ACK");
+                    lineState = LineState.Receiving;
                     transport.Send(ASTMProtocols.ACK);
                     return;
 
                 case ASTMProtocols.ACK:
-                    Logger.Debug(logType, "收到 ACK");  // 收到ack后面可下发申请单到仪器
+                    Logger.Debug(logType, "收到 ACK");
                     lastSentFrame = null;
                     retransmitCount = 0;
+                    lineState = LineState.Sending;
                     return;
 
                 case ASTMProtocols.NAK:
                     Logger.Info(logType, "收到 NAK");
                     RetransmitLastFrame();
+                    lineState = LineState.Receiving;
                     return;
 
                 case ASTMProtocols.EOT:
                     Logger.Info(logType, "收到 EOT，本次传输结束，清理未完成消息");
                     ResetReceiveBuffer();
+                    lineState = LineState.Idle;
                     return;
             }
         }
@@ -181,6 +186,7 @@ namespace DeviceHub.Yhlo
                 if (frameTrailerEnd > buffer.Count)
                     return false; // 半包，帧尾未收齐
 
+                lineState = LineState.Receiving;
                 transport.Send(ASTMProtocols.ACK);
                 Logger.Debug(logType, "收到完整帧，回复ACK");
                 processedOffset = frameTrailerEnd;
@@ -289,6 +295,20 @@ namespace DeviceHub.Yhlo
         /// </summary>
         public async Task SendFrame(byte[] frame)
         {
+            //switch (lineState)
+            //{
+            //    case LineState.Idle:
+            //        transport.Send(ASTMProtocols.EOT);
+            //        break;
+            //    case LineState.Sending:
+            //        // 发送
+            //        break;
+            //    case LineState.Receiving:
+            //        // 等待
+            //        break;
+            //    default:
+            //        break;
+            //}
             lastSentFrame = frame;
             retransmitCount = 0;
             transport.Send(frame);
@@ -327,14 +347,11 @@ namespace DeviceHub.Yhlo
             transport.Close();
         }
 
-        // Driver 定义LineState/Send/Receive，
         public enum LineState
         {
-            Idle, // 空闲
-            WaitAck, // 我方申请发送(已发送ENQ)
-            Sending, // 我方正在发送
-            Receiving, // 对方正在发送
-            WaitEot, // 等待EOT
+            Idle,
+            Sending,
+            Receiving
         }
     }
 }
