@@ -9,7 +9,6 @@ using DeviceHub.YhloTestSerialPort.Handler;
 using System.IO.Ports;
 using System.Runtime.InteropServices;
 using System.Text;
-using static DeviceHub.YhloTestSerialPort.Driver;
 
 namespace DeviceHub.YhloTestSerialPort
 {
