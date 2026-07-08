@@ -20,6 +20,7 @@ namespace DeviceHub.YhloTestSerialPort
         private long _instrumentId;
 
         private LineState lineState = LineState.Idle;
+        private long lastReceiveTime;
         private SerialPortTransport transport;
         private readonly List<byte> buffer = new();
 
@@ -27,21 +28,6 @@ namespace DeviceHub.YhloTestSerialPort
         /// buffer 中下一待解析帧的起始位置（此前完整帧均已 ACK）
         /// </summary>
         private int processedOffset;
-
-        /// <summary>
-        /// 收到 NAK 后重发最后发送帧的最大次数，超过后断开连接
-        /// </summary>
-        private const int MaxRetransmitCount = 6;
-
-        /// <summary>
-        /// 最后一次发送的完整帧，收到 NAK 时用于重传
-        /// </summary>
-        private byte[]? lastSentFrame;
-
-        /// <summary>
-        /// 当前帧已重发次数
-        /// </summary>
-        private int retransmitCount;
 
         public async Task Start(long instrumentId, SerialPortConfig config)
         {
@@ -69,6 +55,7 @@ namespace DeviceHub.YhloTestSerialPort
         {
             try
             {
+                lastReceiveTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                 Logger.Debug(logType, $"串口接收消息: {Decode(data)}");
 
                 buffer.AddRange(data);
@@ -107,14 +94,12 @@ namespace DeviceHub.YhloTestSerialPort
 
                 case ASTMProtocols.ACK:
                     Logger.Debug(logType, "收到 ACK");
-                    lastSentFrame = null;
-                    retransmitCount = 0;
                     lineState = LineState.Sending;
+                    SendFrame();
                     return;
 
                 case ASTMProtocols.NAK:
                     Logger.Info(logType, "收到 NAK");
-                    RetransmitLastFrame();
                     lineState = LineState.Receiving;
                     return;
 
@@ -122,6 +107,7 @@ namespace DeviceHub.YhloTestSerialPort
                     Logger.Info(logType, "收到 EOT，本次传输结束，清理未完成消息");
                     ResetReceiveBuffer();
                     lineState = LineState.Idle;
+                    SendFrame();
                     return;
             }
         }
@@ -291,52 +277,28 @@ namespace DeviceHub.YhloTestSerialPort
         }
 
         /// <summary>
-        /// 发送一个完整帧，并保存为最后发送帧以便收到 NAK 时重传 (主动向仪器下发数据（下发申请单 / 查询单）这条“发送路径”预留的，而不是接收路径)
+        /// 发送一个完整帧 (主动向仪器下发数据（下发申请单 / 查询单）这条“发送路径”预留的，而不是接收路径)
         /// </summary>
-        public async Task SendFrame(byte[] frame)
+        public void SendFrame()
         {
-            //switch (lineState)
-            //{
-            //    case LineState.Idle:
-            //        transport.Send(ASTMProtocols.EOT);
-            //        break;
-            //    case LineState.Sending:
-            //        // 发送
-            //        break;
-            //    case LineState.Receiving:
-            //        // 等待
-            //        break;
-            //    default:
-            //        break;
-            //}
-            lastSentFrame = frame;
-            retransmitCount = 0;
-            transport.Send(frame);
-            Logger.Debug(logType, $"串口发送帧: {Decode(frame)}");
-        }
-
-        /// <summary>
-        /// 收到 NAK 后重发最后发送帧；重发超过最大次数则断开连接
-        /// </summary>
-        private void RetransmitLastFrame()
-        {
-            if (lastSentFrame == null)
+            switch (lineState)
             {
-                Logger.Warn(logType, "收到 NAK，但没有可重发的帧");
-                return;
+                case LineState.Idle:
+                    // 查询队列还有则EOT，没有则跳过
+                    transport.Send(ASTMProtocols.ENQ);
+                    break;
+                case LineState.Sending:
+                    byte[] frame = null;
+                    transport.Send(frame);
+                    Logger.Debug(logType, $"串口发送帧: {Decode(frame)}");
+                    // 完后要EOT
+                    transport.Send(ASTMProtocols.EOT);
+                    break;
+                case LineState.Receiving:
+                    break;
+                default:
+                    break;
             }
-
-            if (retransmitCount >= MaxRetransmitCount)
-            {
-                lastSentFrame = null;
-                retransmitCount = 0;
-                Logger.Error(logType, $"收到 NAK，重发已达最大次数 {MaxRetransmitCount}，清空lastSentFrame");
-                return;
-            }
-
-            retransmitCount++;
-            transport.Send(lastSentFrame);
-            Logger.Warn(logType, $"收到 NAK，重发最后发送帧，第 {retransmitCount}/{MaxRetransmitCount} 次");
         }
 
         public void Stop()

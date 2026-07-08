@@ -4,8 +4,8 @@ using DeviceHub.Lis.Impl;
 using DeviceHub.Model.Entities;
 using DeviceHub.Repository.Repositories;
 using DeviceHub.Service;
-using DeviceHub.Yhlo.Protocol;
-using static DeviceHub.Yhlo.Protocol.AstmMessageDecode;
+using DeviceHub.YhloTestSerialPort.Protocol;
+using static DeviceHub.YhloTestSerialPort.Protocol.AstmMessageDecode;
 using static DeviceHub.YhloTestSerialPort.Protocol.AstmMessageEntity;
 
 namespace DeviceHub.YhloTestSerialPort.Handler
