@@ -1,7 +1,5 @@
 ﻿using DeviceHub.Base.Common;
-using DeviceHub.Lis;
 using DeviceHub.Lis.Dto;
-using DeviceHub.Lis.Impl;
 using DeviceHub.Model.Entities;
 using DeviceHub.Repository.Repositories;
 using DeviceHub.Service;
@@ -67,8 +65,14 @@ namespace DeviceHub.YhloTestSerialPort.Handler
                     }
                     else if (task.Type == SendMessage.TypeEnum.IssueApplication)
                     {
-                        // TODO 后面完成
-                        return [];
+                        GetSampleApplyListOutput? getSampleApplyListOutput = JsonSerializer.Deserialize<GetSampleApplyListOutput>(receiveMessageLarge.SendJson);
+                        if (getSampleApplyListOutput == null)
+                        {
+                            MarkFailed(task.Id, "SendJson数据异常");
+                            continue;
+                        }
+
+                        return AstmMessageEncoder.EncoderIssueApplication(getSampleApplyListOutput);
                     }
                     else
                     {
