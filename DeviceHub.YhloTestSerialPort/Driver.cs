@@ -58,7 +58,7 @@ namespace DeviceHub.YhloTestSerialPort
                 TimeSpan.FromSeconds(5),
                 TimeSpan.FromSeconds(5));
 
-            transport.Open();
+            await Task.Run(transport.Open);
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace DeviceHub.YhloTestSerialPort
                 // 提取控制字符
                 while (TryExtractControlChar(out byte controlChar))
                 {
-                    HandleControlCharAsync(controlChar);
+                    HandleControlChar(controlChar);
                 }
 
                 // 按 Terminator Record（L 记录）切分完整消息
@@ -95,7 +95,7 @@ namespace DeviceHub.YhloTestSerialPort
         /// <summary>
         /// 处理控制字符
         /// </summary>
-        private void HandleControlCharAsync(byte controlChar)
+        private void HandleControlChar(byte controlChar)
         {
             lock (stateLock)
             {
@@ -109,6 +109,10 @@ namespace DeviceHub.YhloTestSerialPort
 
                     case ASTMProtocols.ACK:
                         Logger.Debug(logType, "收到 ACK");
+                        if (sendFrameList.Count == 0)
+                            return;
+                        if (lineState is not (LineState.WaitingAck or LineState.Sending))
+                            return;
                         lineState = LineState.Sending;
                         SendFrameUnlocked();
                         return;
@@ -121,6 +125,11 @@ namespace DeviceHub.YhloTestSerialPort
                     case ASTMProtocols.EOT:
                         Logger.Info(logType, "收到 EOT，本次传输结束，清理未完成消息");
                         ResetReceiveBuffer();
+                        if (lineState == LineState.WaitingAck)
+                        {
+                            sendFrameList = [];
+                            sendFrameOffset = 0;
+                        }
                         lineState = LineState.Idle;
                         SendFrameUnlocked();
                         return;
@@ -191,8 +200,8 @@ namespace DeviceHub.YhloTestSerialPort
                 lock (stateLock)
                 {
                     lineState = LineState.Receiving;
+                    transport.Send(ASTMProtocols.ACK);
                 }
-                transport.Send(ASTMProtocols.ACK);
                 Logger.Debug(logType, "收到完整帧，回复ACK");
                 processedOffset = frameTrailerEnd;
 
@@ -311,7 +320,10 @@ namespace DeviceHub.YhloTestSerialPort
                     {
                         sendFrameOffset = 0;
                         transport.Send(ASTMProtocols.ENQ);
+                        lineState = LineState.WaitingAck;
                     }
+                    break;
+                case LineState.WaitingAck:
                     break;
                 case LineState.Sending:
                     if (sendFrameList.Count > sendFrameOffset)
@@ -350,6 +362,9 @@ namespace DeviceHub.YhloTestSerialPort
                     if (now - lastReceiveTime < ReceiveIdleTimeoutSeconds * 1000L)
                         return;
 
+                    if (lineState == LineState.Receiving)
+                        ResetReceiveBuffer();
+
                     if (lineState != LineState.Idle)
                     {
                         Logger.Info(logType, $"超过{ReceiveIdleTimeoutSeconds}秒未收到消息，重置为Idle并尝试发送");
@@ -380,6 +395,7 @@ namespace DeviceHub.YhloTestSerialPort
         public enum LineState
         {
             Idle,
+            WaitingAck,
             Sending,
             Receiving
         }
