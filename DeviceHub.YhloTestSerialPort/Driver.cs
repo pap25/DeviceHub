@@ -3,6 +3,7 @@ using DeviceHub.Abstractions.Dto;
 using DeviceHub.Base.Common;
 using DeviceHub.Base.Constant;
 using DeviceHub.Base.Transports;
+using DeviceHub.Lis.Dto;
 using DeviceHub.Model.Entities;
 using DeviceHub.Service;
 using DeviceHub.YhloTestSerialPort.Handler;
@@ -17,6 +18,7 @@ namespace DeviceHub.YhloTestSerialPort
         private readonly string logType = nameof(Driver);
         private IConsumeTask receiveTask;
         private ISenderTaskHandler senderTaskHandler;
+        private IConsumeTask lisIssueApplication;
         private readonly ReceiveMessageService receiveMessageService = ReceiveMessageService.Instance;
         private long _instrumentId;
 
@@ -48,6 +50,8 @@ namespace DeviceHub.YhloTestSerialPort
 
             receiveTask = new BatchConsumeTask<ReceiveMessage>(new ReceiveHandler(instrumentId));
             receiveTask.StartConsume();
+            lisIssueApplication = new BatchConsumeTask<GetSampleApplyListOutput>(new LisIssueApplication(instrumentId));
+            lisIssueApplication.StartConsume();
 
             senderTaskHandler = new SendHandler(instrumentId);
 
@@ -387,6 +391,11 @@ namespace DeviceHub.YhloTestSerialPort
             receiveTask.Shutdown();
             ResetReceiveBuffer();
             transport.Close();
+        }
+
+        public void NotifyLisIssueApplication()
+        {
+            lisIssueApplication.NotifyConsume();
         }
 
         public enum LineState
