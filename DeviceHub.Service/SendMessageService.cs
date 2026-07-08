@@ -15,6 +15,8 @@ public class SendMessageService
 
     private readonly SendMessageRepository sendMessageRepository = SendMessageRepository.Instance;
     private readonly SendMessageEncoderRepository sendMessageEncoderRepository = SendMessageEncoderRepository.Instance;
+    private readonly SendMessageLargeRepository sendMessageLargeRepository = SendMessageLargeRepository.Instance;
+    private readonly DictionaryRepository dictionaryRepository = DictionaryRepository.Instance;
 
     private SendMessageService()
     {
@@ -69,10 +71,10 @@ public class SendMessageService
             await sendMessageEncoderRepository.Insert(sendMessageEncoder, connection, transaction);
         });
     }
-
     public void SaveIssueApplication(long lastId, long instrumentId, string externalNo, string sampleNo, string barcode, string sendJson)
     {
         long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
         SendMessage sendMessage = new()
         {
             InstrumentId = instrumentId,
@@ -85,9 +87,20 @@ public class SendMessageService
             CreateTime = now,
             UpdateTime = now
         };
-        SendMessageLarge receiveMessageLarge = new()
+
+        SendMessageLarge sendMessageLarge = new()
         {
             SendJson = sendJson
         };
+
+        DbHelper.ExecuteInTransactionAsync(async (connection, transaction) =>
+        {
+            long sendMessageId = await sendMessageRepository.Insert(sendMessage, connection, transaction);
+
+            sendMessageLarge.SendMessageId = sendMessageId;
+            await sendMessageLargeRepository.Insert(sendMessageLarge, connection, transaction);
+
+            await dictionaryRepository.UpsertValue(DataDictionary.Keys.LisIssueApplicationLastId, lastId.ToString(), connection, transaction);
+        }).GetAwaiter().GetResult();
     }
 }

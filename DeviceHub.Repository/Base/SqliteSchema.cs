@@ -74,5 +74,10 @@ internal static class SqliteSchema
             message TEXT NOT NULL,
             create_time INTEGER NOT NULL
         );
+
+        CREATE TABLE IF NOT EXISTS dictionary (
+            ckey TEXT PRIMARY KEY,
+            value TEXT NOT NULL
+        );
         """;
 }

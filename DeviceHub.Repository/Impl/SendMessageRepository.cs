@@ -15,7 +15,14 @@ public class SendMessageRepository : ISendMessageRepository
     {
     }
 
-    public async Task<long> Insert(SendMessage entity, CancellationToken cancellationToken = default)
+    public Task<long> Insert(SendMessage entity, CancellationToken cancellationToken = default) =>
+        Insert(entity, null, null, cancellationToken);
+
+    public async Task<long> Insert(
+        SendMessage entity,
+        SqliteConnection? connection,
+        SqliteTransaction? transaction,
+        CancellationToken cancellationToken = default)
     {
         const string sql = """
             INSERT INTO send_message (instrument_id, type, external_no, sample_no, barcode, status, error_message, create_time, update_time)
@@ -23,22 +30,26 @@ public class SendMessageRepository : ISendMessageRepository
             RETURNING id;
             """;
 
-        var id = await DbHelper.ExecuteScalarAsync<long>(
-            sql,
-            [
-                DbHelper.Param("@instrument_id", entity.InstrumentId),
-                DbHelper.Param("@type", (byte)entity.Type),
-                DbHelper.Param("@external_no", entity.ExternalNo),
-                DbHelper.Param("@sample_no", entity.SampleNo),
-                DbHelper.Param("@barcode", entity.Barcode),
-                DbHelper.Param("@status", (byte)entity.Status),
-                DbHelper.Param("@error_message", entity.ErrorMessage),
-                DbHelper.Param("@create_time", entity.CreateTime),
-                DbHelper.Param("@update_time", entity.UpdateTime)
-            ],
-            cancellationToken);
+        var parameters = new SqliteParameter[]
+        {
+            DbHelper.Param("@instrument_id", entity.InstrumentId),
+            DbHelper.Param("@type", (byte)entity.Type),
+            DbHelper.Param("@external_no", entity.ExternalNo),
+            DbHelper.Param("@sample_no", entity.SampleNo),
+            DbHelper.Param("@barcode", entity.Barcode),
+            DbHelper.Param("@status", (byte)entity.Status),
+            DbHelper.Param("@error_message", entity.ErrorMessage),
+            DbHelper.Param("@create_time", entity.CreateTime),
+            DbHelper.Param("@update_time", entity.UpdateTime)
+        };
 
-        return id;
+        if (connection is not null && transaction is not null)
+        {
+            return await DbHelper.ExecuteScalarAsync<long>(
+                connection, transaction, sql, parameters, cancellationToken);
+        }
+
+        return await DbHelper.ExecuteScalarAsync<long>(sql, parameters, cancellationToken);
     }
 
     public async Task<bool> Update(SendMessage entity, CancellationToken cancellationToken = default)
