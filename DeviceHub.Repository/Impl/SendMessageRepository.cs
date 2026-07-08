@@ -223,10 +223,10 @@ public class SendMessageRepository : ISendMessageRepository
             ],
             cancellationToken);
 
-    public async Task<int> findCount(long instrumentId, SendMessage.StatusEnum? status,
+    public async Task<int> findCount(long instrumentId, SendMessage.StatusEnum? status, SendMessage.TypeEnum? type,
         string barcode, string sampleNo, long createTimeStart, long createTimeEnd, CancellationToken cancellationToken = default)
     {
-        var (whereClause, parameters) = BuildWhereConditions(instrumentId, status, barcode, sampleNo, createTimeStart, createTimeEnd);
+        var (whereClause, parameters) = BuildWhereConditions(instrumentId, status, type, barcode, sampleNo, createTimeStart, createTimeEnd);
         var sql = $"""
             SELECT COUNT(*)
             FROM send_message a
@@ -237,10 +237,10 @@ public class SendMessageRepository : ISendMessageRepository
         return (int)count;
     }
 
-    public async Task<List<SendMessageView>> findPageDesc(long instrumentId, SendMessage.StatusEnum? status,
+    public async Task<List<SendMessageView>> findPageDesc(long instrumentId, SendMessage.StatusEnum? status, SendMessage.TypeEnum? type,
         string barcode, string sampleNo, long createTimeStart, long createTimeEnd, int pageSize, int pageIndex, CancellationToken cancellationToken = default)
     {
-        var (whereClause, parameters) = BuildWhereConditions(instrumentId, status, barcode, sampleNo, createTimeStart, createTimeEnd);
+        var (whereClause, parameters) = BuildWhereConditions(instrumentId, status, type, barcode, sampleNo, createTimeStart, createTimeEnd);
         parameters.Add(DbHelper.Param("@page_size", pageSize));
         parameters.Add(DbHelper.Param("@offset", Math.Max(0, (pageIndex - 1) * pageSize)));
 
@@ -260,6 +260,7 @@ public class SendMessageRepository : ISendMessageRepository
     private static (string WhereClause, List<SqliteParameter> Parameters) BuildWhereConditions(
         long instrumentId,
         SendMessage.StatusEnum? status,
+        SendMessage.TypeEnum? type,
         string barcode,
         string sampleNo,
         long createTimeStart,
@@ -278,6 +279,12 @@ public class SendMessageRepository : ISendMessageRepository
         {
             conditions.Add("a.status = @status");
             parameters.Add(DbHelper.Param("@status", (byte)status.Value));
+        }
+
+        if (type.HasValue)
+        {
+            conditions.Add("a.type = @type");
+            parameters.Add(DbHelper.Param("@type", (byte)type.Value));
         }
 
         conditions.Add("a.create_time >= @create_time_start");

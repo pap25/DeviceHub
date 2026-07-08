@@ -78,6 +78,8 @@
             pnlSendMessageQuery = new Panel();
             lblSendMessageStatus = new Label();
             cboSendMessageStatus = new ComboBox();
+            lblSendMessageType = new Label();
+            cboSendMessageType = new ComboBox();
             lblSendMessageBarcode = new Label();
             txtSendMessageBarcode = new TextBox();
             lblSendMessageSampleNo = new Label();
@@ -584,6 +586,8 @@
             // 
             pnlSendMessageQuery.Controls.Add(lblSendMessageStatus);
             pnlSendMessageQuery.Controls.Add(cboSendMessageStatus);
+            pnlSendMessageQuery.Controls.Add(lblSendMessageType);
+            pnlSendMessageQuery.Controls.Add(cboSendMessageType);
             pnlSendMessageQuery.Controls.Add(lblSendMessageBarcode);
             pnlSendMessageQuery.Controls.Add(txtSendMessageBarcode);
             pnlSendMessageQuery.Controls.Add(lblSendMessageSampleNo);
@@ -617,80 +621,98 @@
             cboSendMessageStatus.Size = new Size(90, 25);
             cboSendMessageStatus.TabIndex = 1;
             // 
+            // lblSendMessageType
+            // 
+            lblSendMessageType.AutoSize = true;
+            lblSendMessageType.Location = new Point(148, 14);
+            lblSendMessageType.Name = "lblSendMessageType";
+            lblSendMessageType.Size = new Size(32, 17);
+            lblSendMessageType.TabIndex = 2;
+            lblSendMessageType.Text = "类型";
+            // 
+            // cboSendMessageType
+            // 
+            cboSendMessageType.DropDownStyle = ComboBoxStyle.DropDownList;
+            cboSendMessageType.FormattingEnabled = true;
+            cboSendMessageType.Location = new Point(186, 10);
+            cboSendMessageType.Name = "cboSendMessageType";
+            cboSendMessageType.Size = new Size(130, 25);
+            cboSendMessageType.TabIndex = 3;
+            // 
             // lblSendMessageBarcode
             // 
             lblSendMessageBarcode.AutoSize = true;
-            lblSendMessageBarcode.Location = new Point(148, 14);
+            lblSendMessageBarcode.Location = new Point(328, 14);
             lblSendMessageBarcode.Name = "lblSendMessageBarcode";
             lblSendMessageBarcode.Size = new Size(44, 17);
-            lblSendMessageBarcode.TabIndex = 2;
+            lblSendMessageBarcode.TabIndex = 4;
             lblSendMessageBarcode.Text = "条形码";
             // 
             // txtSendMessageBarcode
             // 
-            txtSendMessageBarcode.Location = new Point(198, 10);
+            txtSendMessageBarcode.Location = new Point(378, 10);
             txtSendMessageBarcode.Name = "txtSendMessageBarcode";
             txtSendMessageBarcode.PlaceholderText = "请输入条形码";
             txtSendMessageBarcode.Size = new Size(130, 23);
-            txtSendMessageBarcode.TabIndex = 3;
+            txtSendMessageBarcode.TabIndex = 5;
             // 
             // lblSendMessageSampleNo
             // 
             lblSendMessageSampleNo.AutoSize = true;
-            lblSendMessageSampleNo.Location = new Point(340, 14);
+            lblSendMessageSampleNo.Location = new Point(520, 14);
             lblSendMessageSampleNo.Name = "lblSendMessageSampleNo";
             lblSendMessageSampleNo.Size = new Size(44, 17);
-            lblSendMessageSampleNo.TabIndex = 4;
+            lblSendMessageSampleNo.TabIndex = 6;
             lblSendMessageSampleNo.Text = "样本号";
             // 
             // txtSendMessageSampleNo
             // 
-            txtSendMessageSampleNo.Location = new Point(390, 10);
+            txtSendMessageSampleNo.Location = new Point(570, 10);
             txtSendMessageSampleNo.Name = "txtSendMessageSampleNo";
             txtSendMessageSampleNo.PlaceholderText = "请输入样本号";
             txtSendMessageSampleNo.Size = new Size(110, 23);
-            txtSendMessageSampleNo.TabIndex = 5;
+            txtSendMessageSampleNo.TabIndex = 7;
             // 
             // lblSendMessageCreateTime
             // 
             lblSendMessageCreateTime.AutoSize = true;
-            lblSendMessageCreateTime.Location = new Point(512, 14);
+            lblSendMessageCreateTime.Location = new Point(692, 14);
             lblSendMessageCreateTime.Name = "lblSendMessageCreateTime";
             lblSendMessageCreateTime.Size = new Size(56, 17);
-            lblSendMessageCreateTime.TabIndex = 6;
+            lblSendMessageCreateTime.TabIndex = 8;
             lblSendMessageCreateTime.Text = "创建时间";
             // 
             // dtpSendMessageCreateTimeStart
             // 
             dtpSendMessageCreateTimeStart.Format = DateTimePickerFormat.Short;
-            dtpSendMessageCreateTimeStart.Location = new Point(574, 10);
+            dtpSendMessageCreateTimeStart.Location = new Point(754, 10);
             dtpSendMessageCreateTimeStart.Name = "dtpSendMessageCreateTimeStart";
             dtpSendMessageCreateTimeStart.Size = new Size(110, 23);
-            dtpSendMessageCreateTimeStart.TabIndex = 7;
+            dtpSendMessageCreateTimeStart.TabIndex = 9;
             // 
             // lblSendMessageCreateTimeTo
             // 
             lblSendMessageCreateTimeTo.AutoSize = true;
-            lblSendMessageCreateTimeTo.Location = new Point(692, 14);
+            lblSendMessageCreateTimeTo.Location = new Point(872, 14);
             lblSendMessageCreateTimeTo.Name = "lblSendMessageCreateTimeTo";
             lblSendMessageCreateTimeTo.Size = new Size(20, 17);
-            lblSendMessageCreateTimeTo.TabIndex = 8;
+            lblSendMessageCreateTimeTo.TabIndex = 10;
             lblSendMessageCreateTimeTo.Text = "至";
             // 
             // dtpSendMessageCreateTimeEnd
             // 
             dtpSendMessageCreateTimeEnd.Format = DateTimePickerFormat.Short;
-            dtpSendMessageCreateTimeEnd.Location = new Point(718, 10);
+            dtpSendMessageCreateTimeEnd.Location = new Point(898, 10);
             dtpSendMessageCreateTimeEnd.Name = "dtpSendMessageCreateTimeEnd";
             dtpSendMessageCreateTimeEnd.Size = new Size(110, 23);
-            dtpSendMessageCreateTimeEnd.TabIndex = 9;
+            dtpSendMessageCreateTimeEnd.TabIndex = 11;
             // 
             // btnSendMessageQuery
             // 
-            btnSendMessageQuery.Location = new Point(840, 9);
+            btnSendMessageQuery.Location = new Point(1020, 9);
             btnSendMessageQuery.Name = "btnSendMessageQuery";
             btnSendMessageQuery.Size = new Size(75, 26);
-            btnSendMessageQuery.TabIndex = 10;
+            btnSendMessageQuery.TabIndex = 12;
             btnSendMessageQuery.Text = "查询";
             btnSendMessageQuery.UseVisualStyleBackColor = true;
             btnSendMessageQuery.Click += btnSendMessageQuery_Click;
@@ -960,6 +982,8 @@
         private Panel pnlSendMessageQuery;
         private Label lblSendMessageStatus;
         private ComboBox cboSendMessageStatus;
+        private Label lblSendMessageType;
+        private ComboBox cboSendMessageType;
         private Label lblSendMessageBarcode;
         private TextBox txtSendMessageBarcode;
         private Label lblSendMessageSampleNo;

@@ -33,9 +33,9 @@ public interface ISendMessageRepository
 
     Task<IReadOnlyList<SendMessage>> GetByStatus(SendMessage.StatusEnum status, CancellationToken cancellationToken = default);
 
-    Task<int> findCount(long instrumentId, SendMessage.StatusEnum? status,
+    Task<int> findCount(long instrumentId, SendMessage.StatusEnum? status, SendMessage.TypeEnum? type,
         string barcode, string sampleNo, long createTimeStart, long createTimeEnd, CancellationToken cancellationToken = default);
 
-    Task<List<SendMessageView>> findPageDesc(long instrumentId, SendMessage.StatusEnum? status,
+    Task<List<SendMessageView>> findPageDesc(long instrumentId, SendMessage.StatusEnum? status, SendMessage.TypeEnum? type,
         string barcode, string sampleNo, long createTimeStart, long createTimeEnd, int pageSize, int pageIndex, CancellationToken cancellationToken = default);
 }
