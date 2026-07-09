@@ -322,6 +322,7 @@ namespace DeviceHub.YhloTestSerialPort
                     sendFrameList = senderTaskHandler.SearchEncoderTask();
                     if (sendFrameList.Count > 0)
                     {
+                        Logger.Debug(logType, $"待发送帧条数: {sendFrameList.Count}");
                         sendFrameOffset = 0;
                         transport.Send(ASTMProtocols.ENQ);
                         lineState = LineState.WaitingAck;

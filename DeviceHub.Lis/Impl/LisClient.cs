@@ -126,14 +126,16 @@ namespace DeviceHub.Lis.Impl
             return Task.FromResult(Resp<UploadSpecimenTestResultOutput>.Ok(new UploadSpecimenTestResultOutput { ResultId = resultId }));
         }
 
-        public Task<GetSampleApplyItemOutput> GetSampleApplyItem(GetSampleApplyItemInput getSampleApplyItemInput)
+        public async Task<GetSampleApplyItemOutput> GetSampleApplyItem(GetSampleApplyItemInput getSampleApplyItemInput)
         {
-            throw new NotImplementedException();
+            // TODO 待实现
+            return null;
         }
 
-        public Task<List<GetSampleApplyListOutput>> GetSampleApplyList(long instrumentId, long lastId, int pageSize)
+        public async Task<List<GetSampleApplyListOutput>> GetSampleApplyList(long instrumentId, long lastId, int pageSize)
         {
-            throw new NotImplementedException();
+            // TODO 待实现
+            return [];
         }
     }
 }

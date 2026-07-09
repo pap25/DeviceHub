@@ -1,5 +1,4 @@
-﻿using DeviceHub.Abstractions;
-using DeviceHub.Base.Common;
+﻿using DeviceHub.Base.Common;
 using DeviceHub.Lis;
 using DeviceHub.Lis.Dto;
 using DeviceHub.Lis.Impl;
@@ -38,7 +37,10 @@ namespace DeviceHub.YhloTestSerialPort.Handler
                     dictionaryRepository.UpsertValue(DataDictionary.Keys.LisIssueApplicationLastId, "0").GetAwaiter().GetResult();
                 }
 
-                return lisClient.GetSampleApplyList(_instrumentId, lastId, 20).GetAwaiter().GetResult();
+                List<GetSampleApplyListOutput> list = lisClient.GetSampleApplyList(_instrumentId, lastId, 20).GetAwaiter().GetResult();
+                if (list.Count > 0)
+                    Logger.Debug(logType, $"LIS拉取下单申请条数:{list.Count}");
+                return list;
             }
             catch (Exception ex)
             {
