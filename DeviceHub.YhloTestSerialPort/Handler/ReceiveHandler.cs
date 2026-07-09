@@ -6,7 +6,6 @@ using DeviceHub.Repository.Repositories;
 using DeviceHub.Service;
 using DeviceHub.YhloTestSerialPort.Protocol;
 using static DeviceHub.YhloTestSerialPort.Protocol.AstmMessageDecode;
-using static DeviceHub.YhloTestSerialPort.Protocol.AstmMessageEntity;
 
 namespace DeviceHub.YhloTestSerialPort.Handler
 {
@@ -76,18 +75,18 @@ namespace DeviceHub.YhloTestSerialPort.Handler
         private void ParseData(List<string> recordList, ReceiveMessage task)
         {
             ParseResult parseResult = AstmMessageDecode.Parse(recordList);
-            if (parseResult.HeaderRecord.ProcessingId == HeaderRecord.MessageType.PR.ToString())
+            if (parseResult.RequestInformationRecord != null)
+            {
+                SaveSampleQuery(task, parseResult.RequestInformationRecord);
+                return;
+            }
+            else
             {
                 UploadSpecimenTestResult(task, parseResult);
                 return;
             }
-            else if (parseResult.HeaderRecord.ProcessingId == HeaderRecord.MessageType.RQ.ToString())
-            {
-                SaveSampleQuery(task, parseResult);
-                return;
-            }
 
-            MarkFailed(task.Id, $"不支持消息类型 {parseResult.HeaderRecord.ProcessingId}", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+            //MarkFailed(task.Id, $"不支持消息类型 {parseResult.HeaderRecord.ProcessingId}", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
         }
     }
 }

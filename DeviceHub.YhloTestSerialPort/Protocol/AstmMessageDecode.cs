@@ -3,7 +3,7 @@ using static DeviceHub.YhloTestSerialPort.Protocol.AstmMessageEntity;
 namespace DeviceHub.YhloTestSerialPort.Protocol;
 
 /// <summary>
-/// ASTM 应用层消息记录解析（H/P/O/R/C/L）
+/// ASTM 应用层消息记录解析（H/P/O/R/C/Q/L）
 /// </summary>
 public static class AstmMessageDecode
 {
@@ -50,6 +50,9 @@ public static class AstmMessageDecode
                 break;
             case "C":
                 result.ResultsCommentRecordList.Add(ParseCommentRecord(fields));
+                break;
+            case "Q":
+                result.RequestInformationRecord = ParseRequestInformationRecord(fields);
                 break;
             case "L":
                 result.MessageTerminatorRecord = ParseTerminatorRecord(fields);
@@ -189,6 +192,29 @@ public static class AstmMessageDecode
         CommentType = GetField(fields, 5)
     };
 
+    private static RequestInformationRecord ParseRequestInformationRecord(string[] fields)
+    {
+        string startingRangeId = GetField(fields, 3);
+        return new RequestInformationRecord
+        {
+            RecordTypeId = GetField(fields, 1),
+            SequenceNumber = GetField(fields, 2),
+            StartingRangeId = startingRangeId,
+            SampleStartNo = GetComponent(startingRangeId, 0),
+            Barcode = GetComponent(startingRangeId, 1),
+            EndingRangeId = GetField(fields, 4),
+            UniversalTestId = GetField(fields, 5),
+            NatureOfRequestTimeLimits = GetField(fields, 6),
+            BeginningRequestResultsDateTime = GetField(fields, 7),
+            EndingRequestResultsDateTime = GetField(fields, 8),
+            RequestingPhysicianName = GetField(fields, 9),
+            RequestingPhysicianTelephoneNumber = GetField(fields, 10),
+            UserField1 = GetField(fields, 11),
+            UserField2 = GetField(fields, 12),
+            RequestInformationStatusCode = GetField(fields, 13)
+        };
+    }
+
     private static MessageTerminatorRecord ParseTerminatorRecord(string[] fields) => new()
     {
         RecordTypeId = GetField(fields, 1),
@@ -240,6 +266,7 @@ public static class AstmMessageDecode
         public TestOrderRecord? TestOrderRecord { get; set; }
         public List<ResultRecord> ResultRecordList { get; set; } = [];
         public List<ResultsCommentRecord> ResultsCommentRecordList { get; set; } = [];
+        public RequestInformationRecord? RequestInformationRecord { get; set; }
         public MessageTerminatorRecord? MessageTerminatorRecord { get; set; }
     }
 }

@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
 using static DeviceHub.YhloTestSerialPort.Protocol.AstmMessageDecode;
+using static DeviceHub.YhloTestSerialPort.Protocol.AstmMessageEntity;
 
 namespace DeviceHub.YhloTestSerialPort.Handler
 {
@@ -42,15 +43,10 @@ namespace DeviceHub.YhloTestSerialPort.Handler
             return new UploadSpecimenTestResultInput();
         }
 
-        public void SaveSampleQuery(ReceiveMessage task, ParseResult parseResult)
+        public void SaveSampleQuery(ReceiveMessage task, RequestInformationRecord requestInformationRecord)
         {
-            if (parseResult.TestOrderRecord == null)
-            {
-                MarkFailed(task.Id, "数据异常没有订单记录", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
-                return;
-            }
-            string sampleNo = parseResult.TestOrderRecord.SampleId;
-            string barcode = parseResult.TestOrderRecord.InstrumentSpecimenId;
+            string sampleNo = requestInformationRecord.SampleStartNo;
+            string barcode = requestInformationRecord.Barcode;
 
             /** 1 到LIS接口查询检验信息
              *  2 构建Send对象

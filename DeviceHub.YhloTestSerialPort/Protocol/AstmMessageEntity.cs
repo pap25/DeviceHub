@@ -3,7 +3,7 @@
 namespace DeviceHub.YhloTestSerialPort.Protocol;
 
 /// <summary>
-/// ASTM 应用层消息记录实体（H/P/O/R/C/L）
+/// ASTM 应用层消息记录实体（H/P/O/R/C/Q/L）
 /// </summary>
 public class AstmMessageEntity
 {
@@ -51,16 +51,20 @@ public class AstmMessageEntity
 
         public enum MessageType
         {
-            [Description("病人测试结果")]
+            [Description("病人检验结果")]
             PR,
-            [Description("质控测试结果")]
+
+            [Description("质控检验结果")]
             QR,
+
             [Description("定标结果")]
             CR,
-            [Description("样本请求查询")]
+
+            [Description("去LIS查询样本信息")]
             RQ,
-            [Description("样本查询回应")]
+            [Description("返回查询结果(RQ的返回)")]
             QA,
+
             [Description("样本申请信息")]
             SA
         }
@@ -256,6 +260,43 @@ public class AstmMessageEntity
         public string CommentText { get; set; } = string.Empty;
         /// <summary>字段5，注释类型（G-结果注释，I-异常字符串）</summary>
         public string CommentType { get; set; } = string.Empty;
+    }
+
+    /// <summary>
+    /// 请求信息记录（Q 记录）
+    /// </summary>
+    public class RequestInformationRecord
+    {
+        /// <summary>字段1，记录类型 ID（Q）</summary>
+        public string RecordTypeId { get; set; } = string.Empty;
+        /// <summary>字段2，序列号</summary>
+        public string SequenceNumber { get; set; } = string.Empty;
+        /// <summary>字段3，样本起始编号^样本条码</summary>
+        public string StartingRangeId { get; set; } = string.Empty;
+        /// <summary>字段3组件1，样本起始编号</summary>
+        public string SampleStartNo { get; set; } = string.Empty;
+        /// <summary>字段3组件2，样本条码</summary>
+        public string Barcode { get; set; } = string.Empty;
+        /// <summary>字段4，样本结束编号（查询单个样本时与样本起始编号相同）</summary>
+        public string EndingRangeId { get; set; } = string.Empty;
+        /// <summary>字段5，通用测试 ID（固定为 ALL，请求所有已发出未清订单）</summary>
+        public string UniversalTestId { get; set; } = string.Empty;
+        /// <summary>字段6，置空，保留</summary>
+        public string NatureOfRequestTimeLimits { get; set; } = string.Empty;
+        /// <summary>字段7，查询起始时间（格式 YYYYMMDDHHMMSS）</summary>
+        public string BeginningRequestResultsDateTime { get; set; } = string.Empty;
+        /// <summary>字段8，查询截止时间（格式 YYYYMMDDHHMMSS）</summary>
+        public string EndingRequestResultsDateTime { get; set; } = string.Empty;
+        /// <summary>字段9，置空，保留</summary>
+        public string RequestingPhysicianName { get; set; } = string.Empty;
+        /// <summary>字段10，置空，保留</summary>
+        public string RequestingPhysicianTelephoneNumber { get; set; } = string.Empty;
+        /// <summary>字段11，置空，保留</summary>
+        public string UserField1 { get; set; } = string.Empty;
+        /// <summary>字段12，置空，保留</summary>
+        public string UserField2 { get; set; } = string.Empty;
+        /// <summary>字段13，查询命令码（O-请求样本查询，A-取消当前查询请求）</summary>
+        public string RequestInformationStatusCode { get; set; } = string.Empty;
     }
 
     /// <summary>
