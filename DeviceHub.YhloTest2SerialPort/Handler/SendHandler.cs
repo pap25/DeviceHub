@@ -5,7 +5,6 @@ using DeviceHub.Repository.Repositories;
 using DeviceHub.Service;
 using DeviceHub.YhloTest2SerialPort.Protocol;
 using System.Text.Json;
-using static DeviceHub.YhloTest2SerialPort.DeviceDriver;
 
 namespace DeviceHub.YhloTest2SerialPort.Handler
 {
