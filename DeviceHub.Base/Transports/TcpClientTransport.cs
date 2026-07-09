@@ -34,7 +34,7 @@ namespace DeviceHub.Base.Transports
 
             _stream = _client.GetStream();
 
-            _ = Task.Run(ReceiveLoop);
+            await Task.Run(ReceiveLoop);
         }
 
         public Task Disconnect()

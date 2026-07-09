@@ -44,7 +44,7 @@ namespace DeviceHub.Yhlo
                     byte[] rawMessage = message.ToArray();
                     Logger.Info(logType, $"TCP接收完整消息: {Encoding.UTF8.GetString(rawMessage)}");
 
-                    _ = receiveMessageService.Save(_instrumentId, rawMessage);
+                    receiveMessageService.Save(_instrumentId, rawMessage).GetAwaiter().GetResult();
 
                     receiveTask.NotifyConsume();
                 }
