@@ -100,8 +100,7 @@ public class ReceiveMessageService
 
         await DbHelper.ExecuteInTransactionAsync(async (connection, transaction) =>
         {
-            await receiveMessageRepository.UpdateStatusAndUpdateTimeById(
-                id, ReceiveMessage.StatusEnum.Success, now, connection, transaction);
+            await receiveMessageRepository.UpdateStatusAndUpdateTimeById(id, ReceiveMessage.StatusEnum.Success, now, connection, transaction);
             await receiveMessageDecodeRepository.Insert(receiveMessageDecode, connection, transaction);
         });
     }
@@ -142,8 +141,10 @@ public class ReceiveMessageService
 
         DbHelper.ExecuteInTransactionAsync(async (connection, transaction) =>
         {
+            await receiveMessageRepository.UpdateStatusAndUpdateTimeById(receiveMessageId, ReceiveMessage.StatusEnum.Success, now, connection, transaction);
             await receiveMessageDecodeRepository.Insert(receiveMessageDecode, connection, transaction);
             long sendMessageId = await sendMessageRepository.Insert(sendMessage, connection, transaction);
+
             sendMessageLarge.SendMessageId = sendMessageId;
             await sendMessageLargeRepository.Insert(sendMessageLarge, connection, transaction);
         }).GetAwaiter().GetResult();
