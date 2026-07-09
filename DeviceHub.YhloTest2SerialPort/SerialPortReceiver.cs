@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DeviceHub.YhloTest2SerialPort
 {
-    internal class SerialPortReceiver
+    public class SerialPortReceiver
     {
     }
 }
