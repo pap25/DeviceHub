@@ -140,9 +140,12 @@ public class ReceiveMessageService
             SendJson = sendJson,
         };
 
-        receiveMessageDecodeRepository.Insert(receiveMessageDecode);
-        long sendMessageId = sendMessageRepository.Insert(sendMessage).GetAwaiter().GetResult();
-        sendMessageLarge.SendMessageId = sendMessageId;
-        sendMessageLargeRepository.Insert(sendMessageLarge);
+        DbHelper.ExecuteInTransactionAsync(async (connection, transaction) =>
+        {
+            await receiveMessageDecodeRepository.Insert(receiveMessageDecode, connection, transaction);
+            long sendMessageId = await sendMessageRepository.Insert(sendMessage, connection, transaction);
+            sendMessageLarge.SendMessageId = sendMessageId;
+            await sendMessageLargeRepository.Insert(sendMessageLarge, connection, transaction);
+        }).GetAwaiter().GetResult();
     }
 }
