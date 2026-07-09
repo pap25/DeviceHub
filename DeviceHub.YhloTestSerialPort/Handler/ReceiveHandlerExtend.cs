@@ -45,8 +45,8 @@ namespace DeviceHub.YhloTestSerialPort.Handler
 
         public void SaveSampleQuery(ReceiveMessage task, RequestInformationRecord requestInformationRecord)
         {
-            string sampleNo = requestInformationRecord.SampleStartNo;
-            string barcode = requestInformationRecord.Barcode;
+            string sampleNo = string.IsNullOrEmpty(requestInformationRecord.PatientId) ? requestInformationRecord.EndingRangeId : requestInformationRecord.PatientId;
+            string barcode = requestInformationRecord.SpecimenId;
 
             /** 1 到LIS接口查询检验信息
              *  2 构建Send对象

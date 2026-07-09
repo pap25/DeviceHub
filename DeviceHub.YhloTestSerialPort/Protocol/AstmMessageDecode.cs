@@ -194,14 +194,14 @@ public static class AstmMessageDecode
 
     private static RequestInformationRecord ParseRequestInformationRecord(string[] fields)
     {
-        string startingRangeId = GetField(fields, 3);
+        string patientIdAndSpecimenId = GetField(fields, 3);
         return new RequestInformationRecord
         {
             RecordTypeId = GetField(fields, 1),
             SequenceNumber = GetField(fields, 2),
-            StartingRangeId = startingRangeId,
-            SampleStartNo = GetComponent(startingRangeId, 0),
-            Barcode = GetComponent(startingRangeId, 1),
+            PatientIdAndSpecimenId = patientIdAndSpecimenId,
+            PatientId = GetComponent(patientIdAndSpecimenId, 0),
+            SpecimenId = GetComponent(patientIdAndSpecimenId, 1),
             EndingRangeId = GetField(fields, 4),
             UniversalTestId = GetField(fields, 5),
             NatureOfRequestTimeLimits = GetField(fields, 6),

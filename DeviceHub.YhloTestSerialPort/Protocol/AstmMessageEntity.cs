@@ -269,34 +269,43 @@ public class AstmMessageEntity
     {
         /// <summary>字段1，记录类型 ID（Q）</summary>
         public string RecordTypeId { get; set; } = string.Empty;
-        /// <summary>字段2，序列号</summary>
+        /// <summary>字段2，序列号（1-n）</summary>
         public string SequenceNumber { get; set; } = string.Empty;
-        /// <summary>字段3，样本起始编号^样本条码</summary>
-        public string StartingRangeId { get; set; } = string.Empty;
-        /// <summary>字段3组件1，样本起始编号</summary>
-        public string SampleStartNo { get; set; } = string.Empty;
-        /// <summary>字段3组件2，样本条码</summary>
-        public string Barcode { get; set; } = string.Empty;
-        /// <summary>字段4，样本结束编号（查询单个样本时与样本起始编号相同）</summary>
+        /// <summary>字段3，病人 ID^样本 ID（样本起始编号^样本条码）</summary>
+        public string PatientIdAndSpecimenId { get; set; } = string.Empty;
+        /// <summary>字段3组件1，病人 ID / 样本起始编号（最长 20）</summary>
+        public string PatientId { get; set; } = string.Empty;
+        /// <summary>字段3组件2，样本 ID / 样本条码（最长 29）</summary>
+        public string SpecimenId { get; set; } = string.Empty;
+        /// <summary>字段4，样本结束编号（查询单个样本时与样本起始编号相同，最长 20）</summary>
         public string EndingRangeId { get; set; } = string.Empty;
-        /// <summary>字段5，通用测试 ID（固定为 ALL，请求所有已发出未清订单）</summary>
+        /// <summary>字段5，通用测试 ID（系统总是请求所有已发出未清订单，固定为 ALL）</summary>
         public string UniversalTestId { get; set; } = string.Empty;
-        /// <summary>字段6，置空，保留</summary>
+        /// <summary>字段6，请求时限性质，置空，保留</summary>
         public string NatureOfRequestTimeLimits { get; set; } = string.Empty;
-        /// <summary>字段7，查询起始时间（格式 YYYYMMDDHHMMSS）</summary>
+        /// <summary>字段7，查询起始时间（格式 YYYYMMDDHHMMSS，最长 14）</summary>
         public string BeginningRequestResultsDateTime { get; set; } = string.Empty;
-        /// <summary>字段8，查询截止时间（格式 YYYYMMDDHHMMSS）</summary>
+        /// <summary>字段8，查询截止时间（格式 YYYYMMDDHHMMSS，最长 14）</summary>
         public string EndingRequestResultsDateTime { get; set; } = string.Empty;
-        /// <summary>字段9，置空，保留</summary>
+        /// <summary>字段9，申请医生姓名，置空，保留</summary>
         public string RequestingPhysicianName { get; set; } = string.Empty;
-        /// <summary>字段10，置空，保留</summary>
+        /// <summary>字段10，申请医生电话，置空，保留</summary>
         public string RequestingPhysicianTelephoneNumber { get; set; } = string.Empty;
-        /// <summary>字段11，置空，保留</summary>
+        /// <summary>字段11，用户字段 1，置空，保留</summary>
         public string UserField1 { get; set; } = string.Empty;
-        /// <summary>字段12，置空，保留</summary>
+        /// <summary>字段12，用户字段 2，置空，保留</summary>
         public string UserField2 { get; set; } = string.Empty;
         /// <summary>字段13，查询命令码（O-请求样本查询，A-取消当前查询请求）</summary>
         public string RequestInformationStatusCode { get; set; } = string.Empty;
+
+        public enum RequestInformationStatus
+        {
+            [Description("请求样本查询")]
+            O,
+
+            [Description("取消当前查询请求")]
+            A
+        }
     }
 
     /// <summary>
