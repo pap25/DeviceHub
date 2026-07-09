@@ -28,6 +28,8 @@ namespace DeviceHub.YhloTestSerialPort.Handler
         {
             List<ReceiveMessage> taskList = receiveMessageRepository
                 .FindByInstrumentIdAndStatusOrderAsc(_instrumentId, ReceiveMessage.StatusEnum.Pending, 15).GetAwaiter().GetResult();
+            if (taskList.Count > 0)
+                Logger.Debug(logType, $"查询待解码消息 {taskList.Count} 条");
             return taskList;
         }
 
