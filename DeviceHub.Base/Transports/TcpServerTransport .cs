@@ -84,11 +84,12 @@ namespace DeviceHub.Base.Transports
 
                         if (_client != null)
                         {
+                            var oldEndPoint = _client.Client.RemoteEndPoint;
                             var oldClient = _client;
                             var oldStream = _stream;
                             var newEndPoint = client.Client.RemoteEndPoint?.ToString() ?? "unknown";
 
-                            Logger.Warn(logType, $"新连接替换旧连接: 旧={oldClient.Client.RemoteEndPoint}, 新={newEndPoint}, host:{_host}, port:{_port}");
+                            Logger.Warn(logType, $"新连接替换旧连接: 旧={oldEndPoint}, 新={newEndPoint}, host:{_host}, port:{_port}");
 
                             try
                             {
