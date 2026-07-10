@@ -3,16 +3,16 @@ using DeviceHub.Base.Constant;
 
 namespace DeviceHub.YhloTest2SerialPort
 {
-    public class SerialPortSender
+    public class SerialPortSender1
     {
-        private readonly string logType = nameof(SerialPortSender);
+        private readonly string logType = nameof(SerialPortSender1);
         private readonly SerialPortSession session;
         private readonly ISenderTaskHandler senderTaskHandler;
 
         private List<byte[]> sendFrameList = [];
         private int sendFrameOffset;
 
-        public SerialPortSender(SerialPortSession session, ISenderTaskHandler senderTaskHandler)
+        public SerialPortSender1(SerialPortSession session, ISenderTaskHandler senderTaskHandler)
         {
             this.session = session;
             this.senderTaskHandler = senderTaskHandler;

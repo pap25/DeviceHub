@@ -11,7 +11,7 @@ namespace DeviceHub.YhloTest2SerialPort
         private readonly string logType = nameof(SerialPortSession);
         private readonly object stateLock = new();
         private readonly SerialPortReceiver receiver;
-        private readonly SerialPortSender sender;
+        private readonly SerialPortSender1 sender;
 
         private SerialPortTransport? transport;
         private LineState lineState = LineState.Idle;
@@ -22,7 +22,7 @@ namespace DeviceHub.YhloTest2SerialPort
         public SerialPortSession(long instrumentId, IConsumeTask receiveTask, ISenderTaskHandler senderTaskHandler)
         {
             receiver = new SerialPortReceiver(this, instrumentId, receiveTask);
-            sender = new SerialPortSender(this, senderTaskHandler);
+            sender = new SerialPortSender1(this, senderTaskHandler);
         }
 
         public async Task Start(SerialPortConfig config)
