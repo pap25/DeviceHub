@@ -5,10 +5,10 @@ using DeviceHub.Base.Constant;
 using DeviceHub.Base.Transports;
 using DeviceHub.Model.Entities;
 using DeviceHub.Service;
-using DeviceHub.Yhlo.Handler;
+using DeviceHub.YhloTestTcpServer.Handler;
 using System.Text;
 
-namespace DeviceHub.Yhlo
+namespace DeviceHub.YhloTestTcpServer
 {
     public class Driver : ITcpDeviceDriver
     {

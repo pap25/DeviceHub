@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
-namespace DeviceHub.Yhlo.Handler
+namespace DeviceHub.YhloTestTcpServer.Handler
 {
     public class ReceiveHandler : IBatchTaskHandler<ReceiveMessage>
     {

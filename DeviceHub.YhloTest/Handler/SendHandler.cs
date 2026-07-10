@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DeviceHub.Yhlo.Handler
+namespace DeviceHub.YhloTestTcpServer.Handler
 {
     public class SendHandler : IBatchTaskHandler<Object>
     {
