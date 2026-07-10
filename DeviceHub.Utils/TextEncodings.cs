@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace DeviceHub.Base.Common
+namespace DeviceHub.Utils
 {
     public static class TextEncodings
     {

@@ -1,4 +1,4 @@
-﻿using DeviceHub.Base.Common;
+﻿using DeviceHub.Utils;
 using DeviceHub.Base.Transports;
 using DeviceHub.Model.Entities;
 using DeviceHub.Repository.Repositories;

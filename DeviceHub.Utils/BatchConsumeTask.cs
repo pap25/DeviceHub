@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using DeviceHub.Base.Common;
 
-namespace DeviceHub.Base.Common
+namespace DeviceHub.Utils
 {
     public interface IConsumeTask
     {

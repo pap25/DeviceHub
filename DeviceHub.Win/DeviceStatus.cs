@@ -1,6 +1,6 @@
 ﻿using DeviceHub.Abstractions;
 using DeviceHub.Abstractions.Dto;
-using DeviceHub.Base.Common;
+using DeviceHub.Utils;
 using DeviceHub.Lis;
 using DeviceHub.Lis.Dto;
 using DeviceHub.Lis.Impl;

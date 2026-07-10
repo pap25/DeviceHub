@@ -1,5 +1,5 @@
 ﻿using DeviceHub.Abstractions.Dto;
-using DeviceHub.Base.Common;
+using DeviceHub.Utils;
 using DeviceHub.Base.Constant;
 using DeviceHub.Base.Transports;
 using System.IO.Ports;

@@ -1,4 +1,4 @@
-﻿using DeviceHub.Base.Common;
+﻿using DeviceHub.Utils;
 using DeviceHub.Lis.Dto;
 using DeviceHub.Model.Entities;
 using DeviceHub.Repository.Repositories;

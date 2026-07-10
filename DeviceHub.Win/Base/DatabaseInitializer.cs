@@ -1,4 +1,4 @@
-using DeviceHub.Base.Common;
+using DeviceHub.Utils;
 using DeviceHub.Repository;
 
 namespace DeviceHub.Win.Base;

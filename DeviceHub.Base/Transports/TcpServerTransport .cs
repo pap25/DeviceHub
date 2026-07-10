@@ -1,4 +1,4 @@
-﻿using DeviceHub.Base.Common;
+﻿using DeviceHub.Utils;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;

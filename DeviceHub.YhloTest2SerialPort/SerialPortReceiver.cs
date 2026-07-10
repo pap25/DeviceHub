@@ -1,4 +1,4 @@
-﻿using DeviceHub.Base.Common;
+﻿using DeviceHub.Utils;
 using DeviceHub.Base.Constant;
 using DeviceHub.Service;
 using System.Runtime.InteropServices;
