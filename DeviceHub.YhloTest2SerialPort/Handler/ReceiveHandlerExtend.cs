@@ -8,10 +8,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
-using static DeviceHub.YhloTest2SerialPort.Protocol.AstmMessageDecode;
-using static DeviceHub.YhloTest2SerialPort.Protocol.AstmMessageEntity;
+using static DeviceHub.YhloTestV2SerialPort.Protocol.AstmMessageDecode;
+using static DeviceHub.YhloTestV2SerialPort.Protocol.AstmMessageEntity;
 
-namespace DeviceHub.YhloTest2SerialPort.Handler
+namespace DeviceHub.YhloTestV2SerialPort.Handler
 {
     public partial class ReceiveHandler
     {

@@ -3,10 +3,10 @@ using DeviceHub.Lis.Dto;
 using DeviceHub.Model.Entities;
 using DeviceHub.Repository.Repositories;
 using DeviceHub.Service;
-using DeviceHub.YhloTest2SerialPort.Protocol;
+using DeviceHub.YhloTestV2SerialPort.Protocol;
 using System.Text.Json;
 
-namespace DeviceHub.YhloTest2SerialPort.Handler
+namespace DeviceHub.YhloTestV2SerialPort.Handler
 {
     public class SendHandler : ISenderTaskHandler
     {

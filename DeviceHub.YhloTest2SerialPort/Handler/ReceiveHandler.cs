@@ -4,10 +4,10 @@ using DeviceHub.Lis.Impl;
 using DeviceHub.Model.Entities;
 using DeviceHub.Repository.Repositories;
 using DeviceHub.Service;
-using DeviceHub.YhloTest2SerialPort.Protocol;
-using static DeviceHub.YhloTest2SerialPort.Protocol.AstmMessageDecode;
+using DeviceHub.YhloTestV2SerialPort.Protocol;
+using static DeviceHub.YhloTestV2SerialPort.Protocol.AstmMessageDecode;
 
-namespace DeviceHub.YhloTest2SerialPort.Handler
+namespace DeviceHub.YhloTestV2SerialPort.Handler
 {
     public partial class ReceiveHandler : IBatchTaskHandler<ReceiveMessage>
     {

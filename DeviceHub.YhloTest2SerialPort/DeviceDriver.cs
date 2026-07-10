@@ -3,9 +3,9 @@ using DeviceHub.Abstractions.Dto;
 using DeviceHub.Utils;
 using DeviceHub.Lis.Dto;
 using DeviceHub.Model.Entities;
-using DeviceHub.YhloTest2SerialPort.Handler;
+using DeviceHub.YhloTestV2SerialPort.Handler;
 
-namespace DeviceHub.YhloTest2SerialPort
+namespace DeviceHub.YhloTestV2SerialPort
 {
     public class DeviceDriver : ISerialDeviceDriver
     {

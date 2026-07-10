@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DeviceHub.YhloTest2SerialPort.Protocol
+namespace DeviceHub.YhloTestV2SerialPort.Protocol
 {
     /// <summary>
     /// ASTM 多帧报文解析：<STX> FN DATA <ETB/ETX> CS <CR><LF>

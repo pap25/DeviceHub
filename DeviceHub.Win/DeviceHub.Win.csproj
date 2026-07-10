@@ -12,7 +12,7 @@
     <ProjectReference Include="..\DeviceHub.Abstractions\DeviceHub.Abstractions.csproj" />
     <ProjectReference Include="..\DeviceHub.Service\DeviceHub.Service.csproj" />
     <ProjectReference Include="..\DeviceHub.Utils\DeviceHub.Utils.csproj" />
-    <ProjectReference Include="..\DeviceHub.YhloTestSerialPort\DeviceHub.YhloTestSerialPort.csproj" />
+    <ProjectReference Include="..\DeviceHub.YhloTest2SerialPort\DeviceHub.YhloTestV2SerialPort.csproj" />
     <ProjectReference Include="..\DeviceHub.YhloTest\DeviceHub.YhloTest.csproj" />
   </ItemGroup>
 

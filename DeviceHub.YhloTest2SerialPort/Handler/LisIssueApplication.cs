@@ -7,7 +7,7 @@ using DeviceHub.Repository.Repositories;
 using DeviceHub.Service;
 using System.Text.Json;
 
-namespace DeviceHub.YhloTest2SerialPort.Handler
+namespace DeviceHub.YhloTestV2SerialPort.Handler
 {
     public class LisIssueApplication : IBatchTaskHandler<GetSampleApplyListOutput>
     {

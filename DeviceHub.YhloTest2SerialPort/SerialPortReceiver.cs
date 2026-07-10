@@ -4,7 +4,7 @@ using DeviceHub.Service;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace DeviceHub.YhloTest2SerialPort
+namespace DeviceHub.YhloTestV2SerialPort
 {
     public class SerialPortReceiver
     {

@@ -1,6 +1,6 @@
-using static DeviceHub.YhloTest2SerialPort.Protocol.AstmMessageEntity;
+using static DeviceHub.YhloTestV2SerialPort.Protocol.AstmMessageEntity;
 
-namespace DeviceHub.YhloTest2SerialPort.Protocol;
+namespace DeviceHub.YhloTestV2SerialPort.Protocol;
 
 /// <summary>
 /// ASTM 应用层消息记录解析（H/P/O/R/C/Q/L）
