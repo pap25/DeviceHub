@@ -18,9 +18,9 @@ namespace DeviceHub.YhloTest2SerialPort
             this.senderTaskHandler = senderTaskHandler;
         }
 
-        internal IReadOnlyList<byte[]> SendFrameList => sendFrameList;
+        public List<byte[]> SendFrameList => sendFrameList;
 
-        internal void ClearSendFrames()
+        public void ClearSendFrames()
         {
             sendFrameList = [];
             sendFrameOffset = 0;
@@ -29,7 +29,7 @@ namespace DeviceHub.YhloTest2SerialPort
         /// <summary>
         /// 发送一个完整帧（主动向仪器下发数据）。调用方须已持有 stateLock。
         /// </summary>
-        internal void TrySendNextUnlocked()
+        public void TrySendNextUnlocked()
         {
             switch (session.GetLineStateUnlocked())
             {

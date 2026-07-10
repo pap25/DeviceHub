@@ -60,7 +60,10 @@ namespace DeviceHub.YhloTest2SerialPort
             }
         }
 
-        internal void HandleControlChar(byte controlChar)
+        /// <summary>
+        /// 处理控制字符
+        /// </summary>
+        public void HandleControlChar(byte controlChar)
         {
             lock (stateLock)
             {
@@ -101,7 +104,7 @@ namespace DeviceHub.YhloTest2SerialPort
             }
         }
 
-        internal void OnFrameReceived()
+        public void OnFrameReceived()
         {
             lock (stateLock)
             {
@@ -111,53 +114,17 @@ namespace DeviceHub.YhloTest2SerialPort
             Logger.Debug(logType, "收到完整帧，回复ACK");
         }
 
-        internal void TrySendNext()
-        {
-            lock (stateLock)
-            {
-                sender.TrySendNextUnlocked();
-            }
-        }
+        public void SendUnlocked(byte data) => transport?.Send(data);
 
-        internal void Send(byte data)
-        {
-            lock (stateLock)
-            {
-                SendUnlocked(data);
-            }
-        }
-
-        internal void SendUnlocked(byte data) => transport?.Send(data);
-
-        internal void SendFrameUnlocked(byte[] frame)
+        public void SendFrameUnlocked(byte[] frame)
         {
             transport?.Send(frame);
             Logger.Debug(logType, $"串口发送帧: {SerialPortReceiver.Decode(frame)}");
         }
 
-        private void SendUnlocked(byte[] data) => transport?.Send(data);
+        public LineState GetLineStateUnlocked() => lineState;
 
-        internal LineState GetLineStateUnlocked() => lineState;
-
-        internal void SetLineStateUnlocked(LineState state) => lineState = state;
-
-        internal LineState LineState
-        {
-            get
-            {
-                lock (stateLock)
-                {
-                    return lineState;
-                }
-            }
-            set
-            {
-                lock (stateLock)
-                {
-                    lineState = value;
-                }
-            }
-        }
+        public void SetLineStateUnlocked(LineState state) => lineState = state;
 
         private void CheckReceiveIdleTimeout(object? state)
         {

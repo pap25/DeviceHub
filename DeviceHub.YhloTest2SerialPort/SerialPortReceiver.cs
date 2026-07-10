@@ -34,11 +34,13 @@ namespace DeviceHub.YhloTest2SerialPort
 
             buffer.AddRange(data);
 
+            // 提取控制字符
             while (TryExtractControlChar(out byte controlChar))
             {
                 session.HandleControlChar(controlChar);
             }
 
+            // // 按 Terminator Record（L 记录）切分完整消息
             while (TryExtractMessage(out List<byte> message))
             {
                 LogCompleteMessage(message);
@@ -51,6 +53,9 @@ namespace DeviceHub.YhloTest2SerialPort
             processedOffset = 0;
         }
 
+        /// <summary>
+        /// 提取控制字符
+        /// </summary>
         private bool TryExtractControlChar(out byte controlChar)
         {
             controlChar = 0;
@@ -74,6 +79,10 @@ namespace DeviceHub.YhloTest2SerialPort
         {
             message = new List<byte>(0);
 
+            // buffer 三帧拼接示例：
+            //   <STX>1H|\^&|||^^||||||ASCII|PR|1394-97|20180120110408<CR><ETX>A6<CR><LF>
+            //   <STX>4R|1|TP^TP1I|^+|ResultUnit1|||+|F||||20171019114059|<CR><ETX>46<CR><LF>
+            //   <STX>7L|1|N<CR><ETB>1E<CR><LF>
             int startIndex = IndexOfByte(ASTMProtocols.STX);
             if (startIndex < 0)
             {
@@ -87,27 +96,28 @@ namespace DeviceHub.YhloTest2SerialPort
 
             if (startIndex > 0)
             {
-                buffer.RemoveRange(0, startIndex);
+                buffer.RemoveRange(0, startIndex); // 丢弃 STX 前的粘包前缀
                 processedOffset = Math.Max(0, processedOffset - startIndex);
             }
 
-            int consumeLength = 0;
+            int consumeLength = 0; // 命中 L 后：buffer[0] 至帧尾的总字节数
 
             while (processedOffset < buffer.Count)
             {
                 if (buffer[processedOffset] != ASTMProtocols.STX)
-                    break;
+                    break; // 帧对齐丢失，保留 buffer 等待更多数据或后续重同步
 
                 if (processedOffset + 2 >= buffer.Count)
-                    return false;
+                    return false; // 半包，如只收到 <STX>1
 
+                // processedOffset+0=<STX> +1=帧号 +2=payload 首字节(H/R/L)
                 int payloadStart = processedOffset + 2;
-                int frameEndIndex = -1;
+                int frameEndIndex = -1;  // <ETX/ETB>位置
 
                 for (int i = payloadStart; i < buffer.Count; i++)
                 {
                     if (buffer[i] == ASTMProtocols.STX)
-                        break;
+                        break; // 当前帧尚无 <ETX>/<ETB> 下一帧已开始，视为半包
                     if (ASTMProtocols.IsFrameEnd(buffer[i]))
                     {
                         frameEndIndex = i;
@@ -116,15 +126,16 @@ namespace DeviceHub.YhloTest2SerialPort
                 }
 
                 if (frameEndIndex < 0)
-                    return false;
+                    return false; // 半包，等待 <ETX>/<ETB>
 
                 int frameTrailerEnd = frameEndIndex + ASTMProtocols.FrameTrailerLength;
                 if (frameTrailerEnd > buffer.Count)
-                    return false;
+                    return false; // 半包，帧尾未收齐
 
                 session.OnFrameReceived();
                 processedOffset = frameTrailerEnd;
 
+                // 在 [payloadStart, frameEndIndex) 内按 <CR> 切记录，查找 L 记录
                 int recordStart = payloadStart;
                 for (int i = payloadStart; i < frameEndIndex; i++)
                 {
