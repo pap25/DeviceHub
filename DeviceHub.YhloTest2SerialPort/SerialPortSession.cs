@@ -17,7 +17,7 @@ namespace DeviceHub.YhloTest2SerialPort
         private LineState lineState = LineState.Idle;
         private long lastReceiveTime;
         private Timer? idleCheckTimer;
-        private const int ReceiveIdleTimeoutSeconds = 15;
+        private const int receiveIdleTimeoutSeconds = 15;
 
         public SerialPortSession(long instrumentId, IConsumeTask receiveTask, ISenderTaskHandler senderTaskHandler)
         {
@@ -46,25 +46,11 @@ namespace DeviceHub.YhloTest2SerialPort
             await Task.Run(() => transport.Open());
         }
 
-        public void Stop()
-        {
-            idleCheckTimer?.Dispose();
-            idleCheckTimer = null;
-
-            if (transport != null)
-            {
-                transport.DataReceived -= Transport_DataReceived;
-                transport.Close();
-            }
-
-            receiver.ResetBuffer();
-        }
-
         private void Transport_DataReceived(byte[] data)
         {
             try
             {
-                UpdateLastReceiveTime();
+                lastReceiveTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                 receiver.OnDataReceived(data);
             }
             catch (Exception ex)
@@ -173,27 +159,22 @@ namespace DeviceHub.YhloTest2SerialPort
             }
         }
 
-        internal void UpdateLastReceiveTime()
-        {
-            lastReceiveTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        }
-
         private void CheckReceiveIdleTimeout(object? state)
         {
             try
             {
                 long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-                if (now - lastReceiveTime < ReceiveIdleTimeoutSeconds * 1000L)
+                if (now - lastReceiveTime < receiveIdleTimeoutSeconds * 1000L)
                     return;
 
                 lock (stateLock)
                 {
-                    if (now - lastReceiveTime < ReceiveIdleTimeoutSeconds * 1000L)
+                    if (now - lastReceiveTime < receiveIdleTimeoutSeconds * 1000L)
                         return;
 
                     if (lineState != LineState.Idle)
                     {
-                        Logger.Info(logType, $"超过{ReceiveIdleTimeoutSeconds}秒未收到消息，重置为Idle并尝试发送");
+                        Logger.Info(logType, $"超过{receiveIdleTimeoutSeconds}秒未收到消息，重置为Idle并尝试发送");
                         sender.ClearSendFrames();
                     }
 
@@ -205,6 +186,21 @@ namespace DeviceHub.YhloTest2SerialPort
             {
                 Logger.Error(logType, "空闲超时检查异常", ex);
             }
+        }
+
+        public void Stop()
+        {
+            idleCheckTimer?.Dispose();
+            idleCheckTimer = null;
+
+            if (transport != null)
+            {
+                transport.DataReceived -= Transport_DataReceived;
+                transport.Close();
+            }
+
+            receiver.ResetBuffer();
+            sender.ClearSendFrames();
         }
 
         public void Dispose()
