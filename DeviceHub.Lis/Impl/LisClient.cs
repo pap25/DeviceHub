@@ -64,6 +64,7 @@ namespace DeviceHub.Lis.Impl
                     string json = await File.ReadAllTextAsync(tcpConfigFile);
                     tcpConfig = JsonSerializer.Deserialize<TcpConfig>(json);
                     tcpConfig.Encoding = "UTF-8";
+                    tcpConfig.Host = "0.0.0.0";
                 }
                 catch
                 {

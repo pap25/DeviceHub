@@ -114,7 +114,7 @@ namespace DeviceHub.Base.Transports
                         _sendLock.Release();
                     }
 
-                    await Task.Run(() => ReceiveLoopAsync(client, _stream, receiveToken));
+                    _ = Task.Run(() => ReceiveLoopAsync(client, _stream, receiveToken));
                 }
             }
             catch (OperationCanceledException)
