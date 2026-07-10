@@ -93,10 +93,7 @@ namespace DeviceHub.YhloTestV2SerialPort
                     case ASTMProtocols.EOT:
                         Logger.Info(logType, "收到 EOT，本次传输结束，清理未完成消息");
                         receiver.ResetBuffer();
-                        if (lineState == LineState.WaitingAck)
-                        {
-                            sender.ClearSendFrames();
-                        }
+                        sender.ClearSendFrames();
                         lineState = LineState.Idle;
                         sender.TrySendNextUnlocked();
                         return;
