@@ -109,11 +109,22 @@ namespace DeviceHub.YhloTestTcpServer
 
         public string GetClientRemoteEndPoint()
         {
-            return transport.GetClientRemoteEndPoint();
+            return transport?.GetClientRemoteEndPoint() ?? string.Empty;
         }
+
         public void Stop()
         {
-            throw new NotImplementedException();
+            if (transport != null)
+            {
+                transport.DataReceived -= Transport_DataReceived;
+                transport.Stop();
+                transport = null;
+            }
+
+            receiveTask?.Shutdown();
+            buffer.Clear();
+
+            Logger.Info(logType, "TCP会话已停止");
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using DeviceHub.Abstractions;
 using DeviceHub.Abstractions.Dto;
 using DeviceHub.Lis.Dto;
-using DeviceHub.Model.Entities;
 using DeviceHub.Utils;
 using DeviceHub.YhloTestTcpServer.Handler;
 
@@ -10,7 +9,6 @@ namespace DeviceHub.YhloTestTcpServer
     public class DeviceDriver : ITcpDeviceDriver
     {
         private readonly string logType = nameof(DeviceDriver);
-        private IConsumeTask receiveTask = null!;
         private IConsumeTask lisIssueApplication = null!;
         private TcpServerSession session;
 
@@ -21,9 +19,6 @@ namespace DeviceHub.YhloTestTcpServer
 
         public async Task Start(long instrumentId, TcpConfig config)
         {
-            receiveTask = new BatchConsumeTask<ReceiveMessage>(new ReceiveHandler(instrumentId));
-            receiveTask.StartConsume();
-
             lisIssueApplication = new BatchConsumeTask<GetSampleApplyListOutput>(new LisIssueApplication(instrumentId));
             lisIssueApplication.StartConsume();
 
@@ -34,7 +29,9 @@ namespace DeviceHub.YhloTestTcpServer
 
         public void Stop()
         {
-
+            session?.Stop();
+            lisIssueApplication?.Shutdown();
+            Logger.Info(logType, "设备驱动已停止");
         }
 
         public void NotifyLisIssueApplication()
