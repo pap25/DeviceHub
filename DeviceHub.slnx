@@ -12,7 +12,8 @@
   <Project Path="DeviceHub.Service/DeviceHub.Service.csproj" Id="c4104430-4ece-4859-9dcb-4e4907b0bd34" />
   <Project Path="DeviceHub.Utils/DeviceHub.Utils.csproj" Id="a86d2c58-7811-4151-9305-b2deb0f9779e" />
   <Project Path="DeviceHub.Win/DeviceHub.Win.csproj" />
-  <Project Path="DeviceHub.YhloTest/DeviceHub.YhloTestTcpServer.csproj" Id="202277dd-57f7-4429-ba4c-dc92e3f213b8" />
+  <Project Path="DeviceHub.YhloTest/DeviceHub.YhloTestTcpServer1.csproj" Id="202277dd-57f7-4429-ba4c-dc92e3f213b8" />
   <Project Path="DeviceHub.YhloTest2SerialPort/DeviceHub.YhloTestV2SerialPort.csproj" Id="4148a8ca-10bd-4ec5-9c23-90c312a326ce" />
   <Project Path="DeviceHub.YhloTestSerialPort/DeviceHub.YhloTestSerialPort.csproj" Id="1392f346-c4bc-467c-b338-c58b8e7f7360" />
+  <Project Path="DeviceHub.YhloTestTcpServer/DeviceHub.YhloTestTcpServer.csproj" Id="8113031e-2c32-4020-b7c7-1adf00869bf2" />
 </Solution>
