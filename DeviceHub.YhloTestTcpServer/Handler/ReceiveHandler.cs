@@ -1,16 +1,12 @@
 ﻿using DeviceHub.Utils;
-using DeviceHub.Base.Transports;
 using DeviceHub.Model.Entities;
 using DeviceHub.Repository.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
 
 namespace DeviceHub.YhloTestTcpServer.Handler
 {
     public class ReceiveHandler : IBatchTaskHandler<ReceiveMessage>
     {
+        private readonly string logType = nameof(ReceiveHandler);
         private long _instrumentId;
         private readonly ReceiveMessageRepository receiveMessageRepository = ReceiveMessageRepository.Instance;
         private readonly ReceiveMessageLargeRepository receiveMessageLargeRepository = ReceiveMessageLargeRepository.Instance;
@@ -22,23 +18,42 @@ namespace DeviceHub.YhloTestTcpServer.Handler
         {
             List<ReceiveMessage> taskList = receiveMessageRepository
                 .FindByInstrumentIdAndStatusOrderAsc(_instrumentId, ReceiveMessage.StatusEnum.Pending, 15).GetAwaiter().GetResult();
+            if (taskList.Count > 0)
+                Logger.Debug(logType, $"查询待解码消息 {taskList.Count} 条");
             return taskList;
         }
         public void HandleTask(ReceiveMessage task)
         {
-            // 调用接口上传检验结果
-            // 解码后保存 receive_message_decode 更新receive_message
-            ReceiveMessageLarge? receiveMessageLarge = receiveMessageLargeRepository.GetByReceiveMessageId(task.Id).GetAwaiter().GetResult();
-            if (receiveMessageLarge == null)
+            try
             {
-                long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-                //receiveMessageRepository.UpdateStatusAndErrorMessageAndUpdateTimeById(task.Id, ReceiveMessage.StatusEnum.Failed, "数据异常", now);
-                return;
+                ReceiveMessageLarge? receiveMessageLarge = receiveMessageLargeRepository.GetByReceiveMessageId(task.Id).GetAwaiter().GetResult();
+                if (receiveMessageLarge == null)
+                {
+                    MarkFailed(task.Id, "数据异常", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+                    return;
+                }
+
+                ParseData(receiveMessageLarge.RawMessage, task);
             }
-            byte[] rawMessage = receiveMessageLarge.RawMessage;
+            catch (Exception e)
+            {
+                MarkFailed(task.Id, "HandleTask异常" + e.Message, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+            }
+        }
 
+        private void MarkFailed(long id, string errorMessage, long now)
+        {
+            receiveMessageRepository.UpdateStatusAndErrorMessageAndUpdateTimeById(
+                id,
+                ReceiveMessage.StatusEnum.Failed,
+                errorMessage,
+                now).GetAwaiter().GetResult();
+            Logger.Warn(logType, $"消息处理失败 id={id}: {errorMessage}");
+        }
 
-            //receiveMessageRepository.UpdateStatusAndUpdateTimeById(task.Id, ReceiveMessage.StatusEnum.Success, now);
+        private void ParseData(byte[] rawMessage, ReceiveMessage task)
+        {
+            throw new NotImplementedException();
         }
     }
 }
