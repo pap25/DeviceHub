@@ -10,9 +10,9 @@ using System.Text;
 
 namespace DeviceHub.YhloTestTcpServer
 {
-    public class Driver : ITcpDeviceDriver
+    public class TcpServerDriver : ITcpDeviceDriver
     {
-        private readonly string logType = nameof(Driver);
+        private readonly string logType = nameof(TcpServerDriver);
         private IConsumeTask receiveTask;
         private readonly ReceiveMessageService receiveMessageService = ReceiveMessageService.Instance;
         private long _instrumentId;
