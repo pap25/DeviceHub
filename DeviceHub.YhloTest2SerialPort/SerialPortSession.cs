@@ -43,7 +43,7 @@ namespace DeviceHub.YhloTestV2SerialPort
                 TimeSpan.FromSeconds(5),
                 TimeSpan.FromSeconds(5));
 
-            await Task.Run(() => transport.Open());
+            await Task.Run(transport.Open);
         }
 
         private void Transport_DataReceived(byte[] data)
