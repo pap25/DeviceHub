@@ -18,7 +18,7 @@ namespace DeviceHub.YhloTestTcpServer
 
         private TcpServerTransport transport;
         private readonly List<byte> buffer = new();
-        public async Task Start(long instrumentId, TcpConfig config)
+        public Task Start(long instrumentId, TcpConfig config)
         {
             _instrumentId = instrumentId;
             transport = new(config.Host, config.Port);
@@ -27,7 +27,8 @@ namespace DeviceHub.YhloTestTcpServer
             receiveTask = new BatchConsumeTask<ReceiveMessage>(new ReceiveHandler(instrumentId));
             receiveTask.StartConsume();
 
-            await transport.StartListeningAsync();
+            transport.StartListening();
+            return Task.CompletedTask;
         }
 
         private void Transport_DataReceived(byte[] data)

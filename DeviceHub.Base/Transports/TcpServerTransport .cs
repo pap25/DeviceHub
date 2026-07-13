@@ -35,7 +35,7 @@ namespace DeviceHub.Base.Transports
             Logger.Info(logType, $"初始化TCP服务端 host:{host}, port:{port}");
         }
 
-        public async Task StartListeningAsync()
+        public void StartListening()
         {
             var ip = string.IsNullOrWhiteSpace(_host)
                 || _host == "0.0.0.0"
@@ -44,11 +44,15 @@ namespace DeviceHub.Base.Transports
                     : IPAddress.Parse(_host);
 
             _listener = new TcpListener(ip, _port);
-
             _listener.Start();
 
             Logger.Info(logType, $"TCP服务端开始监听 host:{_host}, port:{_port}");
 
+            _ = AcceptClientsAsync();
+        }
+
+        private async Task AcceptClientsAsync()
+        {
             try
             {
                 while (!_cts.Token.IsCancellationRequested)
