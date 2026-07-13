@@ -1,5 +1,4 @@
-﻿using DeviceHub.Abstractions;
-using DeviceHub.Abstractions.Dto;
+﻿using DeviceHub.Abstractions.Dto;
 using DeviceHub.Utils;
 using DeviceHub.Base.Constant;
 using DeviceHub.Base.Transports;
@@ -10,9 +9,9 @@ using System.Text;
 
 namespace DeviceHub.YhloTestTcpServer
 {
-    public class TcpServerDriver : ITcpDeviceDriver
+    public class TcpServerSession
     {
-        private readonly string logType = nameof(TcpServerDriver);
+        private readonly string logType = nameof(TcpServerSession);
         private IConsumeTask receiveTask;
         private readonly ReceiveMessageService receiveMessageService = ReceiveMessageService.Instance;
         private long _instrumentId;

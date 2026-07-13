@@ -1,6 +1,5 @@
 ﻿using DeviceHub.Abstractions;
 using DeviceHub.Abstractions.Dto;
-using DeviceHub.Base.Transports;
 using DeviceHub.Lis.Dto;
 using DeviceHub.Model.Entities;
 using DeviceHub.Utils;
@@ -13,8 +12,12 @@ namespace DeviceHub.YhloTestTcpServer
         private readonly string logType = nameof(DeviceDriver);
         private IConsumeTask receiveTask = null!;
         private IConsumeTask lisIssueApplication = null!;
-        private TcpServerReceiver? receiver;
-        private TcpServerTransport transport;
+        private TcpServerSession session;
+
+        public DeviceDriver()
+        {
+            session = new TcpServerSession();
+        }
 
         public async Task Start(long instrumentId, TcpConfig config)
         {
@@ -24,18 +27,14 @@ namespace DeviceHub.YhloTestTcpServer
             lisIssueApplication = new BatchConsumeTask<GetSampleApplyListOutput>(new LisIssueApplication(instrumentId));
             lisIssueApplication.StartConsume();
 
-            receiver = new TcpServerReceiver(instrumentId, receiveTask);
+            await session.Start(instrumentId, config);
 
-            transport = new(config.Host, config.Port);
-            transport.DataReceived += receiver.Transport_DataReceived;
-            await transport.StartListeningAsync();
-
-            Logger.Info(logType, $"设备驱动已启动 instrumentId={instrumentId}, port={config.PortName}");
+            Logger.Info(logType, $"设备驱动已启动 instrumentId={instrumentId}, host={config.Host}, port={config.Port}");
         }
 
         public void Stop()
         {
-            
+
         }
 
         public void NotifyLisIssueApplication()
@@ -45,7 +44,7 @@ namespace DeviceHub.YhloTestTcpServer
 
         public string GetClientRemoteEndPoint()
         {
-            return transport.GetClientRemoteEndPoint();
+            return session.GetClientRemoteEndPoint();
         }
     }
 }
