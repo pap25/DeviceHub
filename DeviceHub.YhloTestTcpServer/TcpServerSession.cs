@@ -45,7 +45,7 @@ namespace DeviceHub.YhloTestTcpServer
                     Logger.Info(logType, $"TCP接收完整消息: {Encoding.UTF8.GetString(rawMessage)}");
 
                     receiveMessageService.Save(_instrumentId, rawMessage).GetAwaiter().GetResult();
-
+                    // 回复ack MSA ACK时候必填
                     receiveTask.NotifyConsume();
                 }
             }
