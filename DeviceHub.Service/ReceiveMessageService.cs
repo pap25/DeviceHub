@@ -35,6 +35,7 @@ public class ReceiveMessageService
         {
             outputList.Add(new()
             {
+                Id = row.Id,
                 StatusName = row.Status.GetDescription(),
                 TypeName = row.Type == null ? string.Empty : row.Type.GetDescription(),
                 RawMessage = Encoding.UTF8.GetString(row.RawMessage),

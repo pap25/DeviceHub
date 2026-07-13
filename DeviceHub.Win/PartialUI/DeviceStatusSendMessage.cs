@@ -12,7 +12,7 @@ namespace DeviceHub.Win
         {
             BindEnumComboBox<SendMessage.StatusEnum>(cboSendMessageStatus, true);
             BindEnumComboBox<SendMessage.TypeEnum>(cboSendMessageType, true);
-            cboSendMessageStatus.SelectedValue = ((int)SendMessage.StatusEnum.Pending).ToString();
+            //cboSendMessageStatus.SelectedValue = ((int)SendMessage.StatusEnum.Pending).ToString();
             dtpSendMessageCreateTimeStart.Value = DateTime.Today;
             dtpSendMessageCreateTimeEnd.Value = DateTime.Today;
         }

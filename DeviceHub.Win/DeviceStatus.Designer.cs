@@ -32,7 +32,6 @@
             colInstrumentItemMappingInstrumentItemCode = new DataGridViewTextBoxColumn();
             colInstrumentItemMappingInstrumentItemName = new DataGridViewTextBoxColumn();
             colInstrumentItemMappingLisItemCode = new DataGridViewTextBoxColumn();
-            colInstrumentItemMappingLisItemName = new DataGridViewTextBoxColumn();
             colInstrumentItemMappingUnit = new DataGridViewTextBoxColumn();
             pagerInstrumentItemMapping = new DeviceHub.Win.DeviceHubControl.PagerControl();
             tabControl1 = new TabControl();
@@ -40,15 +39,6 @@
             pnlLisConfigLeft = new Panel();
             tabReceiveMessage = new TabPage();
             dgvReceiveMessage = new DataGridView();
-            colReceiveMessageSelect = new DataGridViewCheckBoxColumn();
-            colReceiveMessageStatus = new DataGridViewTextBoxColumn();
-            colReceiveMessageType = new DataGridViewTextBoxColumn();
-            colReceiveMessageRawMessage = new DataGridViewTextBoxColumn();
-            colReceiveMessageDecodeResult = new DataGridViewTextBoxColumn();
-            colReceiveMessageBarcode = new DataGridViewTextBoxColumn();
-            colReceiveMessageSampleNo = new DataGridViewTextBoxColumn();
-            colReceiveMessageCreateTime = new DataGridViewTextBoxColumn();
-            colReceiveMessageErrorMessage = new DataGridViewTextBoxColumn();
             pagerReceiveMessage = new DeviceHub.Win.DeviceHubControl.PagerControl();
             pnlReceiveMessageQuery = new Panel();
             button1 = new Button();
@@ -108,10 +98,19 @@
             lblLogCreateTimeTo = new Label();
             dtpLogCreateTimeEnd = new DateTimePicker();
             btnLogQuery = new Button();
+            colReceiveMessageSelect = new DataGridViewCheckBoxColumn();
+            Id = new DataGridViewTextBoxColumn();
+            colReceiveMessageStatus = new DataGridViewTextBoxColumn();
+            colReceiveMessageType = new DataGridViewTextBoxColumn();
+            colReceiveMessageRawMessage = new DataGridViewTextBoxColumn();
+            colReceiveMessageDecodeResult = new DataGridViewTextBoxColumn();
+            colReceiveMessageBarcode = new DataGridViewTextBoxColumn();
+            colReceiveMessageSampleNo = new DataGridViewTextBoxColumn();
+            colReceiveMessageCreateTime = new DataGridViewTextBoxColumn();
+            colReceiveMessageErrorMessage = new DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)dgvInstrumentItemMapping).BeginInit();
             tabControl1.SuspendLayout();
             tabLisConfig.SuspendLayout();
-            pnlLisConfigLeft.SuspendLayout();
             tabReceiveMessage.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvReceiveMessage).BeginInit();
             pnlReceiveMessageQuery.SuspendLayout();
@@ -129,7 +128,7 @@
             dgvInstrumentItemMapping.AllowUserToDeleteRows = false;
             dgvInstrumentItemMapping.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvInstrumentItemMapping.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvInstrumentItemMapping.Columns.AddRange(new DataGridViewColumn[] { colInstrumentItemMappingInstrumentItemCode, colInstrumentItemMappingInstrumentItemName, colInstrumentItemMappingLisItemCode, colInstrumentItemMappingLisItemName, colInstrumentItemMappingUnit });
+            dgvInstrumentItemMapping.Columns.AddRange(new DataGridViewColumn[] { colInstrumentItemMappingInstrumentItemCode, colInstrumentItemMappingInstrumentItemName, colInstrumentItemMappingLisItemCode, colInstrumentItemMappingUnit });
             dgvInstrumentItemMapping.Dock = DockStyle.Fill;
             dgvInstrumentItemMapping.Location = new Point(259, 3);
             dgvInstrumentItemMapping.Name = "dgvInstrumentItemMapping";
@@ -159,13 +158,6 @@
             colInstrumentItemMappingLisItemCode.HeaderText = "LIS项目编号";
             colInstrumentItemMappingLisItemCode.Name = "colInstrumentItemMappingLisItemCode";
             colInstrumentItemMappingLisItemCode.ReadOnly = true;
-            // 
-            // colInstrumentItemMappingLisItemName
-            // 
-            colInstrumentItemMappingLisItemName.DataPropertyName = "LisItemName";
-            colInstrumentItemMappingLisItemName.HeaderText = "LIS项目名";
-            colInstrumentItemMappingLisItemName.Name = "colInstrumentItemMappingLisItemName";
-            colInstrumentItemMappingLisItemName.ReadOnly = true;
             // 
             // colInstrumentItemMappingUnit
             // 
@@ -239,7 +231,7 @@
             dgvReceiveMessage.AllowUserToDeleteRows = false;
             dgvReceiveMessage.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvReceiveMessage.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvReceiveMessage.Columns.AddRange(new DataGridViewColumn[] { colReceiveMessageSelect, colReceiveMessageStatus, colReceiveMessageType, colReceiveMessageRawMessage, colReceiveMessageDecodeResult, colReceiveMessageBarcode, colReceiveMessageSampleNo, colReceiveMessageCreateTime, colReceiveMessageErrorMessage });
+            dgvReceiveMessage.Columns.AddRange(new DataGridViewColumn[] { colReceiveMessageSelect, Id, colReceiveMessageStatus, colReceiveMessageType, colReceiveMessageRawMessage, colReceiveMessageDecodeResult, colReceiveMessageBarcode, colReceiveMessageSampleNo, colReceiveMessageCreateTime, colReceiveMessageErrorMessage });
             dgvReceiveMessage.Dock = DockStyle.Fill;
             dgvReceiveMessage.Location = new Point(3, 47);
             dgvReceiveMessage.Name = "dgvReceiveMessage";
@@ -247,84 +239,6 @@
             dgvReceiveMessage.SelectionMode = DataGridViewSelectionMode.CellSelect;
             dgvReceiveMessage.Size = new Size(1336, 483);
             dgvReceiveMessage.TabIndex = 1;
-            // 
-            // colReceiveMessageSelect
-            // 
-            colReceiveMessageSelect.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            colReceiveMessageSelect.FillWeight = 51F;
-            colReceiveMessageSelect.HeaderText = "全选";
-            colReceiveMessageSelect.Name = "colReceiveMessageSelect";
-            colReceiveMessageSelect.Width = 51;
-            // 
-            // colReceiveMessageStatus
-            // 
-            colReceiveMessageStatus.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            colReceiveMessageStatus.DataPropertyName = "StatusName";
-            colReceiveMessageStatus.FillWeight = 80F;
-            colReceiveMessageStatus.HeaderText = "状态";
-            colReceiveMessageStatus.Name = "colReceiveMessageStatus";
-            colReceiveMessageStatus.ReadOnly = true;
-            colReceiveMessageStatus.Width = 80;
-            // 
-            // colReceiveMessageType
-            // 
-            colReceiveMessageType.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            colReceiveMessageType.DataPropertyName = "TypeName";
-            colReceiveMessageType.HeaderText = "类型";
-            colReceiveMessageType.Name = "colReceiveMessageType";
-            colReceiveMessageType.ReadOnly = true;
-            colReceiveMessageType.Width = 80;
-            // 
-            // colReceiveMessageRawMessage
-            // 
-            colReceiveMessageRawMessage.DataPropertyName = "RawMessage";
-            colReceiveMessageRawMessage.FillWeight = 200F;
-            colReceiveMessageRawMessage.HeaderText = "原始报文";
-            colReceiveMessageRawMessage.Name = "colReceiveMessageRawMessage";
-            colReceiveMessageRawMessage.ReadOnly = true;
-            // 
-            // colReceiveMessageDecodeResult
-            // 
-            colReceiveMessageDecodeResult.DataPropertyName = "DecodeResult";
-            colReceiveMessageDecodeResult.FillWeight = 200F;
-            colReceiveMessageDecodeResult.HeaderText = "解码结果";
-            colReceiveMessageDecodeResult.Name = "colReceiveMessageDecodeResult";
-            colReceiveMessageDecodeResult.ReadOnly = true;
-            // 
-            // colReceiveMessageBarcode
-            // 
-            colReceiveMessageBarcode.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            colReceiveMessageBarcode.DataPropertyName = "Barcode";
-            colReceiveMessageBarcode.FillWeight = 120F;
-            colReceiveMessageBarcode.HeaderText = "条形码";
-            colReceiveMessageBarcode.Name = "colReceiveMessageBarcode";
-            colReceiveMessageBarcode.ReadOnly = true;
-            colReceiveMessageBarcode.Width = 120;
-            // 
-            // colReceiveMessageSampleNo
-            // 
-            colReceiveMessageSampleNo.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            colReceiveMessageSampleNo.DataPropertyName = "SampleNo";
-            colReceiveMessageSampleNo.HeaderText = "样本号";
-            colReceiveMessageSampleNo.Name = "colReceiveMessageSampleNo";
-            colReceiveMessageSampleNo.ReadOnly = true;
-            // 
-            // colReceiveMessageCreateTime
-            // 
-            colReceiveMessageCreateTime.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-            colReceiveMessageCreateTime.DataPropertyName = "CreateTime";
-            colReceiveMessageCreateTime.FillWeight = 150F;
-            colReceiveMessageCreateTime.HeaderText = "创建时间";
-            colReceiveMessageCreateTime.Name = "colReceiveMessageCreateTime";
-            colReceiveMessageCreateTime.ReadOnly = true;
-            colReceiveMessageCreateTime.Width = 150;
-            // 
-            // colReceiveMessageErrorMessage
-            // 
-            colReceiveMessageErrorMessage.DataPropertyName = "ErrorMessage";
-            colReceiveMessageErrorMessage.HeaderText = "失败原因";
-            colReceiveMessageErrorMessage.Name = "colReceiveMessageErrorMessage";
-            colReceiveMessageErrorMessage.ReadOnly = true;
             // 
             // pagerReceiveMessage
             // 
@@ -761,7 +675,6 @@
             colLogType.HeaderText = "类型";
             colLogType.Name = "colLogType";
             colLogType.ReadOnly = true;
-            colLogType.Width = 100;
             // 
             // colLogMessage
             // 
@@ -907,6 +820,91 @@
             btnLogQuery.UseVisualStyleBackColor = true;
             btnLogQuery.Click += btnLogQuery_Click;
             // 
+            // colReceiveMessageSelect
+            // 
+            colReceiveMessageSelect.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            colReceiveMessageSelect.FillWeight = 40F;
+            colReceiveMessageSelect.HeaderText = "全选";
+            colReceiveMessageSelect.Name = "colReceiveMessageSelect";
+            colReceiveMessageSelect.Width = 40;
+            // 
+            // Id
+            // 
+            Id.DataPropertyName = "Id";
+            Id.FillWeight = 40F;
+            Id.HeaderText = "ID";
+            Id.Name = "Id";
+            // 
+            // colReceiveMessageStatus
+            // 
+            colReceiveMessageStatus.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            colReceiveMessageStatus.DataPropertyName = "StatusName";
+            colReceiveMessageStatus.FillWeight = 80F;
+            colReceiveMessageStatus.HeaderText = "状态";
+            colReceiveMessageStatus.Name = "colReceiveMessageStatus";
+            colReceiveMessageStatus.ReadOnly = true;
+            colReceiveMessageStatus.Width = 80;
+            // 
+            // colReceiveMessageType
+            // 
+            colReceiveMessageType.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            colReceiveMessageType.DataPropertyName = "TypeName";
+            colReceiveMessageType.HeaderText = "类型";
+            colReceiveMessageType.Name = "colReceiveMessageType";
+            colReceiveMessageType.ReadOnly = true;
+            colReceiveMessageType.Width = 80;
+            // 
+            // colReceiveMessageRawMessage
+            // 
+            colReceiveMessageRawMessage.DataPropertyName = "RawMessage";
+            colReceiveMessageRawMessage.FillWeight = 200F;
+            colReceiveMessageRawMessage.HeaderText = "原始报文";
+            colReceiveMessageRawMessage.Name = "colReceiveMessageRawMessage";
+            colReceiveMessageRawMessage.ReadOnly = true;
+            // 
+            // colReceiveMessageDecodeResult
+            // 
+            colReceiveMessageDecodeResult.DataPropertyName = "DecodeResult";
+            colReceiveMessageDecodeResult.FillWeight = 200F;
+            colReceiveMessageDecodeResult.HeaderText = "解码结果";
+            colReceiveMessageDecodeResult.Name = "colReceiveMessageDecodeResult";
+            colReceiveMessageDecodeResult.ReadOnly = true;
+            // 
+            // colReceiveMessageBarcode
+            // 
+            colReceiveMessageBarcode.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            colReceiveMessageBarcode.DataPropertyName = "Barcode";
+            colReceiveMessageBarcode.FillWeight = 120F;
+            colReceiveMessageBarcode.HeaderText = "条形码";
+            colReceiveMessageBarcode.Name = "colReceiveMessageBarcode";
+            colReceiveMessageBarcode.ReadOnly = true;
+            colReceiveMessageBarcode.Width = 120;
+            // 
+            // colReceiveMessageSampleNo
+            // 
+            colReceiveMessageSampleNo.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            colReceiveMessageSampleNo.DataPropertyName = "SampleNo";
+            colReceiveMessageSampleNo.HeaderText = "样本号";
+            colReceiveMessageSampleNo.Name = "colReceiveMessageSampleNo";
+            colReceiveMessageSampleNo.ReadOnly = true;
+            // 
+            // colReceiveMessageCreateTime
+            // 
+            colReceiveMessageCreateTime.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            colReceiveMessageCreateTime.DataPropertyName = "CreateTime";
+            colReceiveMessageCreateTime.FillWeight = 150F;
+            colReceiveMessageCreateTime.HeaderText = "创建时间";
+            colReceiveMessageCreateTime.Name = "colReceiveMessageCreateTime";
+            colReceiveMessageCreateTime.ReadOnly = true;
+            colReceiveMessageCreateTime.Width = 150;
+            // 
+            // colReceiveMessageErrorMessage
+            // 
+            colReceiveMessageErrorMessage.DataPropertyName = "ErrorMessage";
+            colReceiveMessageErrorMessage.HeaderText = "失败原因";
+            colReceiveMessageErrorMessage.Name = "colReceiveMessageErrorMessage";
+            colReceiveMessageErrorMessage.ReadOnly = true;
+            // 
             // DeviceStatus
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
@@ -920,7 +918,6 @@
             tabControl1.ResumeLayout(false);
             tabLisConfig.ResumeLayout(false);
             tabLisConfig.PerformLayout();
-            pnlLisConfigLeft.ResumeLayout(false);
             tabReceiveMessage.ResumeLayout(false);
             tabReceiveMessage.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dgvReceiveMessage).EndInit();
@@ -943,11 +940,6 @@
         private Panel pnlLisConfigLeft;
         private DataGridView dgvInstrumentItemMapping;
         private DeviceHubControl.PagerControl pagerInstrumentItemMapping;
-        private DataGridViewTextBoxColumn colInstrumentItemMappingInstrumentItemCode;
-        private DataGridViewTextBoxColumn colInstrumentItemMappingInstrumentItemName;
-        private DataGridViewTextBoxColumn colInstrumentItemMappingLisItemCode;
-        private DataGridViewTextBoxColumn colInstrumentItemMappingLisItemName;
-        private DataGridViewTextBoxColumn colInstrumentItemMappingUnit;
         private TabControl tabControl1;
         private TabPage tabLisConfig;
         private TabPage tabReceiveMessage;
@@ -970,15 +962,6 @@
         private DataGridView dgvReceiveMessage;
         private DeviceHubControl.PagerControl pagerReceiveMessage;
         private Button button1;
-        private DataGridViewCheckBoxColumn colReceiveMessageSelect;
-        private DataGridViewTextBoxColumn colReceiveMessageStatus;
-        private DataGridViewTextBoxColumn colReceiveMessageType;
-        private DataGridViewTextBoxColumn colReceiveMessageRawMessage;
-        private DataGridViewTextBoxColumn colReceiveMessageDecodeResult;
-        private DataGridViewTextBoxColumn colReceiveMessageBarcode;
-        private DataGridViewTextBoxColumn colReceiveMessageSampleNo;
-        private DataGridViewTextBoxColumn colReceiveMessageCreateTime;
-        private DataGridViewTextBoxColumn colReceiveMessageErrorMessage;
         private Panel pnlSendMessageQuery;
         private Label lblSendMessageStatus;
         private ComboBox cboSendMessageStatus;
@@ -1020,5 +1003,19 @@
         private DataGridViewTextBoxColumn colLogType;
         private DataGridViewTextBoxColumn colLogMessage;
         private DataGridViewTextBoxColumn colLogCreateTime;
+        private DataGridViewTextBoxColumn colInstrumentItemMappingInstrumentItemCode;
+        private DataGridViewTextBoxColumn colInstrumentItemMappingInstrumentItemName;
+        private DataGridViewTextBoxColumn colInstrumentItemMappingLisItemCode;
+        private DataGridViewTextBoxColumn colInstrumentItemMappingUnit;
+        private DataGridViewCheckBoxColumn colReceiveMessageSelect;
+        private DataGridViewTextBoxColumn Id;
+        private DataGridViewTextBoxColumn colReceiveMessageStatus;
+        private DataGridViewTextBoxColumn colReceiveMessageType;
+        private DataGridViewTextBoxColumn colReceiveMessageRawMessage;
+        private DataGridViewTextBoxColumn colReceiveMessageDecodeResult;
+        private DataGridViewTextBoxColumn colReceiveMessageBarcode;
+        private DataGridViewTextBoxColumn colReceiveMessageSampleNo;
+        private DataGridViewTextBoxColumn colReceiveMessageCreateTime;
+        private DataGridViewTextBoxColumn colReceiveMessageErrorMessage;
     }
 }

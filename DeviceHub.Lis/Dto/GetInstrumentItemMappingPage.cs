@@ -18,11 +18,6 @@
         public string LisItemCode { get; set; }
 
         /// <summary>
-        /// LIS项目名
-        /// </summary>
-        public string LisItemName { get; set; }
-
-        /// <summary>
         /// 单位
         /// </summary>
         public string Unit { get; set; }

@@ -223,7 +223,7 @@ public class ReceiveMessageRepository : IReceiveMessageRepository
         parameters.Add(DbHelper.Param("@offset", Math.Max(0, (pageIndex - 1) * pageSize)));
 
         var sql = $"""
-            SELECT a.status, b.raw_message, c.result_json, c.type, c.barcode, c.sample_no, a.create_time, a.error_message
+            SELECT a.id, a.status, b.raw_message, c.result_json, c.type, c.barcode, c.sample_no, a.create_time, a.error_message
             FROM receive_message a
             INNER JOIN receive_message_large b ON a.id = b.receive_message_id
             LEFT JOIN receive_message_decode c ON a.id = c.receive_message_id
@@ -297,13 +297,14 @@ public class ReceiveMessageRepository : IReceiveMessageRepository
 
     private static ReceiveMessageView MapView(SqliteDataReader reader) => new()
     {
-        Status = (ReceiveMessage.StatusEnum)reader.GetByte(0),
-        RawMessage = reader.IsDBNull(1) ? [] : reader.GetFieldValue<byte[]>(1),
-        ResultJson = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),
-        Type = reader.IsDBNull(3) ? null : (ReceiveMessageDecode.TypeEnum)reader.GetByte(3),
-        Barcode = reader.IsDBNull(4) ? string.Empty : reader.GetString(4),
-        SampleNo = reader.IsDBNull(5) ? string.Empty : reader.GetString(5),
-        CreateTime = reader.GetInt64(6),
-        ErrorMessage = reader.GetString(7)
+        Id = reader.GetInt64(0),
+        Status = (ReceiveMessage.StatusEnum)reader.GetByte(1),
+        RawMessage = reader.IsDBNull(2) ? [] : reader.GetFieldValue<byte[]>(2),
+        ResultJson = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
+        Type = reader.IsDBNull(4) ? null : (ReceiveMessageDecode.TypeEnum)reader.GetByte(4),
+        Barcode = reader.IsDBNull(5) ? string.Empty : reader.GetString(5),
+        SampleNo = reader.IsDBNull(6) ? string.Empty : reader.GetString(6),
+        CreateTime = reader.GetInt64(7),
+        ErrorMessage = reader.GetString(8)
     };
 }

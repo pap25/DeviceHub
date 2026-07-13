@@ -7,6 +7,8 @@ namespace DeviceHub.Model.view
 {
     public class ReceiveMessageView
     {
+        public long Id { get; set; }
+
         public ReceiveMessage.StatusEnum Status { get; set; }
         public byte[] RawMessage { get; set; }
         public string ResultJson { get; set; }

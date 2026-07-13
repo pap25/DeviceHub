@@ -12,7 +12,7 @@ namespace DeviceHub.Win
         {
             BindEnumComboBox<ReceiveMessage.StatusEnum>(cboReceiveMessageStatus, true);
             BindEnumComboBox<ReceiveMessageDecode.TypeEnum>(cboReceiveMessageType, true);
-            cboReceiveMessageStatus.SelectedValue = ((int)ReceiveMessage.StatusEnum.Pending).ToString();
+            //cboReceiveMessageStatus.SelectedValue = ((int)ReceiveMessage.StatusEnum.Pending).ToString();
             //cboReceiveMessageType.SelectedValue = ((int)ReceiveMessageDecode.TypeEnum.TestResult).ToString();
             dtpReceiveMessageCreateTimeStart.Value = DateTime.Today;
             dtpReceiveMessageCreateTimeEnd.Value = DateTime.Today;

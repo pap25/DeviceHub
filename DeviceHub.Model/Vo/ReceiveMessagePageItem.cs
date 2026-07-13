@@ -5,6 +5,8 @@ namespace DeviceHub.Model.Vo;
 /// </summary>
 public class ReceiveMessagePageItem
 {
+    public long Id { get; set; }
+
     public string StatusName { get; set; }
 
     public string TypeName { get; set; }
