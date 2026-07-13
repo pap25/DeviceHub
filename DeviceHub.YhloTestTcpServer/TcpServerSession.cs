@@ -45,7 +45,10 @@ namespace DeviceHub.YhloTestTcpServer
                     Logger.Info(logType, $"TCP接收完整消息: {Encoding.UTF8.GetString(rawMessage)}");
 
                     receiveMessageService.Save(_instrumentId, rawMessage).GetAwaiter().GetResult();
+
                     // 回复ack MSA ACK时候必填
+                    transport.SendAsync(null).GetAwaiter().GetResult();
+
                     receiveTask.NotifyConsume();
                 }
             }
@@ -111,6 +114,11 @@ namespace DeviceHub.YhloTestTcpServer
         public string GetClientRemoteEndPoint()
         {
             return transport?.GetClientRemoteEndPoint() ?? string.Empty;
+        }
+
+        public async Task SendAsync(byte[] data)
+        {
+            await transport.SendAsync(data);
         }
 
         public void Stop()
