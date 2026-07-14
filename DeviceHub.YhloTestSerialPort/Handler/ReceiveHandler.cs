@@ -4,10 +4,9 @@ using DeviceHub.Lis.Impl;
 using DeviceHub.Model.Entities;
 using DeviceHub.Repository.Repositories;
 using DeviceHub.Service;
-using DeviceHub.YhloTestSerialPort.Protocol;
-using static DeviceHub.YhloTestSerialPort.Protocol.AstmMessageDecode;
+using DeviceHub.YhloTestV2SerialPort.Protocol;
 
-namespace DeviceHub.YhloTestSerialPort.Handler
+namespace DeviceHub.YhloTestV2SerialPort.Handler
 {
     public partial class ReceiveHandler : IBatchTaskHandler<ReceiveMessage>
     {
@@ -40,14 +39,14 @@ namespace DeviceHub.YhloTestSerialPort.Handler
                 long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                 if (receiveMessageLarge == null)
                 {
-                    MarkFailed(task.Id, "数据异常", now);
+                    MarkFailed(task.Id, "数据异常");
                     return;
                 }
 
                 AstmMessageVerify.VerifyParseResult parseResult = AstmMessageVerify.VerifyParse(receiveMessageLarge.RawMessage);
                 if (!parseResult.Success)
                 {
-                    MarkFailed(task.Id, parseResult.ErrorMessage, now);
+                    MarkFailed(task.Id, parseResult.ErrorMessage);
                     return;
                 }
 
@@ -55,18 +54,18 @@ namespace DeviceHub.YhloTestSerialPort.Handler
             }
             catch (Exception e)
             {
-                MarkFailed(task.Id, "HandleTask异常" + e.Message, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+                MarkFailed(task.Id, "HandleTask异常" + e.Message);
             }
         }
 
-        private void MarkFailed(long id, string errorMessage, long now)
+        private void MarkFailed(long id, string errorMessage)
         {
             receiveMessageRepository.UpdateStatusAndErrorMessageAndUpdateTimeById(
                 id,
                 ReceiveMessage.StatusEnum.Failed,
                 errorMessage,
-                now).GetAwaiter().GetResult();
-            Logger.Warn(logType, $"消息处理失败 id={id}: {errorMessage}");
+                DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()).GetAwaiter().GetResult();
+            Logger.Warn(logType, $"待解码消息处理失败 id={id}: {errorMessage}");
         }
 
         /// <summary>
@@ -74,19 +73,27 @@ namespace DeviceHub.YhloTestSerialPort.Handler
         /// </summary>
         private void ParseData(List<string> recordList, ReceiveMessage task)
         {
-            ParseResult parseResult = AstmMessageDecode.Parse(recordList);
+            AstmMessageDecode.ParseResult parseResult = AstmMessageDecode.Parse(recordList);
             if (parseResult.RequestInformationRecord != null)
             {
                 SaveSampleQuery(task, parseResult.RequestInformationRecord);
                 return;
             }
-            else
+
+            string processingId = parseResult.HeaderRecord.ProcessingId;
+            if (string.Equals(processingId, nameof(AstmMessageEntity.HeaderRecord.MessageType.QR), StringComparison.OrdinalIgnoreCase))
+            {
+                UploadQualityControlTestResult(task, parseResult);
+                return;
+            }
+
+            if (string.Equals(processingId, nameof(AstmMessageEntity.HeaderRecord.MessageType.PR), StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty(processingId))
             {
                 UploadSpecimenTestResult(task, parseResult);
                 return;
             }
 
-            //MarkFailed(task.Id, $"不支持消息类型 {parseResult.HeaderRecord.ProcessingId}", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+            MarkFailed(task.Id, $"不支持消息类型 {processingId}");
         }
     }
 }

@@ -1,6 +1,6 @@
-using static DeviceHub.YhloTestSerialPort.Protocol.AstmMessageEntity;
+using static DeviceHub.YhloTestV2SerialPort.Protocol.AstmMessageEntity;
 
-namespace DeviceHub.YhloTestSerialPort.Protocol;
+namespace DeviceHub.YhloTestV2SerialPort.Protocol;
 
 /// <summary>
 /// ASTM 应用层消息记录解析（H/P/O/R/C/Q/L）
@@ -82,10 +82,9 @@ public static class AstmMessageDecode
             CharacteristicsOfSender = GetField(fields, 9),
             ReceiverId = GetField(fields, 10),
             CharacterCodingSet = GetField(fields, 11),
-            CharacterSet = GetField(fields, 12),
-            ProcessingId = GetField(fields, 13),
-            VersionNumber = GetField(fields, 14),
-            DateAndTime = GetField(fields, 15)
+            ProcessingId = GetField(fields, 12),
+            VersionNumber = GetField(fields, 13),
+            DateAndTime = GetField(fields, 14)
         };
     }
 

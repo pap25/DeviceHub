@@ -23,7 +23,6 @@ namespace DeviceHub.Win
             }
 
             Application.Run(new DeviceStatus());
-            //Application.Run(new Form1());
         }
     }
 }

@@ -2,9 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using static DeviceHub.YhloTestSerialPort.Protocol.AstmMessageDecode;
+using static DeviceHub.YhloTestV2SerialPort.Protocol.AstmMessageDecode;
 
-namespace DeviceHub.YhloTestSerialPort.Protocol
+namespace DeviceHub.YhloTestV2SerialPort.Protocol
 {
     public class AstmMessageEncoder
     {

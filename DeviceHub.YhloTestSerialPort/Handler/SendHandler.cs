@@ -3,11 +3,10 @@ using DeviceHub.Lis.Dto;
 using DeviceHub.Model.Entities;
 using DeviceHub.Repository.Repositories;
 using DeviceHub.Service;
-using DeviceHub.YhloTestSerialPort.Protocol;
+using DeviceHub.YhloTestV2SerialPort.Protocol;
 using System.Text.Json;
-using static DeviceHub.YhloTestSerialPort.Driver;
 
-namespace DeviceHub.YhloTestSerialPort.Handler
+namespace DeviceHub.YhloTestV2SerialPort.Handler
 {
     public class SendHandler : ISenderTaskHandler
     {
@@ -94,7 +93,7 @@ namespace DeviceHub.YhloTestSerialPort.Handler
                 SendMessage.StatusEnum.Failed,
                 errorMessage,
                 DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()).GetAwaiter().GetResult();
-            Logger.Warn(logType, $"消息处理失败 id={id}: {errorMessage}");
+            Logger.Warn(logType, $"待发送消息处理失败 id={id}: {errorMessage}");
         }
 
         public void Completed(List<byte[]> sendFrameList)
