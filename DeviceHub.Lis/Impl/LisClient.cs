@@ -127,6 +127,16 @@ namespace DeviceHub.Lis.Impl
             return Task.FromResult(Resp<UploadSpecimenTestResultOutput>.Ok(new UploadSpecimenTestResultOutput { ResultId = resultId }));
         }
 
+        public Task<Resp<UploadQualityControlTestResultOutput>> UploadQualityControlTestResult(UploadQualityControlTestResultInput uploadQualityControlTestResultInput)
+        {
+            Logger.Debug(logType, $"准备上传质控结果 {JsonSerializer.Serialize(uploadQualityControlTestResultInput)}");
+
+            string resultId = Guid.NewGuid().ToString(); // 后续调用LIS接口替换，作为 external_no 回写
+
+            Logger.Debug(logType, $"已上传质控结果 resultId={resultId}");
+            return Task.FromResult(Resp<UploadQualityControlTestResultOutput>.Ok(new UploadQualityControlTestResultOutput { ResultId = resultId }));
+        }
+
         public async Task<GetSampleApplyItemOutput> GetSampleApplyItem(GetSampleApplyItemInput getSampleApplyItemInput)
         {
             // TODO 待实现

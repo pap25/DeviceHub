@@ -28,6 +28,9 @@ namespace DeviceHub.Lis
         // 上传检验结果
         Task<Resp<UploadSpecimenTestResultOutput>> UploadSpecimenTestResult(UploadSpecimenTestResultInput uploadSpecimenTestResultInput);
 
+        // 上传质控结果
+        Task<Resp<UploadQualityControlTestResultOutput>> UploadQualityControlTestResult(UploadQualityControlTestResultInput uploadQualityControlTestResultInput);
+
         // 查询样本信息
         Task<GetSampleApplyItemOutput> GetSampleApplyItem(GetSampleApplyItemInput getSampleApplyItemInput);
 
