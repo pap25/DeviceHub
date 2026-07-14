@@ -82,10 +82,9 @@ public static class AstmMessageDecode
             CharacteristicsOfSender = GetField(fields, 9),
             ReceiverId = GetField(fields, 10),
             CharacterCodingSet = GetField(fields, 11),
-            CharacterSet = GetField(fields, 12),
-            ProcessingId = GetField(fields, 13),
-            VersionNumber = GetField(fields, 14),
-            DateAndTime = GetField(fields, 15)
+            ProcessingId = GetField(fields, 12),
+            VersionNumber = GetField(fields, 13),
+            DateAndTime = GetField(fields, 14)
         };
     }
 

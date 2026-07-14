@@ -44,8 +44,6 @@ public class AstmMessageEntity
         public string ProcessingId { get; set; } = string.Empty;
         /// <summary>字段13，协议版本编号，固定为 1394-97</summary>
         public string VersionNumber { get; set; } = string.Empty;
-        /// <summary>字段12解析映射原始值（消息类型，同 ProcessingId）</summary>
-        public string CharacterSet { get; set; } = string.Empty;
         /// <summary>字段14，消息创建的日期和时间（格式 YYYYMMDDHHMMSS）</summary>
         public string DateAndTime { get; set; } = string.Empty;
 
@@ -148,7 +146,7 @@ public class AstmMessageEntity
         public string AssayNo { get; set; } = string.Empty;
         /// <summary>字段6，是否急诊（R-常规，S-STAT 测试）</summary>
         public string Priority { get; set; } = string.Empty;
-        /// <summary>字段7，样本申请时间（格式 YYYYMMDDHHMMSS）</summary>
+        /// <summary>字段7，样本：申请时间；质控：质控时间（格式 YYYYMMDDHHMMSS）</summary>
         public string RequestedDateTime { get; set; } = string.Empty;
         /// <summary>字段8，样本采集时间（格式 YYYYMMDDHHMMSS）</summary>
         public string SpecimenCollectionDateTime { get; set; } = string.Empty;
@@ -158,7 +156,7 @@ public class AstmMessageEntity
         public string CollectionVolume { get; set; } = string.Empty;
         /// <summary>字段11，采集者</summary>
         public string CollectedBy { get; set; } = string.Empty;
-        /// <summary>字段12，置空，保留</summary>
+        /// <summary>字段12，样本：置空；质控：质控液编号^名称^批号^有效期^均值^浓度水平^标准差^结果值（多液用\分隔）</summary>
         public string ActionCode { get; set; } = string.Empty;
         /// <summary>字段13，置空，保留</summary>
         public string DangerCode { get; set; } = string.Empty;

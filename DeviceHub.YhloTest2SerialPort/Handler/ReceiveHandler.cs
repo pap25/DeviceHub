@@ -80,13 +80,21 @@ namespace DeviceHub.YhloTestV2SerialPort.Handler
                 SaveSampleQuery(task, parseResult.RequestInformationRecord);
                 return;
             }
-            else
+
+            string processingId = parseResult.HeaderRecord.ProcessingId;
+            if (string.Equals(processingId, nameof(AstmMessageEntity.HeaderRecord.MessageType.QR), StringComparison.OrdinalIgnoreCase))
+            {
+                UploadQualityControlTestResult(task, parseResult);
+                return;
+            }
+
+            if (string.Equals(processingId, nameof(AstmMessageEntity.HeaderRecord.MessageType.PR), StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty(processingId))
             {
                 UploadSpecimenTestResult(task, parseResult);
                 return;
             }
 
-            //MarkFailed(task.Id, $"不支持消息类型 {parseResult.HeaderRecord.ProcessingId}", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+            MarkFailed(task.Id, $"不支持消息类型 {processingId}");
         }
     }
 }
