@@ -43,18 +43,44 @@ public class Hl7MessageEntity
     {
         /// <summary>字段1，OBR 序号</summary>
         public string SetId { get; set; } = string.Empty;
-        /// <summary>字段2，请求者医嘱号（样本条码号）</summary>
+        /// <summary>字段2，样本：条码号；质控：项目编号</summary>
         public string PlacerOrderNumber { get; set; } = string.Empty;
-        /// <summary>字段3，执行者医嘱号（样本编号）</summary>
+        /// <summary>字段3，样本：样本编号；质控：项目名称</summary>
         public string FillerOrderNumber { get; set; } = string.Empty;
         /// <summary>字段4，通用服务标识符（厂商名^型号）</summary>
         public string UniversalServiceId { get; set; } = string.Empty;
-        /// <summary>字段6，样本采集时间</summary>
+        /// <summary>字段6，样本采集时间（质控置空）</summary>
         public string RequestedDateTime { get; set; } = string.Empty;
-        /// <summary>字段7，检验时间</summary>
+        /// <summary>字段7，样本：检验时间；质控：质控时间</summary>
         public string ObservationDateTime { get; set; } = string.Empty;
-        /// <summary>字段15，样本类型</summary>
+        /// <summary>字段8，质控：结果追溯信息</summary>
+        public string ObservationEndDateTime { get; set; } = string.Empty;
+        /// <summary>字段9，样本：稀释倍数；质控：质控规则（0-Westguard，1-累积和，2-TWIN-PLOT）</summary>
+        public string CollectionVolume { get; set; } = string.Empty;
+        /// <summary>字段10，样本：样本位（架号^位号）；质控：置空保留</summary>
+        public string CollectorIdentifier { get; set; } = string.Empty;
+        /// <summary>字段11，质控：质控液个数</summary>
+        public string SpecimenActionCode { get; set; } = string.Empty;
+        /// <summary>字段12，质控：质控液编号（V1^V2^…）</summary>
+        public string DangerCode { get; set; } = string.Empty;
+        /// <summary>字段13，样本：临床诊断；质控：质控液名称（V1^V2^…）</summary>
+        public string RelevantClinicalInfo { get; set; } = string.Empty;
+        /// <summary>字段14，样本：送检时间；质控：质控液批号（V1^V2^…）</summary>
+        public string SpecimenReceivedDateTime { get; set; } = string.Empty;
+        /// <summary>字段15，样本：样本类型；质控：质控液有效期（V1^V2^…）</summary>
         public string SpecimenSource { get; set; } = string.Empty;
+        /// <summary>字段16，质控：测试模块（如 M1）</summary>
+        public string OrderingProvider { get; set; } = string.Empty;
+        /// <summary>字段17，质控：浓度水平（H/M/L，V1^V2^…）</summary>
+        public string OrderCallbackPhoneNumber { get; set; } = string.Empty;
+        /// <summary>字段18，质控：质控液均值（V1^V2^…）</summary>
+        public string PlacerField1 { get; set; } = string.Empty;
+        /// <summary>字段19，质控：质控液标准差（V1^V2^…）</summary>
+        public string PlacerField2 { get; set; } = string.Empty;
+        /// <summary>字段20，质控：测试结果值/浓度（V1^V2^…）</summary>
+        public string FillerField1 { get; set; } = string.Empty;
+        /// <summary>字段21，质控：质控条码号</summary>
+        public string QcBarCode { get; set; } = string.Empty;
     }
 
     public class ObxSegment

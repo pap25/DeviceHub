@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace DeviceHub.Lis.Dto;
 
-namespace DeviceHub.Lis.Dto
+public class UploadQualityControlTestResultOutput
 {
-    public class UploadQualityControlTestResultOutput
-    {
-        public string ResultId { get; set; }
-    }
+    public string ResultId { get; set; } = string.Empty;
 }

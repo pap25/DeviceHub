@@ -63,6 +63,105 @@ namespace DeviceHub.YhloTestTcpServer.Handler
             };
         }
 
+        public void UploadQualityControlTestResult(ReceiveMessage task, ParseResult parseResult)
+        {
+            ObrSegment? obrSegment = parseResult.FirstObrSegment;
+            if (obrSegment == null)
+            {
+                MarkFailed(task.Id, "数据异常没有OBR段");
+                return;
+            }
+
+            UploadQualityControlTestResultInput input = ToUploadQualityControlTestResultInput(obrSegment);
+            if (input.Items.Count == 0)
+            {
+                MarkFailed(task.Id, "数据异常没有质控结果");
+                return;
+            }
+
+            Resp<UploadQualityControlTestResultOutput> resp = lisClient.UploadQualityControlTestResult(input).GetAwaiter().GetResult();
+            if (!resp.IsSuccess())
+            {
+                MarkFailed(task.Id, resp.GetErrorMsg() ?? "");
+                return;
+            }
+
+            string resultId = resp.GetData().ResultId;
+            string barcode = input.Items.Select(i => i.QcBarcode).FirstOrDefault(b => !string.IsNullOrEmpty(b)) ?? input.ItemCode;
+            receiveMessageService.UpdateSuccessTestResult(task.Id, resultId, input.ItemCode, barcode, JsonSerializer.Serialize(input)).GetAwaiter();
+        }
+
+        private UploadQualityControlTestResultInput ToUploadQualityControlTestResultInput(ObrSegment obr)
+        {
+            string[] qcNos = SplitComponent(obr.DangerCode);
+            string[] qcNames = SplitComponent(obr.RelevantClinicalInfo);
+            string[] lotNos = SplitComponent(obr.SpecimenReceivedDateTime);
+            string[] expiryDates = SplitComponent(obr.SpecimenSource);
+            string[] levels = SplitComponent(obr.OrderCallbackPhoneNumber);
+            string[] means = SplitComponent(obr.PlacerField1);
+            string[] stdDevs = SplitComponent(obr.PlacerField2);
+            string[] resultValues = SplitComponent(obr.FillerField1);
+            string[] qcBarcodes = SplitComponent(obr.QcBarCode);
+
+            int count = 0;
+            if (int.TryParse(obr.SpecimenActionCode, out int qcCount) && qcCount > 0)
+                count = qcCount;
+
+            count = Math.Max(count, qcNos.Length);
+            count = Math.Max(count, qcNames.Length);
+            count = Math.Max(count, lotNos.Length);
+            count = Math.Max(count, expiryDates.Length);
+            count = Math.Max(count, levels.Length);
+            count = Math.Max(count, means.Length);
+            count = Math.Max(count, stdDevs.Length);
+            count = Math.Max(count, resultValues.Length);
+
+            var items = new List<QualityControlResultItem>(count);
+            for (int i = 0; i < count; i++)
+            {
+                items.Add(new QualityControlResultItem
+                {
+                    QcNo = GetComponent(qcNos, i),
+                    QcName = GetComponent(qcNames, i),
+                    LotNo = GetComponent(lotNos, i),
+                    ExpiryDate = GetComponent(expiryDates, i),
+                    Level = GetComponent(levels, i),
+                    Mean = GetComponent(means, i),
+                    StdDev = GetComponent(stdDevs, i),
+                    ResultValue = GetComponent(resultValues, i),
+                    QcBarcode = qcBarcodes.Length == 1
+                        ? qcBarcodes[0]
+                        : GetComponent(qcBarcodes, i)
+                });
+            }
+
+            return new UploadQualityControlTestResultInput
+            {
+                InstrumentId = _instrumentId,
+                ItemCode = obr.PlacerOrderNumber,
+                ItemName = obr.FillerOrderNumber,
+                TestTime = obr.ObservationDateTime,
+                QcRule = obr.CollectionVolume,
+                ModuleId = obr.OrderingProvider,
+                TraceabilityInfo = obr.ObservationEndDateTime,
+                Items = items
+            };
+        }
+
+        private static string[] SplitComponent(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return [];
+            return value.Split('^');
+        }
+
+        private static string GetComponent(string[] components, int index)
+        {
+            if (index < 0 || index >= components.Length)
+                return string.Empty;
+            return components[index];
+        }
+
         public void SaveSampleQuery(ReceiveMessage task, ParseResult parseResult)
         {
             string sampleNo = string.Empty;

@@ -86,7 +86,20 @@ public static class Hl7MessageDecode
         UniversalServiceId = GetField(fields, 4),
         RequestedDateTime = GetField(fields, 6),
         ObservationDateTime = GetField(fields, 7),
-        SpecimenSource = GetField(fields, 15)
+        ObservationEndDateTime = GetField(fields, 8),
+        CollectionVolume = GetField(fields, 9),
+        CollectorIdentifier = GetField(fields, 10),
+        SpecimenActionCode = GetField(fields, 11),
+        DangerCode = GetField(fields, 12),
+        RelevantClinicalInfo = GetField(fields, 13),
+        SpecimenReceivedDateTime = GetField(fields, 14),
+        SpecimenSource = GetField(fields, 15),
+        OrderingProvider = GetField(fields, 16),
+        OrderCallbackPhoneNumber = GetField(fields, 17),
+        PlacerField1 = GetField(fields, 18),
+        PlacerField2 = GetField(fields, 19),
+        FillerField1 = GetField(fields, 20),
+        QcBarCode = GetField(fields, 21)
     };
 
     private static ObxSegment ParseObxSegment(string[] fields) => new()

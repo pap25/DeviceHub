@@ -79,7 +79,7 @@ namespace DeviceHub.YhloTestTcpServer.Handler
             {
                 if (parseResult.IsQcResult)
                 {
-                    MarkFailed(task.Id, "暂不支持质控结果上传");
+                    UploadQualityControlTestResult(task, parseResult);
                     return;
                 }
 
