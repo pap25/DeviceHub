@@ -1,7 +1,7 @@
 ﻿using DeviceHub.Utils;
 using DeviceHub.Base.Constant;
 
-namespace DeviceHub.YhloTestSerialPort
+namespace DeviceHub.Template.Template.SerialPort
 {
     public class SerialPortSender
     {

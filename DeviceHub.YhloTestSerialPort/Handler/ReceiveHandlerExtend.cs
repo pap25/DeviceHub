@@ -2,10 +2,10 @@
 using DeviceHub.Lis.Dto;
 using DeviceHub.Model.Entities;
 using System.Text.Json;
-using static DeviceHub.YhloTestV2SerialPort.Protocol.AstmMessageDecode;
-using static DeviceHub.YhloTestV2SerialPort.Protocol.AstmMessageEntity;
+using static DeviceHub.YhloTestSerialPort.Protocol.AstmMessageDecode;
+using static DeviceHub.YhloTestSerialPort.Protocol.AstmMessageEntity;
 
-namespace DeviceHub.YhloTestV2SerialPort.Handler
+namespace DeviceHub.YhloTestSerialPort.Handler
 {
     public partial class ReceiveHandler
     {

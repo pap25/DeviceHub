@@ -3,21 +3,20 @@ using DeviceHub.Lis.Dto;
 using DeviceHub.Model.Entities;
 using DeviceHub.Repository.Repositories;
 using DeviceHub.Service;
-using DeviceHub.YhloTestSerialPort.Protocol;
 using System.Text.Json;
 
-namespace DeviceHub.YhloTestSerialPort.Handler
+namespace DeviceHub.Template.Template.SerialPort
 {
-    public class SendHandler : ISenderTaskHandler
+    public abstract class SerialPortSendHandler : ISenderTaskHandler
     {
-        private readonly string logType = nameof(SendHandler);
+        private readonly string logType = nameof(SerialPortSendHandler);
         private long _instrumentId;
         private readonly SendMessageRepository sendMessageRepository = SendMessageRepository.Instance;
         private readonly SendMessageLargeRepository sendMessageLargeRepository = SendMessageLargeRepository.Instance;
         private readonly SendMessageService sendMessageService = SendMessageService.Instance;
         private long sendMessageId;
 
-        public SendHandler(long instrumentId)
+        public SerialPortSendHandler(long instrumentId)
         {
             _instrumentId = instrumentId;
         }
@@ -59,7 +58,7 @@ namespace DeviceHub.YhloTestSerialPort.Handler
                             continue;
                         }
 
-                        return AstmMessageEncoder.EncoderRequestApplication(getSampleApplyItemOutput);
+                        return EncoderRequestApplication(getSampleApplyItemOutput);
                     }
                     else if (task.Type == SendMessage.TypeEnum.IssueApplication)
                     {
@@ -70,7 +69,7 @@ namespace DeviceHub.YhloTestSerialPort.Handler
                             continue;
                         }
 
-                        return AstmMessageEncoder.EncoderIssueApplication(getSampleApplyListOutput);
+                        return EncoderIssueApplication(getSampleApplyListOutput);
                     }
                     else
                     {
@@ -85,6 +84,10 @@ namespace DeviceHub.YhloTestSerialPort.Handler
                 }
             }
         }
+
+        public abstract List<byte[]> EncoderRequestApplication(GetSampleApplyItemOutput getSampleApplyItemOutput);
+
+        public abstract List<byte[]> EncoderIssueApplication(GetSampleApplyListOutput getSampleApplyListOutput);
 
         private void MarkFailed(long id, string errorMessage)
         {

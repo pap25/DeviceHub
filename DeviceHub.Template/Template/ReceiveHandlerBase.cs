@@ -2,7 +2,7 @@
 using DeviceHub.Model.Entities;
 using DeviceHub.Repository.Repositories;
 
-namespace DeviceHub.YhloTestTcpServer.Handler
+namespace DeviceHub.Template.Template
 {
     public abstract class ReceiveHandlerBase : IBatchTaskHandler<ReceiveMessage>
     {

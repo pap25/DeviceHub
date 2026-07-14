@@ -4,7 +4,7 @@ using DeviceHub.Base.Constant;
 using DeviceHub.Template.Transports;
 using System.IO.Ports;
 
-namespace DeviceHub.YhloTestSerialPort
+namespace DeviceHub.Template.Template.SerialPort
 {
     public class SerialPortSession : IDisposable
     {

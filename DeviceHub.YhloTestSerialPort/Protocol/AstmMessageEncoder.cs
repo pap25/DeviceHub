@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using static DeviceHub.YhloTestV2SerialPort.Protocol.AstmMessageDecode;
+using static DeviceHub.YhloTestSerialPort.Protocol.AstmMessageDecode;
 
 namespace DeviceHub.YhloTestV2SerialPort.Protocol
 {

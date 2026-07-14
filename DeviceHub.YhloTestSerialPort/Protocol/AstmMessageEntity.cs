@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace DeviceHub.YhloTestV2SerialPort.Protocol;
+namespace DeviceHub.YhloTestSerialPort.Protocol;
 
 /// <summary>
 /// ASTM 应用层消息记录实体（H/P/O/R/C/Q/L）
