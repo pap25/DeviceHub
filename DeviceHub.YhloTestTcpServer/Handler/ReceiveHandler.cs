@@ -5,7 +5,6 @@ using DeviceHub.Model.Entities;
 using DeviceHub.Repository.Repositories;
 using DeviceHub.Service;
 using DeviceHub.YhloTestTcpServer.Protocol;
-using static DeviceHub.YhloTestTcpServer.Protocol.Hl7MessageDecode;
 
 namespace DeviceHub.YhloTestTcpServer.Handler
 {
@@ -73,7 +72,7 @@ namespace DeviceHub.YhloTestTcpServer.Handler
                 return;
             }
 
-            ParseResult parseResult = Parse(verifyResult.SegmentList);
+            Hl7MessageDecode.ParseResult parseResult = Hl7MessageDecode.Parse(verifyResult.SegmentList);
             string messageType = parseResult.MshSegment.MessageType;
             if (messageType.StartsWith("ORU", StringComparison.OrdinalIgnoreCase))
             {

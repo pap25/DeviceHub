@@ -5,7 +5,6 @@ using DeviceHub.Model.Entities;
 using DeviceHub.Repository.Repositories;
 using DeviceHub.Service;
 using DeviceHub.YhloTestV2SerialPort.Protocol;
-using static DeviceHub.YhloTestV2SerialPort.Protocol.AstmMessageDecode;
 
 namespace DeviceHub.YhloTestV2SerialPort.Handler
 {
@@ -74,7 +73,7 @@ namespace DeviceHub.YhloTestV2SerialPort.Handler
         /// </summary>
         private void ParseData(List<string> recordList, ReceiveMessage task)
         {
-            ParseResult parseResult = AstmMessageDecode.Parse(recordList);
+            AstmMessageDecode.ParseResult parseResult = AstmMessageDecode.Parse(recordList);
             if (parseResult.RequestInformationRecord != null)
             {
                 SaveSampleQuery(task, parseResult.RequestInformationRecord);
