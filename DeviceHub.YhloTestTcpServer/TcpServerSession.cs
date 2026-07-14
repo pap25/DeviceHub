@@ -1,11 +1,13 @@
 ﻿using DeviceHub.Abstractions.Dto;
-using DeviceHub.Utils;
 using DeviceHub.Base.Constant;
 using DeviceHub.Base.Transports;
 using DeviceHub.Model.Entities;
 using DeviceHub.Service;
+using DeviceHub.Utils;
 using DeviceHub.YhloTestTcpServer.Handler;
+using DeviceHub.YhloTestTcpServer.Protocol;
 using System.Text;
+using static DeviceHub.YhloTestTcpServer.Protocol.Hl7MessageEntity;
 
 namespace DeviceHub.YhloTestTcpServer
 {
@@ -46,8 +48,8 @@ namespace DeviceHub.YhloTestTcpServer
 
                     receiveMessageService.Save(_instrumentId, rawMessage).GetAwaiter().GetResult();
 
-                    // 回复ack MSA ACK时候必填
-                    transport.SendAsync(null).GetAwaiter().GetResult();
+                    // 回复 ack：ORU→ACK^R01；QRY→QCK^Q02（MSA 必填）
+                    ReplyAck(rawMessage);
 
                     receiveTask.NotifyConsume();
                 }
@@ -57,6 +59,23 @@ namespace DeviceHub.YhloTestTcpServer
                 Logger.Error(logType, $"TCP接收数据处理异常: {Encoding.UTF8.GetString(data)}", ex);
                 buffer.Clear();
             }
+        }
+
+        private void ReplyAck(byte[] rawMessage)
+        {
+            MshSegment? msh = Hl7MessageDecode.ParseMsh(rawMessage);
+            if (msh is null)
+            {
+                Logger.Warn(logType, "无法构建ACK: 报文缺少MSH段");
+                return;
+            }
+
+            byte[]? ackMessage = Hl7MessageEncoder.EncoderAck(msh);
+            if (ackMessage is null)
+                return;
+
+            transport.SendAsync(ackMessage).GetAwaiter().GetResult();
+            Logger.Info(logType, $"TCP回复ACK: {Encoding.UTF8.GetString(ackMessage)}");
         }
 
         private bool TryExtractMessage(out List<byte> message)

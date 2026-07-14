@@ -1,3 +1,5 @@
+using DeviceHub.Base.Constant;
+using System.Text;
 using static DeviceHub.YhloTestTcpServer.Protocol.Hl7MessageEntity;
 
 namespace DeviceHub.YhloTestTcpServer.Protocol;
@@ -7,6 +9,40 @@ namespace DeviceHub.YhloTestTcpServer.Protocol;
 /// </summary>
 public static class Hl7MessageDecode
 {
+    /// <summary>
+    /// 仅解析报文中的 MSH 段（用于即时 ACK）。
+    /// </summary>
+    public static MshSegment? ParseMsh(byte[] rawMessage)
+    {
+        if (rawMessage is null || rawMessage.Length == 0)
+            return null;
+
+        int start = 0;
+        int end = rawMessage.Length;
+
+        if (rawMessage[start] == HL7Protocols.VT)
+            start++;
+
+        while (end > start && rawMessage[end - 1] is HL7Protocols.CR or HL7Protocols.EB)
+            end--;
+
+        if (end <= start)
+            return null;
+
+        string text = Encoding.UTF8.GetString(rawMessage, start, end - start);
+        foreach (string line in text.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries))
+        {
+            string segment = line.Trim();
+            if (!segment.StartsWith("MSH|", StringComparison.Ordinal))
+                continue;
+
+            string[] fields = segment.Split('|');
+            return fields.Length == 0 ? null : ParseMshSegment(fields);
+        }
+
+        return null;
+    }
+
     public static ParseResult Parse(List<string> segmentList)
     {
         var result = new ParseResult();
