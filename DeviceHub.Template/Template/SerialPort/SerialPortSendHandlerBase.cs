@@ -7,16 +7,16 @@ using System.Text.Json;
 
 namespace DeviceHub.Template.Template.SerialPort
 {
-    public abstract class SerialPortSendHandler : ISenderTaskHandler
+    public abstract class SerialPortSendHandlerBase : ISenderTaskHandler
     {
-        private readonly string logType = nameof(SerialPortSendHandler);
+        private readonly string logType = nameof(SerialPortSendHandlerBase);
         private long _instrumentId;
         private readonly SendMessageRepository sendMessageRepository = SendMessageRepository.Instance;
         private readonly SendMessageLargeRepository sendMessageLargeRepository = SendMessageLargeRepository.Instance;
         private readonly SendMessageService sendMessageService = SendMessageService.Instance;
         private long sendMessageId;
 
-        public SerialPortSendHandler(long instrumentId)
+        public SerialPortSendHandlerBase(long instrumentId)
         {
             _instrumentId = instrumentId;
         }
