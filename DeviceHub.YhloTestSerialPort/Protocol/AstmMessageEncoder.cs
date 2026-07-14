@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using static DeviceHub.YhloTestSerialPort.Protocol.AstmMessageDecode;
 
-namespace DeviceHub.YhloTestV2SerialPort.Protocol
+namespace DeviceHub.YhloTestSerialPort.Protocol
 {
     public class AstmMessageEncoder
     {

@@ -1,7 +1,7 @@
-using DeviceHub.Base.Constant;
+using DeviceHub.Template.Constant;
 using System.Text;
 
-namespace DeviceHub.YhloTestTcpServer.Protocol;
+namespace DeviceHub.Template.Protocol;
 
 /// <summary>
 /// HL7 MLLP 报文解析：&lt;VT&gt; segments &lt;EB&gt;&lt;CR&gt;

@@ -1,4 +1,4 @@
-using DeviceHub.Base.Constant;
+using DeviceHub.Template.Constant;
 using System;
 using System.Collections.Generic;
 using System.Text;

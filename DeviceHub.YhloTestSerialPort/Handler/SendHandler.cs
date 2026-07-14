@@ -3,8 +3,8 @@ using DeviceHub.Lis.Dto;
 using DeviceHub.Model.Entities;
 using DeviceHub.Repository.Repositories;
 using DeviceHub.Service;
-using DeviceHub.YhloTestSerialPort.Protocol;
 using System.Text.Json;
+using DeviceHub.YhloTestSerialPort.Protocol;
 
 namespace DeviceHub.YhloTestSerialPort.Handler
 {

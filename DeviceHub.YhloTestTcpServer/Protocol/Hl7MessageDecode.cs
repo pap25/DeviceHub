@@ -1,4 +1,4 @@
-using DeviceHub.Base.Constant;
+using DeviceHub.Template.Constant;
 using System.Text;
 using static DeviceHub.YhloTestTcpServer.Protocol.Hl7MessageEntity;
 

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DeviceHub.Base.Constant
+namespace DeviceHub.Template.Constant
 {
     /// <summary>
     /// ASTM 协议控制字符定义

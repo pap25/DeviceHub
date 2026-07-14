@@ -1,5 +1,5 @@
-﻿using DeviceHub.Base.Constant;
-using DeviceHub.Lis.Dto;
+﻿using DeviceHub.Lis.Dto;
+using DeviceHub.Template.Constant;
 using System.Text;
 using static DeviceHub.YhloTestTcpServer.Protocol.Hl7MessageEntity;
 

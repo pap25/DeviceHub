@@ -1,5 +1,5 @@
 ﻿using DeviceHub.Utils;
-using DeviceHub.Base.Constant;
+using DeviceHub.Template.Constant;
 using DeviceHub.Service;
 using System.Runtime.InteropServices;
 using System.Text;

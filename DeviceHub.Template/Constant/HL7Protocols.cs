@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DeviceHub.Base.Constant
+namespace DeviceHub.Template.Constant
 {
     public static class HL7Protocols
     {
