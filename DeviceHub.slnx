@@ -5,11 +5,11 @@
     <File Path="DeviceHub.Lis/通信服务与LIS对接.pdf" />
   </Folder>
   <Project Path="DeviceHub.Abstractions/DeviceHub.Abstractions.csproj" />
-  <Project Path="DeviceHub.Base/DeviceHub.Base.csproj" />
   <Project Path="DeviceHub.Lis/DeviceHub.Lis.csproj" />
   <Project Path="DeviceHub.Model/DeviceHub.Model.csproj" Id="cd633e08-4fb8-4282-9cde-49dc52fa0eb3" />
   <Project Path="DeviceHub.Repository/DeviceHub.Repository.csproj" Id="656c7673-edea-470b-980a-a514d1e42e98" />
   <Project Path="DeviceHub.Service/DeviceHub.Service.csproj" Id="c4104430-4ece-4859-9dcb-4e4907b0bd34" />
+  <Project Path="DeviceHub.Template/DeviceHub.Template.csproj" Id="73090144-c5b0-4488-b2ba-dc1195df39be" />
   <Project Path="DeviceHub.Utils/DeviceHub.Utils.csproj" Id="a86d2c58-7811-4151-9305-b2deb0f9779e" />
   <Project Path="DeviceHub.Win/DeviceHub.Win.csproj" />
   <Project Path="DeviceHub.YhloTestSerialPort/DeviceHub.YhloTestSerialPort.csproj" Id="6350b2fb-d53a-43f4-9b45-bc579a7f948e" />
