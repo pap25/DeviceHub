@@ -1,158 +1,29 @@
 ﻿using DeviceHub.Abstractions.Dto;
-using DeviceHub.Base.Constant;
-using DeviceHub.Model.Entities;
-using DeviceHub.Service;
-using DeviceHub.Template.Transports;
+using DeviceHub.Template.Template.Tcp;
 using DeviceHub.Utils;
 using DeviceHub.YhloTestTcpServer.Handler;
 using DeviceHub.YhloTestTcpServer.Protocol;
-using System.Text;
-using static DeviceHub.YhloTestTcpServer.Protocol.Hl7MessageEntity;
 
 namespace DeviceHub.YhloTestTcpServer
 {
-    public class TcpServerSession
+    public class TcpServerSession : TcpServerSessionBase
     {
         private readonly string logType = nameof(TcpServerSession);
-        private IConsumeTask receiveTask;
-        private readonly ReceiveMessageService receiveMessageService = ReceiveMessageService.Instance;
-        private long _instrumentId;
-
-        private TcpServerTransport transport;
-        private readonly List<byte> buffer = new();
-        public Task Start(long instrumentId, TcpConfig config)
+        public void Start(long instrumentId, TcpConfig config)
         {
-            _instrumentId = instrumentId;
-            transport = new(config.Host, config.Port);
-            transport.DataReceived += Transport_DataReceived;
-
-            receiveTask = new BatchConsumeTask<ReceiveMessage>(new ReceiveHandler(instrumentId));
-            receiveTask.StartConsume();
-
-            transport.StartListening();
-            return Task.CompletedTask;
+            base.Start(instrumentId, config, new ReceiveHandler(instrumentId));
         }
 
-        private void Transport_DataReceived(byte[] data)
+        public override byte[]? GetReplyAckMessage(byte[] rawMessage)
         {
-            try
-            {
-                Logger.Debug(logType, $"TCP接收消息: {Encoding.UTF8.GetString(data)}");
-
-                buffer.AddRange(data);
-
-                while (TryExtractMessage(out List<byte> message))
-                {
-                    byte[] rawMessage = message.ToArray();
-                    Logger.Info(logType, $"TCP接收完整消息: {Encoding.UTF8.GetString(rawMessage)}");
-
-                    receiveMessageService.Save(_instrumentId, rawMessage).GetAwaiter().GetResult();
-
-                    // 回复 ack：ORU→ACK^R01；QRY→QCK^Q02（MSA 必填）
-                    ReplyAck(rawMessage);
-
-                    receiveTask.NotifyConsume();
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(logType, $"TCP接收数据处理异常: {Encoding.UTF8.GetString(data)}", ex);
-                buffer.Clear();
-            }
-        }
-
-        private void ReplyAck(byte[] rawMessage)
-        {
-            MshSegment? msh = Hl7MessageDecode.ParseMsh(rawMessage);
+            Hl7MessageEntity.MshSegment? msh = Hl7MessageDecode.ParseMsh(rawMessage);
             if (msh is null)
             {
                 Logger.Warn(logType, "无法构建ACK: 报文缺少MSH段");
-                return;
+                return null;
             }
 
-            byte[]? ackMessage = Hl7MessageEncoder.EncoderAck(msh);
-            if (ackMessage is null)
-                return;
-
-            transport.SendAsync(ackMessage).GetAwaiter().GetResult();
-            Logger.Info(logType, $"TCP回复ACK: {Encoding.UTF8.GetString(ackMessage)}");
-        }
-
-        private bool TryExtractMessage(out List<byte> message)
-        {
-            message = new List<byte>(0);
-
-            int startIndex = IndexOfByte(HL7Protocols.VT);
-            if (startIndex < 0)
-            {
-                if (buffer.Count > Constants.FourMB)
-                {
-                    Logger.Error(logType, $"接收数据没VT异常: {Encoding.UTF8.GetString(buffer.ToArray(), buffer.Count - Constants.OneMB, Constants.OneMB)}");
-                    buffer.Clear();
-                }
-                return false; // 半包或垃圾前缀，继续等
-            }
-
-            if (startIndex > 0)
-                buffer.RemoveRange(0, startIndex); // 移除粘包前面数据
-
-            int endIndex = IndexOfByte(HL7Protocols.EB, 1);
-            if (endIndex < 0)
-            {
-                if (buffer.Count > Constants.FourMB)
-                {
-                    Logger.Error(logType, $"接收数据没EB异常: {Encoding.UTF8.GetString(buffer.ToArray(), buffer.Count - Constants.OneMB, Constants.OneMB)}");
-                    buffer.Clear();
-                }
-                return false;  // 半包，继续等
-            }
-
-            // 完整消息：VT + 正文 + EB
-            message = buffer.GetRange(0, endIndex + 1);
-
-            int consumed = endIndex + 1;
-            if (consumed < buffer.Count && buffer[consumed] == HL7Protocols.CR)
-                consumed++;
-
-            buffer.RemoveRange(0, consumed);
-
-            return true;
-        }
-
-        private int IndexOfByte(byte value, int startIndex = 0)
-        {
-            for (int i = startIndex; i < buffer.Count; i++)
-            {
-                if (buffer[i] == value)
-                    return i;
-            }
-
-            return -1;
-        }
-
-        public string GetClientRemoteEndPoint()
-        {
-            return transport?.GetClientRemoteEndPoint() ?? string.Empty;
-        }
-
-        public async Task SendAsync(byte[] data)
-        {
-            await transport.SendAsync(data);
-        }
-
-        public void Stop()
-        {
-            if (transport != null)
-            {
-                transport.DataReceived -= Transport_DataReceived;
-                transport.Stop();
-                transport = null;
-            }
-
-            receiveTask?.Shutdown();
-            buffer.Clear();
-
-            Logger.Info(logType, "TCP会话已停止");
+            return Hl7MessageEncoder.EncoderAck(msh);
         }
     }
 }

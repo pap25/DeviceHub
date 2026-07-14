@@ -7,15 +7,15 @@ using System.Text.Json;
 
 namespace DeviceHub.Template.Template
 {
-    public abstract class TcpSendHandlerBase : IBatchTaskHandler<SendMessage>
+    public abstract class SendHandlerBase : IBatchTaskHandler<SendMessage>
     {
-        private readonly string logType = nameof(TcpSendHandlerBase);
+        private readonly string logType = nameof(SendHandlerBase);
         private long _instrumentId;
         private readonly SendMessageRepository sendMessageRepository = SendMessageRepository.Instance;
         private readonly SendMessageLargeRepository sendMessageLargeRepository = SendMessageLargeRepository.Instance;
         private readonly SendMessageService sendMessageService = SendMessageService.Instance;
 
-        public TcpSendHandlerBase(long instrumentId)
+        public SendHandlerBase(long instrumentId)
         {
             this._instrumentId = instrumentId;
         }

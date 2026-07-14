@@ -1,96 +1,30 @@
 ﻿using DeviceHub.Lis.Dto;
-using DeviceHub.Model.Entities;
-using DeviceHub.Repository.Repositories;
-using DeviceHub.Service;
-using DeviceHub.Utils;
+using DeviceHub.Template.Template;
 using DeviceHub.YhloTestTcpServer.Protocol;
-using System.Text.Json;
 
 namespace DeviceHub.YhloTestTcpServer.Handler
 {
-    public class SendHandler : IBatchTaskHandler<SendMessage>
+    public class SendHandler : SendHandlerBase
     {
-        private readonly string logType = nameof(SendHandler);
-        private long _instrumentId;
         private TcpServerSession tcpServerSession;
-        private readonly SendMessageRepository sendMessageRepository = SendMessageRepository.Instance;
-        private readonly SendMessageLargeRepository sendMessageLargeRepository = SendMessageLargeRepository.Instance;
-        private readonly SendMessageService sendMessageService = SendMessageService.Instance;
 
-        public SendHandler(long instrumentId, TcpServerSession tcpServerSession)
+        public SendHandler(long instrumentId, TcpServerSession tcpServerSession) : base(instrumentId)
         {
-            this._instrumentId = instrumentId;
             this.tcpServerSession = tcpServerSession;
         }
 
-        public IEnumerable<SendMessage> SearchTask()
+        public override byte[] EncoderIssueApplicationSend(GetSampleApplyListOutput getSampleApplyListOutput)
         {
-            List<SendMessage> taskList = sendMessageRepository
-                .FindByInstrumentIdAndStatusOrderAsc(_instrumentId, SendMessage.StatusEnum.Pending, 15).GetAwaiter().GetResult();
-            if (taskList.Count > 0)
-                Logger.Debug(logType, $"查询待发送消息 {taskList.Count} 条");
-            return taskList;
-        }
-        public void HandleTask(SendMessage task)
-        {
-            try
-            {
-                SendMessageLarge? receiveMessageLarge = sendMessageLargeRepository.GetBySendMessageId(task.Id).GetAwaiter().GetResult();
-                if (receiveMessageLarge == null)
-                {
-                    MarkFailed(task.Id, "数据异常");
-                    return;
-                }
-
-                switch (task.Type)
-                {
-                    case SendMessage.TypeEnum.RequestApplication:
-                        GetSampleApplyItemOutput? getSampleApplyItemOutput = JsonSerializer.Deserialize<GetSampleApplyItemOutput>(receiveMessageLarge.SendJson);
-                        if (getSampleApplyItemOutput == null)
-                        {
-                            MarkFailed(task.Id, "数据异常");
-                            return;
-                        }
-
-                        byte[] rawMessage = Hl7MessageEncoder.EncoderRequestApplication(getSampleApplyItemOutput);
-                        tcpServerSession.SendAsync(rawMessage).GetAwaiter().GetResult();
-
-                        sendMessageService.UpdateSuccessRequestApplication(task.Id, rawMessage).GetAwaiter().GetResult();
-                        Logger.Debug(logType, $"待发送请求查询申请信息处理成功 id={task.Id}");
-                        break;
-                    case SendMessage.TypeEnum.IssueApplication:
-                        GetSampleApplyListOutput? getSampleApplyListOutput = JsonSerializer.Deserialize<GetSampleApplyListOutput>(receiveMessageLarge.SendJson);
-                        if (getSampleApplyListOutput == null)
-                        {
-                            MarkFailed(task.Id, "SendJson数据异常");
-                            return;
-                        }
-
-                        rawMessage = Hl7MessageEncoder.EncoderIssueApplication(getSampleApplyListOutput);
-                        tcpServerSession.SendAsync(rawMessage).GetAwaiter().GetResult();
-
-                        sendMessageService.UpdateSuccessRequestApplication(task.Id, rawMessage).GetAwaiter().GetResult();
-                        Logger.Debug(logType, $"待发送LIS下发申请信息处理成功 id={task.Id}");
-                        break;
-                    default:
-                        MarkFailed(task.Id, "不支持的类型 " + task.Type);
-                        break;
-                }
-            }
-            catch (Exception e)
-            {
-                MarkFailed(task.Id, "HandleTask异常" + e.Message);
-            }
+            byte[] rawMessage = Hl7MessageEncoder.EncoderIssueApplication(getSampleApplyListOutput);
+            tcpServerSession.SendAsync(rawMessage).GetAwaiter().GetResult();
+            return rawMessage;
         }
 
-        private void MarkFailed(long id, string errorMessage)
+        public override byte[] EncoderRequestApplicationSend(GetSampleApplyItemOutput getSampleApplyItemOutput)
         {
-            sendMessageRepository.UpdateStatusAndErrorMessageAndUpdateTimeById(
-                id,
-                SendMessage.StatusEnum.Failed,
-                errorMessage,
-                DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()).GetAwaiter().GetResult();
-            Logger.Warn(logType, $"待发送消息处理失败 id={id}: {errorMessage}");
+            byte[] rawMessage = Hl7MessageEncoder.EncoderRequestApplication(getSampleApplyItemOutput);
+            tcpServerSession.SendAsync(rawMessage).GetAwaiter().GetResult();
+            return rawMessage;
         }
     }
 }

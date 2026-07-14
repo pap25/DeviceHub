@@ -17,7 +17,7 @@ namespace DeviceHub.Template.Template.Tcp
 
         private TcpServerTransport transport;
         private readonly List<byte> buffer = new();
-        public Task Start(long instrumentId, TcpConfig config, IBatchTaskHandler<ReceiveMessage> receiveHandler)
+        public void Start(long instrumentId, TcpConfig config, IBatchTaskHandler<ReceiveMessage> receiveHandler)
         {
             _instrumentId = instrumentId;
             transport = new(config.Host, config.Port);
@@ -27,7 +27,6 @@ namespace DeviceHub.Template.Template.Tcp
             receiveTask.StartConsume();
 
             transport.StartListening();
-            return Task.CompletedTask;
         }
 
         private void Transport_DataReceived(byte[] data)

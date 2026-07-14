@@ -14,11 +14,13 @@ namespace DeviceHub.YhloTestTcpServer
             session = new TcpServerSession();
         }
 
-        public async Task Start(long instrumentId, TcpConfig config)
+        public Task Start(long instrumentId, TcpConfig config)
         {
-            await session.Start(instrumentId, config);
+            session.Start(instrumentId, config);
 
             Logger.Info(logType, $"设备驱动已启动 instrumentId={instrumentId}, host={config.Host}, port={config.Port}");
+
+            return Task.CompletedTask;
         }
 
         public void Stop()
