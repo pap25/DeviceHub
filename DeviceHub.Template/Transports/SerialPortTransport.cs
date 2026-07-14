@@ -2,7 +2,7 @@
 using System.IO.Ports;
 using System.Text;
 
-namespace DeviceHub.Base.Transports
+namespace DeviceHub.Template.Transports
 {
     public class SerialPortTransport : IDisposable
     {

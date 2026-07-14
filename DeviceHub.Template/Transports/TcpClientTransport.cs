@@ -2,7 +2,7 @@
 using System.Text;
 using System.Net.Sockets;
 
-namespace DeviceHub.Base.Transports
+namespace DeviceHub.Template.Transports
 {
     public class TcpClientTransport : IDisposable
     {

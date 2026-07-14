@@ -1,7 +1,7 @@
 ﻿using DeviceHub.Abstractions.Dto;
 using DeviceHub.Utils;
 using DeviceHub.Base.Constant;
-using DeviceHub.Base.Transports;
+using DeviceHub.Template.Transports;
 using System.IO.Ports;
 
 namespace DeviceHub.YhloTestV2SerialPort

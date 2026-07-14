@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
-namespace DeviceHub.Base.Transports
+namespace DeviceHub.Template.Transports
 {
     public class TcpServerTransport : IDisposable
     {
