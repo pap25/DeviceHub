@@ -19,7 +19,7 @@ namespace DeviceHub.YhloTestV2SerialPort.Handler
         {
             if (parseResult.TestOrderRecord == null)
             {
-                MarkFailed(task.Id, "数据异常没有订单记录", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+                MarkFailed(task.Id, "数据异常没有订单记录");
                 return;
             }
 
@@ -28,7 +28,7 @@ namespace DeviceHub.YhloTestV2SerialPort.Handler
             Resp<UploadSpecimenTestResultOutput> resp = lisClient.UploadSpecimenTestResult(uploadSpecimenTestResultInput).GetAwaiter().GetResult();
             if (!resp.IsSuccess())
             {
-                MarkFailed(task.Id, resp.GetErrorMsg() ?? "", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+                MarkFailed(task.Id, resp.GetErrorMsg() ?? "");
                 return;
             }
             string resultId = resp.GetData().ResultId;

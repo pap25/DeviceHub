@@ -14,13 +14,13 @@ namespace DeviceHub.YhloTestTcpServer.Handler
             ObrSegment? obrSegment = parseResult.FirstObrSegment;
             if (obrSegment == null)
             {
-                MarkFailed(task.Id, "数据异常没有OBR段", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+                MarkFailed(task.Id, "数据异常没有OBR段");
                 return;
             }
 
             if (parseResult.ObxSegmentList.Count == 0)
             {
-                MarkFailed(task.Id, "数据异常没有OBX段", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+                MarkFailed(task.Id, "数据异常没有OBX段");
                 return;
             }
 
@@ -28,7 +28,7 @@ namespace DeviceHub.YhloTestTcpServer.Handler
             Resp<UploadSpecimenTestResultOutput> resp = lisClient.UploadSpecimenTestResult(uploadSpecimenTestResultInput).GetAwaiter().GetResult();
             if (!resp.IsSuccess())
             {
-                MarkFailed(task.Id, resp.GetErrorMsg() ?? "", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+                MarkFailed(task.Id, resp.GetErrorMsg() ?? "");
                 return;
             }
 
@@ -88,7 +88,7 @@ namespace DeviceHub.YhloTestTcpServer.Handler
 
             if (string.IsNullOrEmpty(sampleNo) && string.IsNullOrEmpty(barcode))
             {
-                MarkFailed(task.Id, "数据异常没有样本信息", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+                MarkFailed(task.Id, "数据异常没有样本信息");
                 return;
             }
 

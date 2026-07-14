@@ -1,7 +1,5 @@
-﻿using DeviceHub.Abstractions.Dto;
-using DeviceHub.Utils;
+﻿using DeviceHub.Utils;
 using DeviceHub.Lis;
-using DeviceHub.Lis.Dto;
 using DeviceHub.Lis.Impl;
 using DeviceHub.Model.Entities;
 using DeviceHub.Repository.Repositories;
@@ -41,7 +39,7 @@ namespace DeviceHub.YhloTestTcpServer.Handler
                 ReceiveMessageLarge? receiveMessageLarge = receiveMessageLargeRepository.GetByReceiveMessageId(task.Id).GetAwaiter().GetResult();
                 if (receiveMessageLarge == null)
                 {
-                    MarkFailed(task.Id, "数据异常", DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+                    MarkFailed(task.Id, "数据异常");
                     return;
                 }
 
@@ -49,18 +47,18 @@ namespace DeviceHub.YhloTestTcpServer.Handler
             }
             catch (Exception e)
             {
-                MarkFailed(task.Id, "HandleTask异常" + e.Message, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+                MarkFailed(task.Id, "HandleTask异常" + e.Message);
             }
         }
 
-        private void MarkFailed(long id, string errorMessage, long now)
+        private void MarkFailed(long id, string errorMessage)
         {
             receiveMessageRepository.UpdateStatusAndErrorMessageAndUpdateTimeById(
                 id,
                 ReceiveMessage.StatusEnum.Failed,
                 errorMessage,
-                now).GetAwaiter().GetResult();
-            Logger.Warn(logType, $"消息处理失败 id={id}: {errorMessage}");
+                DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()).GetAwaiter().GetResult();
+            Logger.Warn(logType, $"待解码消息处理失败 id={id}: {errorMessage}");
         }
 
         /// <summary>
@@ -68,11 +66,10 @@ namespace DeviceHub.YhloTestTcpServer.Handler
         /// </summary>
         private void ParseData(byte[] rawMessage, ReceiveMessage task)
         {
-            long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             Hl7MessageVerify.VerifyParseResult verifyResult = Hl7MessageVerify.VerifyParse(rawMessage);
             if (!verifyResult.Success)
             {
-                MarkFailed(task.Id, verifyResult.ErrorMessage, now);
+                MarkFailed(task.Id, verifyResult.ErrorMessage);
                 return;
             }
 
@@ -82,7 +79,7 @@ namespace DeviceHub.YhloTestTcpServer.Handler
             {
                 if (parseResult.IsQcResult)
                 {
-                    MarkFailed(task.Id, "暂不支持质控结果上传", now);
+                    MarkFailed(task.Id, "暂不支持质控结果上传");
                     return;
                 }
 
@@ -96,7 +93,7 @@ namespace DeviceHub.YhloTestTcpServer.Handler
                 return;
             }
 
-            MarkFailed(task.Id, $"不支持消息类型 {messageType}", now);
+            MarkFailed(task.Id, $"不支持消息类型 {messageType}");
         }
     }
 }
