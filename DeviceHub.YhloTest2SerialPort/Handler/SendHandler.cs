@@ -93,7 +93,7 @@ namespace DeviceHub.YhloTestV2SerialPort.Handler
                 SendMessage.StatusEnum.Failed,
                 errorMessage,
                 DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()).GetAwaiter().GetResult();
-            Logger.Warn(logType, $"消息处理失败 id={id}: {errorMessage}");
+            Logger.Warn(logType, $"待发送消息处理失败 id={id}: {errorMessage}");
         }
 
         public void Completed(List<byte[]> sendFrameList)

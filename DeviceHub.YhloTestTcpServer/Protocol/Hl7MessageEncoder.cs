@@ -11,5 +11,10 @@ namespace DeviceHub.YhloTestTcpServer.Protocol
         {
             throw new NotImplementedException();
         }
+
+        public static byte[] EncoderIssueApplication(GetSampleApplyListOutput getSampleApplyListOutput)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
