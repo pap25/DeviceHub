@@ -2,6 +2,7 @@
 using DeviceHub.Lis.Impl;
 using DeviceHub.Model.Entities;
 using DeviceHub.Service;
+using DeviceHub.Template.Protocol;
 using DeviceHub.Template.Template;
 using DeviceHub.YhloTestSerialPort.Protocol;
 
