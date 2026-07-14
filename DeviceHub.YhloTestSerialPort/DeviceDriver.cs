@@ -3,6 +3,7 @@ using DeviceHub.Abstractions.Dto;
 using DeviceHub.Utils;
 using DeviceHub.Model.Entities;
 using DeviceHub.YhloTestSerialPort.Handler;
+using DeviceHub.Template.Template.SerialPort;
 
 namespace DeviceHub.YhloTestSerialPort
 {
