@@ -7,17 +7,17 @@ using DeviceHub.Repository.Repositories;
 using DeviceHub.Service;
 using System.Text.Json;
 
-namespace DeviceHub.YhloTestTcpServer.Handler
+namespace DeviceHub.YhloTestV2SerialPort.Handler
 {
-    public class LisIssueApplication : IBatchTaskHandler<GetSampleApplyListOutput>
+    public class LisIssueApplicationHandler : IBatchTaskHandler<GetSampleApplyListOutput>
     {
-        private readonly string logType = nameof(LisIssueApplication);
+        private readonly string logType = nameof(LisIssueApplicationHandler);
         private long _instrumentId;
         private readonly ILisClient lisClient = LisClient.Instance;
         private readonly SendMessageService sendMessageService = SendMessageService.Instance;
         private readonly DictionaryRepository dictionaryRepository = DictionaryRepository.Instance;
 
-        public LisIssueApplication(long instrumentId)
+        public LisIssueApplicationHandler(long instrumentId)
         {
             _instrumentId = instrumentId;
         }
@@ -44,7 +44,7 @@ namespace DeviceHub.YhloTestTcpServer.Handler
             }
             catch (Exception ex)
             {
-                Logger.Warn(logType, $"SearchTask异常 instrumentId={_instrumentId}: {ex.Message}");
+                Logger.Warn(logType, $"到LIS拉取下单申请异常 instrumentId={_instrumentId}: {ex.Message}");
                 return [];
             }
         }
@@ -57,7 +57,7 @@ namespace DeviceHub.YhloTestTcpServer.Handler
             }
             catch (Exception ex)
             {
-                Logger.Warn(logType, $"HandleTask异常 id={task.Id}: {ex.Message}");
+                Logger.Warn(logType, $"保存LIS拉取下单申请异常 id={task.Id}: {ex.Message}");
             }
         }
     }
