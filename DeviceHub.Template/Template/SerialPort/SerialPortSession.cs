@@ -40,8 +40,8 @@ namespace DeviceHub.Template.Template.SerialPort
             idleCheckTimer = new Timer(
                 CheckReceiveIdleTimeout,
                 null,
-                TimeSpan.FromSeconds(10),
-                TimeSpan.FromSeconds(10));
+                TimeSpan.FromSeconds(5),
+                TimeSpan.FromSeconds(5));
 
             await Task.Run(transport.Open);
         }
@@ -121,7 +121,14 @@ namespace DeviceHub.Template.Template.SerialPort
 
         public LineState GetLineStateUnlocked() => lineState;
 
-        public void SetLineStateUnlocked(LineState state) => lineState = state;
+        public void SetLineStateUnlocked(LineState state)
+        {
+            this.lineState = state;
+            if (state == LineState.WaitingAck)
+            {
+                lastReceiveTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            }
+        }
 
         private void CheckReceiveIdleTimeout(object? state)
         {
