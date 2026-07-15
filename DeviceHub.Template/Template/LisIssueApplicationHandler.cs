@@ -9,7 +9,7 @@ using System.Text.Json;
 
 namespace DeviceHub.Template.Template
 {
-    public class LisIssueApplicationHandler : IBatchTaskHandler<GetSampleApplyListOutput>
+    public class LisIssueApplicationHandler : IBatchTaskHandler<GetSampleApplyItemOutput>
     {
         private readonly string logType = nameof(LisIssueApplicationHandler);
         private long _instrumentId;
@@ -24,7 +24,7 @@ namespace DeviceHub.Template.Template
             this.sendHandlerTask = sendHandlerTask;
         }
 
-        public IEnumerable<GetSampleApplyListOutput> SearchTask()
+        public IEnumerable<GetSampleApplyItemOutput> SearchTask()
         {
             try
             {
@@ -39,7 +39,7 @@ namespace DeviceHub.Template.Template
                     dictionaryRepository.UpsertValue(DataDictionary.Keys.LisIssueApplicationLastId, "0").GetAwaiter().GetResult();
                 }
 
-                List<GetSampleApplyListOutput> list = lisClient.GetSampleApplyList(_instrumentId, lastId, 20).GetAwaiter().GetResult();
+                List<GetSampleApplyItemOutput> list = lisClient.GetSampleApplyList(_instrumentId, lastId, 20).GetAwaiter().GetResult();
                 if (list.Count > 0)
                     Logger.Debug(logType, $"LIS拉取下单申请条数:{list.Count}");
                 return list;
@@ -51,7 +51,7 @@ namespace DeviceHub.Template.Template
             }
         }
 
-        public void HandleTask(GetSampleApplyListOutput task)
+        public void HandleTask(GetSampleApplyItemOutput task)
         {
             try
             {

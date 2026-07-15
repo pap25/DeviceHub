@@ -55,14 +55,14 @@ namespace DeviceHub.Template.Template
                         Logger.Debug(logType, $"待发送请求查询申请信息处理成功 id={task.Id}");
                         break;
                     case SendMessage.TypeEnum.IssueApplication:
-                        GetSampleApplyListOutput? getSampleApplyListOutput = JsonSerializer.Deserialize<GetSampleApplyListOutput>(receiveMessageLarge.SendJson);
-                        if (getSampleApplyListOutput == null)
+                        getSampleApplyItemOutput = JsonSerializer.Deserialize<GetSampleApplyItemOutput>(receiveMessageLarge.SendJson);
+                        if (getSampleApplyItemOutput == null)
                         {
                             MarkFailed(task.Id, "SendJson数据异常");
                             return;
                         }
 
-                        rawMessage = EncoderIssueApplicationSend(getSampleApplyListOutput);
+                        rawMessage = EncoderIssueApplicationSend(getSampleApplyItemOutput);
 
                         sendMessageService.UpdateSuccessRequestApplication(task.Id, rawMessage).GetAwaiter().GetResult();
                         Logger.Debug(logType, $"待发送LIS下发申请信息处理成功 id={task.Id}");
@@ -80,7 +80,7 @@ namespace DeviceHub.Template.Template
 
         protected abstract byte[] EncoderRequestApplicationSend(GetSampleApplyItemOutput getSampleApplyItemOutput);
 
-        protected abstract byte[] EncoderIssueApplicationSend(GetSampleApplyListOutput getSampleApplyListOutput);
+        protected abstract byte[] EncoderIssueApplicationSend(GetSampleApplyItemOutput getSampleApplyListOutput);
 
         private void MarkFailed(long id, string errorMessage)
         {

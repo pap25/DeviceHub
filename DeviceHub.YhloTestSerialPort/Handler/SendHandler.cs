@@ -10,9 +10,9 @@ namespace DeviceHub.YhloTestSerialPort.Handler
         {
         }
 
-        protected override List<byte[]> EncoderIssueApplication(GetSampleApplyListOutput getSampleApplyListOutput)
+        protected override List<byte[]> EncoderIssueApplication(GetSampleApplyItemOutput getSampleApplyItemOutput)
         {
-            return AstmMessageEncoder.EncoderIssueApplication(getSampleApplyListOutput);
+            return AstmMessageEncoder.EncoderIssueApplication(getSampleApplyItemOutput);
         }
 
         protected override List<byte[]> EncoderRequestApplication(GetSampleApplyItemOutput getSampleApplyItemOutput)

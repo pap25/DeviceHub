@@ -93,10 +93,10 @@ namespace DeviceHub.YhloTestTcpServer.Protocol
         /// <summary>
         /// LIS 服务器主动下发样本申请信息到仪器（DSR^Q03，MSH-15=P）。
         /// </summary>
-        public static byte[] EncoderIssueApplication(GetSampleApplyListOutput getSampleApplyListOutput)
+        public static byte[] EncoderIssueApplication(GetSampleApplyItemOutput getSampleApplyItemOutput)
         {
-            ArgumentNullException.ThrowIfNull(getSampleApplyListOutput);
-            return EncodeDsr(getSampleApplyListOutput, isProactiveIssue: true);
+            ArgumentNullException.ThrowIfNull(getSampleApplyItemOutput);
+            return EncodeDsr(getSampleApplyItemOutput, isProactiveIssue: true);
         }
 
         /// <summary>
@@ -107,8 +107,8 @@ namespace DeviceHub.YhloTestTcpServer.Protocol
             string datetime = DateTime.Now.ToString("yyyyMMddHHmmss");
             string messageControlId = !string.IsNullOrEmpty(sample.MessageControlId)
                 ? sample.MessageControlId
-                : sample is GetSampleApplyListOutput list && list.Id > 0
-                    ? list.Id.ToString()
+                : sample.Id > 0
+                    ? sample.Id.ToString()
                     : "1";
             string characterSet = string.IsNullOrEmpty(sample.CharacterSet) ? "ASCII" : sample.CharacterSet;
             string deviceModel = sample.DeviceModel ?? string.Empty;

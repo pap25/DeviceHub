@@ -143,7 +143,7 @@ namespace DeviceHub.Lis.Impl
             return new GetSampleApplyItemOutput();
         }
 
-        public async Task<List<GetSampleApplyListOutput>> GetSampleApplyList(long instrumentId, long lastId, int pageSize)
+        public async Task<List<GetSampleApplyItemOutput>> GetSampleApplyList(long instrumentId, long lastId, int pageSize)
         {
             // TODO 待实现
             return [];

@@ -1,11 +1,15 @@
 ﻿namespace DeviceHub.Lis.Dto;
 
 /// <summary>
-/// 仪器查询样本申请信息的 LIS 返回（编码为 DSR^Q03，MSH-15 非 P）。
+/// 样本申请信息的 LIS 返回（编码为 DSR^Q03）。
+/// 仪器查询时 MSH-15 非 P；LIS 主动下发时 MSH-15=P，并带 Id 作为拉取游标。
 /// DSP Data Line 字段顺序见《YHLO LIS接口手册》DSP 段说明。
 /// </summary>
 public class GetSampleApplyItemOutput
 {
+    /// <summary>LIS 侧申请记录 ID（用于主动下发拉取游标）</summary>
+    public long Id { get; set; }
+
     /// <summary>MSH-10 / MSA-2，对应原查询消息控制 ID</summary>
     public string MessageControlId { get; set; } = string.Empty;
 

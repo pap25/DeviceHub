@@ -35,7 +35,7 @@ namespace DeviceHub.Lis
         Task<GetSampleApplyItemOutput> GetSampleApplyItem(GetSampleApplyItemInput getSampleApplyItemInput);
 
         // 下载申请单
-        Task<List<GetSampleApplyListOutput>> GetSampleApplyList(long instrumentId, long lastId, int pageSize);
+        Task<List<GetSampleApplyItemOutput>> GetSampleApplyList(long instrumentId, long lastId, int pageSize);
 
         //// 上传设备状态
         //Task UploadDeviceStatusAsync(DeviceStatus status);

@@ -13,9 +13,9 @@ namespace DeviceHub.YhloTestTcpServer.Handler
             this.tcpServerSession = tcpServerSession;
         }
 
-        protected override byte[] EncoderIssueApplicationSend(GetSampleApplyListOutput getSampleApplyListOutput)
+        protected override byte[] EncoderIssueApplicationSend(GetSampleApplyItemOutput getSampleApplyItemOutput)
         {
-            byte[] rawMessage = Hl7MessageEncoder.EncoderIssueApplication(getSampleApplyListOutput);
+            byte[] rawMessage = Hl7MessageEncoder.EncoderIssueApplication(getSampleApplyItemOutput);
             tcpServerSession.SendAsync(rawMessage).GetAwaiter().GetResult();
             return rawMessage;
         }

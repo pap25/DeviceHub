@@ -16,7 +16,7 @@ namespace DeviceHub.YhloTestSerialPort.Protocol
         }
 
         // LIS下发申请信息
-        public static List<byte[]> EncoderIssueApplication(GetSampleApplyListOutput getSampleApplyListOutput)
+        public static List<byte[]> EncoderIssueApplication(GetSampleApplyItemOutput sampleApplyItem)
         {
             // SampleQuery TestResult
             return [];

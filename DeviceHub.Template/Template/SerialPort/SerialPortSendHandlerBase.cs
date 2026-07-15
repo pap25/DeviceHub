@@ -62,14 +62,14 @@ namespace DeviceHub.Template.Template.SerialPort
                     }
                     else if (task.Type == SendMessage.TypeEnum.IssueApplication)
                     {
-                        GetSampleApplyListOutput? getSampleApplyListOutput = JsonSerializer.Deserialize<GetSampleApplyListOutput>(receiveMessageLarge.SendJson);
-                        if (getSampleApplyListOutput == null)
+                        GetSampleApplyItemOutput? getSampleApplyItemOutput = JsonSerializer.Deserialize<GetSampleApplyItemOutput>(receiveMessageLarge.SendJson);
+                        if (getSampleApplyItemOutput == null)
                         {
                             MarkFailed(task.Id, "SendJson数据异常");
                             continue;
                         }
 
-                        return EncoderIssueApplication(getSampleApplyListOutput);
+                        return EncoderIssueApplication(getSampleApplyItemOutput);
                     }
                     else
                     {
@@ -87,7 +87,7 @@ namespace DeviceHub.Template.Template.SerialPort
 
         protected abstract List<byte[]> EncoderRequestApplication(GetSampleApplyItemOutput getSampleApplyItemOutput);
 
-        protected abstract List<byte[]> EncoderIssueApplication(GetSampleApplyListOutput getSampleApplyListOutput);
+        protected abstract List<byte[]> EncoderIssueApplication(GetSampleApplyItemOutput getSampleApplyItemOutput);
 
         private void MarkFailed(long id, string errorMessage)
         {

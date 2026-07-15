@@ -30,7 +30,7 @@ namespace DeviceHub.YhloTestTcpServer
 
             receiveHandler.SendTask = sendTask;
 
-            lisIssueApplicationTask = new BatchConsumeTask<GetSampleApplyListOutput>(new LisIssueApplicationHandler(instrumentId, sendTask));
+            lisIssueApplicationTask = new BatchConsumeTask<GetSampleApplyItemOutput>(new LisIssueApplicationHandler(instrumentId, sendTask));
             lisIssueApplicationTask.StartConsume();
 
             Logger.Info(logType, $"设备驱动已启动 instrumentId={instrumentId}, host={config.Host}, port={config.Port}");
