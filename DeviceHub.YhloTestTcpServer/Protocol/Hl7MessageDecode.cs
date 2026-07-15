@@ -79,10 +79,13 @@ public static class Hl7MessageDecode
                 result.PidSegment = ParsePidSegment(fields);
                 break;
             case "OBR":
+                // OBR 可重复；其后 OBX 挂到当前（最后一个）OBR 下
                 result.ObrSegmentList.Add(ParseObrSegment(fields));
                 break;
             case "OBX":
-                result.ObxSegmentList.Add(ParseObxSegment(fields));
+                if (result.ObrSegmentList.Count == 0)
+                    break;
+                result.ObrSegmentList[^1].ObxSegmentList.Add(ParseObxSegment(fields));
                 break;
             case "QRD":
                 result.QrdSegment = ParseQrdSegment(fields);
@@ -187,12 +190,17 @@ public static class Hl7MessageDecode
     {
         public MshSegment MshSegment { get; set; } = new();
         public PidSegment? PidSegment { get; set; }
+
+        /// <summary>检验申请/检验组列表（OBR 可重复，每个下挂各自的 OBX）</summary>
         public List<ObrSegment> ObrSegmentList { get; set; } = [];
-        public List<ObxSegment> ObxSegmentList { get; set; } = [];
+
         public QrdSegment? QrdSegment { get; set; }
         public QrfSegment? QrfSegment { get; set; }
 
-        public ObrSegment? FirstObrSegment => ObrSegmentList.Count > 0 ? ObrSegmentList[0] : null;
+        //public ObrSegment? FirstObrSegment => ObrSegmentList.Count > 0 ? ObrSegmentList[0] : null;
+
+        /// <summary>所有 OBR 下的 OBX（扁平视图）</summary>
+        public IEnumerable<ObxSegment> AllObxSegments => ObrSegmentList.SelectMany(obr => obr.ObxSegmentList);
 
         public bool IsQcResult => MshSegment.ApplicationAcknowledgmentType == "2";
     }

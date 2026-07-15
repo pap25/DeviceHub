@@ -11,84 +11,129 @@ namespace DeviceHub.YhloTestTcpServer.Handler
     {
         public void UploadSpecimenTestResult(ReceiveMessage task, ParseResult parseResult)
         {
-            ObrSegment? obrSegment = parseResult.FirstObrSegment;
-            if (obrSegment == null)
+            if (parseResult.ObrSegmentList.Count == 0)
             {
                 MarkFailed(task.Id, "数据异常没有OBR段");
                 return;
             }
 
-            if (parseResult.ObxSegmentList.Count == 0)
+            if (!parseResult.AllObxSegments.Any())
             {
                 MarkFailed(task.Id, "数据异常没有OBX段");
                 return;
             }
 
-            UploadSpecimenTestResultInput uploadSpecimenTestResultInput = ToUploadSpecimenTestResultInput(parseResult);
-            Resp<UploadSpecimenTestResultOutput> resp = lisClient.UploadSpecimenTestResult(uploadSpecimenTestResultInput).GetAwaiter().GetResult();
-            if (!resp.IsSuccess())
+            // 每个 OBR 组（含其下 OBX）按样本分别上传；同条码的 OBR 结果合并为一次上传
+            var groups = parseResult.ObrSegmentList
+                .Where(obr => obr.ObxSegmentList.Count > 0)
+                .GroupBy(obr =>
+                {
+                    string sampleNo = obr.FillerOrderNumber;
+                    string barcode = string.IsNullOrEmpty(obr.PlacerOrderNumber) ? sampleNo : obr.PlacerOrderNumber;
+                    return $"{sampleNo}\0{barcode}";
+                });
+
+            var resultIdList = new List<string>();
+            var sampleNoList = new List<string>();
+            var barcodeList = new List<string>();
+            var inputList = new List<UploadSpecimenTestResultInput>();
+
+            foreach (var group in groups)
             {
-                MarkFailed(task.Id, resp.GetErrorMsg() ?? "");
-                return;
+                UploadSpecimenTestResultInput input = ToUploadSpecimenTestResultInput(group.ToList());
+                Resp<UploadSpecimenTestResultOutput> resp = lisClient.UploadSpecimenTestResult(input).GetAwaiter().GetResult();
+                if (!resp.IsSuccess())
+                {
+                    MarkFailed(task.Id, resp.GetErrorMsg() ?? "");
+                    return;
+                }
+
+                resultIdList.Add(resp.GetData().ResultId);
+                sampleNoList.Add(input.SampleNo);
+                barcodeList.Add(input.Barcode);
+                inputList.Add(input);
             }
 
-            string resultId = resp.GetData().ResultId;
-            receiveMessageService.UpdateSuccessTestResult(task.Id, resultId, uploadSpecimenTestResultInput.SampleNo,
-                uploadSpecimenTestResultInput.Barcode, JsonSerializer.Serialize(uploadSpecimenTestResultInput)).GetAwaiter();
+            receiveMessageService.UpdateSuccessTestResult(
+                task.Id,
+                string.Join(",", resultIdList),
+                string.Join(",", sampleNoList),
+                string.Join(",", barcodeList),
+                JsonSerializer.Serialize(inputList)).GetAwaiter();
         }
 
-        private UploadSpecimenTestResultInput ToUploadSpecimenTestResultInput(ParseResult parseResult)
+        private UploadSpecimenTestResultInput ToUploadSpecimenTestResultInput(List<ObrSegment> obrGroup)
         {
-            ObrSegment obrSegment = parseResult.FirstObrSegment!;
-            string sampleNo = obrSegment.FillerOrderNumber;
-            string barcode = string.IsNullOrEmpty(obrSegment.PlacerOrderNumber)
+            ObrSegment first = obrGroup[0];
+            string sampleNo = first.FillerOrderNumber;
+            string barcode = string.IsNullOrEmpty(first.PlacerOrderNumber)
                 ? sampleNo
-                : obrSegment.PlacerOrderNumber;
-            string defaultTestTime = obrSegment.ObservationDateTime;
+                : first.PlacerOrderNumber;
+
+            var items = new List<TestResultItem>();
+            foreach (ObrSegment obr in obrGroup)
+            {
+                string defaultTestTime = obr.ObservationDateTime;
+                foreach (ObxSegment obx in obr.ObxSegmentList)
+                {
+                    items.Add(new TestResultItem
+                    {
+                        ItemCode = obx.ObservationIdentifier,
+                        ItemName = obx.ObservationSubId,
+                        ResultValue = string.IsNullOrEmpty(obx.ObservationValue) ? obx.Probability : obx.ObservationValue,
+                        Unit = obx.Units,
+                        AbnormalFlag = obx.AbnormalFlags,
+                        TestTime = string.IsNullOrEmpty(obx.ObservationDateTime) ? defaultTestTime : obx.ObservationDateTime
+                    });
+                }
+            }
 
             return new UploadSpecimenTestResultInput
             {
                 InstrumentId = _instrumentId,
                 SampleNo = sampleNo,
                 Barcode = barcode,
-                Items = parseResult.ObxSegmentList.Select(obx => new TestResultItem
-                {
-                    ItemCode = obx.ObservationIdentifier,
-                    ItemName = obx.ObservationSubId,
-                    ResultValue = string.IsNullOrEmpty(obx.ObservationValue) ? obx.Probability : obx.ObservationValue,
-                    Unit = obx.Units,
-                    AbnormalFlag = obx.AbnormalFlags,
-                    TestTime = string.IsNullOrEmpty(obx.ObservationDateTime) ? defaultTestTime : obx.ObservationDateTime
-                }).ToList()
+                Items = items
             };
         }
 
         public void UploadQualityControlTestResult(ReceiveMessage task, ParseResult parseResult)
         {
-            ObrSegment? obrSegment = parseResult.FirstObrSegment;
-            if (obrSegment == null)
+            if (parseResult.ObrSegmentList.Count == 0)
             {
                 MarkFailed(task.Id, "数据异常没有OBR段");
                 return;
             }
 
-            UploadQualityControlTestResultInput input = ToUploadQualityControlTestResultInput(obrSegment);
-            if (input.Items.Count == 0)
+            // 质控：每个 OBR 对应一个检验项目，消息中可有多个 OBR
+            string? lastResultId = null;
+            UploadQualityControlTestResultInput? lastInput = null;
+
+            foreach (ObrSegment obr in parseResult.ObrSegmentList)
+            {
+                UploadQualityControlTestResultInput input = ToUploadQualityControlTestResultInput(obr);
+                if (input.Items.Count == 0)
+                    continue;
+
+                Resp<UploadQualityControlTestResultOutput> resp = lisClient.UploadQualityControlTestResult(input).GetAwaiter().GetResult();
+                if (!resp.IsSuccess())
+                {
+                    MarkFailed(task.Id, resp.GetErrorMsg() ?? "");
+                    return;
+                }
+
+                lastResultId = resp.GetData().ResultId;
+                lastInput = input;
+            }
+
+            if (lastInput == null)
             {
                 MarkFailed(task.Id, "数据异常没有质控结果");
                 return;
             }
 
-            Resp<UploadQualityControlTestResultOutput> resp = lisClient.UploadQualityControlTestResult(input).GetAwaiter().GetResult();
-            if (!resp.IsSuccess())
-            {
-                MarkFailed(task.Id, resp.GetErrorMsg() ?? "");
-                return;
-            }
-
-            string resultId = resp.GetData().ResultId;
-            string barcode = input.Items.Select(i => i.QcBarcode).FirstOrDefault(b => !string.IsNullOrEmpty(b)) ?? input.ItemCode;
-            receiveMessageService.UpdateSuccessTestResult(task.Id, resultId, input.ItemCode, barcode, JsonSerializer.Serialize(input)).GetAwaiter();
+            string barcode = lastInput.Items.Select(i => i.QcBarcode).FirstOrDefault(b => !string.IsNullOrEmpty(b)) ?? lastInput.ItemCode;
+            receiveMessageService.UpdateSuccessTestResult(task.Id, lastResultId!, lastInput.ItemCode, barcode, JsonSerializer.Serialize(lastInput)).GetAwaiter();
         }
 
         private UploadQualityControlTestResultInput ToUploadQualityControlTestResultInput(ObrSegment obr)

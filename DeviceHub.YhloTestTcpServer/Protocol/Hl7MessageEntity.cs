@@ -1,7 +1,8 @@
 namespace DeviceHub.YhloTestTcpServer.Protocol;
 
 /// <summary>
-/// HL7 应用层消息段实体（MSH/PID/OBR/OBX/QRD/QRF）
+/// HL7 应用层消息段实体（MSH/PID/OBR/OBX/QRD/QRF）。
+/// 标准结构：1 MSH + 1 PID + 多个 OBR，每个 OBR 下可有多个 OBX。
 /// </summary>
 public class Hl7MessageEntity
 {
@@ -39,6 +40,9 @@ public class Hl7MessageEntity
         public string Sex { get; set; } = string.Empty;
     }
 
+    /// <summary>
+    /// 检验申请/检验组。消息中可重复；其后连续的 OBX 归属于本段。
+    /// </summary>
     public class ObrSegment
     {
         /// <summary>字段1，OBR 序号</summary>
@@ -81,6 +85,9 @@ public class Hl7MessageEntity
         public string FillerField1 { get; set; } = string.Empty;
         /// <summary>字段21，质控：质控条码号</summary>
         public string QcBarCode { get; set; } = string.Empty;
+
+        /// <summary>本 OBR 下的检验结果段（可多个）</summary>
+        public List<ObxSegment> ObxSegmentList { get; set; } = [];
     }
 
     public class ObxSegment
