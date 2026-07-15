@@ -11,7 +11,7 @@ namespace DeviceHub.Template.Template.Tcp
     public abstract class TcpServerSessionBase
     {
         private readonly string logType = nameof(TcpServerSessionBase);
-        private IConsumeTask receiveTask;
+        private IConsumeTask? receiveTask;
         private readonly ReceiveMessageService receiveMessageService = ReceiveMessageService.Instance;
         private long _instrumentId;
 
@@ -19,14 +19,14 @@ namespace DeviceHub.Template.Template.Tcp
         private readonly List<byte> buffer = new();
         public void Start(long instrumentId, TcpConfig config, IBatchTaskHandler<ReceiveMessage> receiveHandler)
         {
-            _instrumentId = instrumentId;
-            transport = new(config.Host, config.Port);
-            transport.DataReceived += Transport_DataReceived;
+            this._instrumentId = instrumentId;
+            this.transport = new(config.Host, config.Port);
+            this.transport.DataReceived += Transport_DataReceived;
 
-            receiveTask = new BatchConsumeTask<ReceiveMessage>(receiveHandler);
-            receiveTask.StartConsume();
+            this.receiveTask = new BatchConsumeTask<ReceiveMessage>(receiveHandler);
+            this.receiveTask.StartConsume();
 
-            transport.StartListening();
+            this.transport.StartListening();
         }
 
         private void Transport_DataReceived(byte[] data)
@@ -47,7 +47,7 @@ namespace DeviceHub.Template.Template.Tcp
                     // 回复 ACK
                     ReplyAck(rawMessage);
 
-                    receiveTask.NotifyConsume();
+                    receiveTask?.NotifyConsume();
                 }
             }
             catch (Exception ex)

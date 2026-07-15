@@ -6,6 +6,8 @@ namespace DeviceHub.Abstractions
     {
         Task Start(long instrumentId, TcpConfig tcpConfig);
 
+        void NotifyLisIssueApplication();
+
         string GetClientRemoteEndPoint();
         void Stop();
     }

@@ -5,7 +5,6 @@ using DeviceHub.Lis.Dto;
 using DeviceHub.Lis.Impl;
 using DeviceHub.Utils;
 using DeviceHub.Win.Base;
-using DeviceHub.YhloTestV2SerialPort.Handler;
 
 namespace DeviceHub.Win
 {
@@ -17,7 +16,6 @@ namespace DeviceHub.Win
         private bool _isError = false;
         private ITcpDeviceDriver? tcpDeviceDriver = null;
         private ISerialDeviceDriver? serialDeviceDriver = null;
-        private IConsumeTask lisIssueApplicationHandler = null!;
 
         public DeviceStatus()
         {
@@ -79,9 +77,6 @@ namespace DeviceHub.Win
                 MessageBox.Show($"启动失败！请检查DLL、网络环境、端口是否被占用然后重启: {ex.Message}");
                 return;
             }
-
-            lisIssueApplicationHandler = new BatchConsumeTask<GetSampleApplyListOutput>(new LisIssueApplicationHandler(_instrumentId));
-            lisIssueApplicationHandler.StartConsume();
         }
 
         private async void TabControl1_SelectedIndexChanged(object? sender, EventArgs e)

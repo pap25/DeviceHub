@@ -4,6 +4,7 @@ using DeviceHub.Model.Entities;
 using DeviceHub.Service;
 using DeviceHub.Template.Protocol;
 using DeviceHub.Template.Template;
+using DeviceHub.Utils;
 using DeviceHub.YhloTestTcpServer.Protocol;
 
 namespace DeviceHub.YhloTestTcpServer.Handler
@@ -13,6 +14,14 @@ namespace DeviceHub.YhloTestTcpServer.Handler
         private long _instrumentId;
         private readonly ReceiveMessageService receiveMessageService = ReceiveMessageService.Instance;
         private readonly ILisClient lisClient = LisClient.Instance;
+        private IConsumeTask? sendTask;
+        public IConsumeTask SendTask
+        {
+            set
+            {
+                this.sendTask = value;
+            }
+        }
 
         public ReceiveHandler(long instrumentId) : base(instrumentId)
         {
@@ -45,6 +54,7 @@ namespace DeviceHub.YhloTestTcpServer.Handler
             if (messageType.StartsWith("QRY", StringComparison.OrdinalIgnoreCase))
             {
                 SaveSampleQuery(task, parseResult);
+                this.sendTask?.NotifyConsume();
                 return;
             }
 

@@ -1,7 +1,5 @@
-﻿using DeviceHub.Abstractions.Dto;
-using DeviceHub.Template.Template.Tcp;
+﻿using DeviceHub.Template.Template.Tcp;
 using DeviceHub.Utils;
-using DeviceHub.YhloTestTcpServer.Handler;
 using DeviceHub.YhloTestTcpServer.Protocol;
 
 namespace DeviceHub.YhloTestTcpServer
@@ -9,10 +7,6 @@ namespace DeviceHub.YhloTestTcpServer
     public class TcpServerSession : TcpServerSessionBase
     {
         private readonly string logType = nameof(TcpServerSession);
-        public void Start(long instrumentId, TcpConfig config)
-        {
-            base.Start(instrumentId, config, new ReceiveHandler(instrumentId));
-        }
 
         protected override byte[]? GetReplyAckMessage(byte[] rawMessage)
         {
