@@ -34,6 +34,7 @@ public class SendMessageService
         {
             outputList.Add(new()
             {
+                Id = row.Id,
                 StatusName = row.Status.GetDescription(),
                 SendJson = row.SendJson,
                 SendContent = Encoding.UTF8.GetString(row.SendContent),

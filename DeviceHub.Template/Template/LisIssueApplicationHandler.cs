@@ -18,7 +18,7 @@ namespace DeviceHub.Template.Template
         private readonly DictionaryRepository dictionaryRepository = DictionaryRepository.Instance;
         private readonly IConsumeTask? sendHandlerTask;
 
-        public LisIssueApplicationHandler(long instrumentId, IConsumeTask sendHandlerTask)
+        public LisIssueApplicationHandler(long instrumentId, IConsumeTask? sendHandlerTask)
         {
             this._instrumentId = instrumentId;
             this.sendHandlerTask = sendHandlerTask;

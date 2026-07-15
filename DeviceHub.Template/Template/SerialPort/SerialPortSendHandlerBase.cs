@@ -7,7 +7,7 @@ using System.Text.Json;
 
 namespace DeviceHub.Template.Template.SerialPort
 {
-    public abstract class SerialPortSendHandlerBase : ISenderTaskHandler
+    public abstract class SerialPortSendHandlerBase : ISenderSerialPortTaskHandler
     {
         private readonly string logType = nameof(SerialPortSendHandlerBase);
         private long _instrumentId;
@@ -129,7 +129,7 @@ namespace DeviceHub.Template.Template.SerialPort
         }
     }
 
-    public interface ISenderTaskHandler
+    public interface ISenderSerialPortTaskHandler
     {
         List<byte[]> SearchEncoderTask();
         void Completed(List<byte[]> sendFrameList);

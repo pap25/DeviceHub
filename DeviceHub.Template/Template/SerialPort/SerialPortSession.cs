@@ -1,7 +1,8 @@
 ﻿using DeviceHub.Abstractions.Dto;
-using DeviceHub.Utils;
+using DeviceHub.Model.Entities;
 using DeviceHub.Template.Constant;
 using DeviceHub.Template.Transports;
+using DeviceHub.Utils;
 using System.IO.Ports;
 
 namespace DeviceHub.Template.Template.SerialPort
@@ -19,7 +20,7 @@ namespace DeviceHub.Template.Template.SerialPort
         private Timer? idleCheckTimer;
         private const int receiveIdleTimeoutSeconds = 15;
 
-        public SerialPortSession(long instrumentId, IConsumeTask receiveTask, ISenderTaskHandler senderTaskHandler)
+        public SerialPortSession(long instrumentId, IConsumeTask receiveTask, ISenderSerialPortTaskHandler senderTaskHandler)
         {
             receiver = new SerialPortReceiver(this, instrumentId, receiveTask);
             sender = new SerialPortSender(this, senderTaskHandler);

@@ -5,6 +5,8 @@
 /// </summary>
 public class SendMessagePageItem
 {
+    public long Id { get; set; }
+
     public string StatusName { get; set; }
 
     public string SendJson { get; set; }

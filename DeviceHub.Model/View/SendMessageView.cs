@@ -4,6 +4,8 @@ namespace DeviceHub.Model.view;
 
 public class SendMessageView
 {
+    public long Id { get; set; }
+
     public SendMessage.StatusEnum Status { get; set; }
 
     public string SendJson { get; set; }

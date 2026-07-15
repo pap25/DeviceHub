@@ -7,12 +7,12 @@ namespace DeviceHub.Template.Template.SerialPort
     {
         private readonly string logType = nameof(SerialPortSender);
         private readonly SerialPortSession session;
-        private readonly ISenderTaskHandler senderTaskHandler;
+        private readonly ISenderSerialPortTaskHandler senderTaskHandler;
 
         private List<byte[]> sendFrameList = [];
         private int sendFrameOffset;
 
-        public SerialPortSender(SerialPortSession session, ISenderTaskHandler senderTaskHandler)
+        public SerialPortSender(SerialPortSession session, ISenderSerialPortTaskHandler senderTaskHandler)
         {
             this.session = session;
             this.senderTaskHandler = senderTaskHandler;

@@ -28,6 +28,7 @@ public class ClientLogService
         {
             outputList.Add(new()
             {
+                Id = row.Id,
                 LevelName = row.Level.GetDescription(),
                 TypeName = row.Type.GetDescription(),
                 Message = row.Message,

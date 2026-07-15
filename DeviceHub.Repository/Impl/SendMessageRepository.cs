@@ -246,7 +246,7 @@ public class SendMessageRepository : ISendMessageRepository
         parameters.Add(DbHelper.Param("@offset", Math.Max(0, (pageIndex - 1) * pageSize)));
 
         var sql = $"""
-            SELECT a.status, b.send_json, c.send_content, a.barcode, a.sample_no, a.create_time, a.error_message
+            SELECT a.id, a.status, b.send_json, c.send_content, a.barcode, a.sample_no, a.create_time, a.error_message
             FROM send_message a
             INNER JOIN send_message_large b ON a.id = b.send_message_id
             LEFT JOIN send_message_encoder c ON a.id = c.send_message_id
@@ -327,12 +327,13 @@ public class SendMessageRepository : ISendMessageRepository
 
     private static SendMessageView MapView(SqliteDataReader reader) => new()
     {
-        Status = (SendMessage.StatusEnum)reader.GetByte(0),
-        SendJson = reader.GetString(1),
-        SendContent = reader.IsDBNull(2) ? [] : reader.GetFieldValue<byte[]>(2),
-        Barcode = reader.GetString(3),
-        SampleNo = reader.GetString(4),
-        CreateTime = reader.GetInt64(5),
-        ErrorMessage = reader.GetString(6)
+        Id = reader.GetInt64(0),
+        Status = (SendMessage.StatusEnum)reader.GetByte(1),
+        SendJson = reader.GetString(2),
+        SendContent = reader.IsDBNull(3) ? [] : reader.GetFieldValue<byte[]>(3),
+        Barcode = reader.GetString(4),
+        SampleNo = reader.GetString(5),
+        CreateTime = reader.GetInt64(6),
+        ErrorMessage = reader.GetString(7)
     };
 }
