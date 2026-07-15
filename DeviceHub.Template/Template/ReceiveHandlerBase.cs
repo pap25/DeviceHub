@@ -44,7 +44,7 @@ namespace DeviceHub.Template.Template
             }
         }
 
-        public void MarkFailed(long id, string errorMessage)
+        protected void MarkFailed(long id, string errorMessage)
         {
             receiveMessageRepository.UpdateStatusAndErrorMessageAndUpdateTimeById(
                 id,
@@ -54,6 +54,6 @@ namespace DeviceHub.Template.Template
             Logger.Warn(logType, $"待解码消息处理失败 id={id}: {errorMessage}");
         }
 
-        public abstract void ParseData(byte[] rawMessage, ReceiveMessage task);
+        protected abstract void ParseData(byte[] rawMessage, ReceiveMessage task);
     }
 }

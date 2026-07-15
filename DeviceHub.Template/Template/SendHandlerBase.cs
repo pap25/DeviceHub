@@ -78,9 +78,9 @@ namespace DeviceHub.Template.Template
             }
         }
 
-        public abstract byte[] EncoderRequestApplicationSend(GetSampleApplyItemOutput getSampleApplyItemOutput);
+        protected abstract byte[] EncoderRequestApplicationSend(GetSampleApplyItemOutput getSampleApplyItemOutput);
 
-        public abstract byte[] EncoderIssueApplicationSend(GetSampleApplyListOutput getSampleApplyListOutput);
+        protected abstract byte[] EncoderIssueApplicationSend(GetSampleApplyListOutput getSampleApplyListOutput);
 
         private void MarkFailed(long id, string errorMessage)
         {

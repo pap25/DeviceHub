@@ -57,7 +57,7 @@ namespace DeviceHub.Template.Template.Tcp
             }
         }
 
-        public void ReplyAck(byte[] rawMessage)
+        protected void ReplyAck(byte[] rawMessage)
         {
             byte[]? ackMessage = GetReplyAckMessage(rawMessage);
             if (ackMessage is null)
@@ -67,7 +67,7 @@ namespace DeviceHub.Template.Template.Tcp
             Logger.Info(logType, $"TCP回复ACK: {Encoding.UTF8.GetString(ackMessage)}");
         }
 
-        public abstract byte[]? GetReplyAckMessage(byte[] rawMessage);
+        protected abstract byte[]? GetReplyAckMessage(byte[] rawMessage);
 
         private bool TryExtractMessage(out List<byte> message)
         {

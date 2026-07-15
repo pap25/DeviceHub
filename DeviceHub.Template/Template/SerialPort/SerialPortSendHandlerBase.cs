@@ -85,9 +85,9 @@ namespace DeviceHub.Template.Template.SerialPort
             }
         }
 
-        public abstract List<byte[]> EncoderRequestApplication(GetSampleApplyItemOutput getSampleApplyItemOutput);
+        protected abstract List<byte[]> EncoderRequestApplication(GetSampleApplyItemOutput getSampleApplyItemOutput);
 
-        public abstract List<byte[]> EncoderIssueApplication(GetSampleApplyListOutput getSampleApplyListOutput);
+        protected abstract List<byte[]> EncoderIssueApplication(GetSampleApplyListOutput getSampleApplyListOutput);
 
         private void MarkFailed(long id, string errorMessage)
         {

@@ -19,7 +19,7 @@ namespace DeviceHub.YhloTestSerialPort.Handler
             _instrumentId = instrumentId;
         }
 
-        public override void ParseData(byte[] rawMessage, ReceiveMessage task)
+        protected override void ParseData(byte[] rawMessage, ReceiveMessage task)
         {
             AstmMessageVerify.VerifyParseResult verifyResult = AstmMessageVerify.VerifyParse(rawMessage);
             if (!verifyResult.Success)

@@ -14,7 +14,7 @@ namespace DeviceHub.YhloTestTcpServer
             base.Start(instrumentId, config, new ReceiveHandler(instrumentId));
         }
 
-        public override byte[]? GetReplyAckMessage(byte[] rawMessage)
+        protected override byte[]? GetReplyAckMessage(byte[] rawMessage)
         {
             Hl7MessageEntity.MshSegment? msh = Hl7MessageDecode.ParseMsh(rawMessage);
             if (msh is null)

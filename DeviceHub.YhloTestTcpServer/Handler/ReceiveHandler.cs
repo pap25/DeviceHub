@@ -19,7 +19,7 @@ namespace DeviceHub.YhloTestTcpServer.Handler
             this._instrumentId = instrumentId;
         }
 
-        public override void ParseData(byte[] rawMessage, ReceiveMessage task)
+        protected override void ParseData(byte[] rawMessage, ReceiveMessage task)
         {
             Hl7MessageVerify.VerifyParseResult verifyResult = Hl7MessageVerify.VerifyParse(rawMessage);
             if (!verifyResult.Success)
