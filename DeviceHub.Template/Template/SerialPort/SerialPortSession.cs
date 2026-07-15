@@ -1,5 +1,4 @@
 ﻿using DeviceHub.Abstractions.Dto;
-using DeviceHub.Model.Entities;
 using DeviceHub.Template.Constant;
 using DeviceHub.Template.Transports;
 using DeviceHub.Utils;

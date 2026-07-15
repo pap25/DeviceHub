@@ -23,7 +23,10 @@ namespace DeviceHub.YhloTestTcpServer
         public Task Start(long instrumentId, TcpConfig config)
         {
             ReceiveHandler receiveHandler = new(instrumentId);
-            session.Start(instrumentId, config, receiveHandler);
+            IConsumeTask receiveTask = new BatchConsumeTask<ReceiveMessage>(receiveHandler);
+            receiveTask.StartConsume();
+
+            session.Start(instrumentId, config, receiveTask);
 
             sendTask = new BatchConsumeTask<SendMessage>(new SendHandler(instrumentId, session));
             sendTask.StartConsume();

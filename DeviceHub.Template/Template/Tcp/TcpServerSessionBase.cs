@@ -1,6 +1,5 @@
 ﻿using DeviceHub.Abstractions.Dto;
 using DeviceHub.Template.Constant;
-using DeviceHub.Model.Entities;
 using DeviceHub.Service;
 using DeviceHub.Template.Transports;
 using DeviceHub.Utils;
@@ -17,14 +16,13 @@ namespace DeviceHub.Template.Template.Tcp
 
         private TcpServerTransport transport;
         private readonly List<byte> buffer = new();
-        public void Start(long instrumentId, TcpConfig config, IBatchTaskHandler<ReceiveMessage> receiveHandler)
+
+        public void Start(long instrumentId, TcpConfig config, IConsumeTask receiveTask)
         {
             this._instrumentId = instrumentId;
             this.transport = new(config.Host, config.Port);
             this.transport.DataReceived += Transport_DataReceived;
-
-            this.receiveTask = new BatchConsumeTask<ReceiveMessage>(receiveHandler);
-            this.receiveTask.StartConsume();
+            this.receiveTask = receiveTask;
 
             this.transport.StartListening();
         }
