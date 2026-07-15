@@ -106,8 +106,10 @@ namespace DeviceHub.YhloTestTcpServer.Handler
             }
 
             // 质控：每个 OBR 对应一个检验项目，消息中可有多个 OBR
-            string? lastResultId = null;
-            UploadQualityControlTestResultInput? lastInput = null;
+            var resultIdList = new List<string>();
+            var sampleNoList = new List<string>();
+            var barcodeList = new List<string>();
+            var inputList = new List<UploadQualityControlTestResultInput>();
 
             foreach (ObrSegment obr in parseResult.ObrSegmentList)
             {
@@ -122,18 +124,25 @@ namespace DeviceHub.YhloTestTcpServer.Handler
                     return;
                 }
 
-                lastResultId = resp.GetData().ResultId;
-                lastInput = input;
+                string barcode = input.Items.Select(i => i.QcBarcode).FirstOrDefault(b => !string.IsNullOrEmpty(b)) ?? input.ItemCode;
+                resultIdList.Add(resp.GetData().ResultId);
+                sampleNoList.Add(input.ItemCode);
+                barcodeList.Add(barcode);
+                inputList.Add(input);
             }
 
-            if (lastInput == null)
+            if (inputList.Count == 0)
             {
                 MarkFailed(task.Id, "数据异常没有质控结果");
                 return;
             }
 
-            string barcode = lastInput.Items.Select(i => i.QcBarcode).FirstOrDefault(b => !string.IsNullOrEmpty(b)) ?? lastInput.ItemCode;
-            receiveMessageService.UpdateSuccessTestResult(task.Id, lastResultId!, lastInput.ItemCode, barcode, JsonSerializer.Serialize(lastInput)).GetAwaiter();
+            receiveMessageService.UpdateSuccessTestResult(
+                task.Id,
+                string.Join(",", resultIdList),
+                string.Join(",", sampleNoList),
+                string.Join(",", barcodeList),
+                JsonSerializer.Serialize(inputList)).GetAwaiter();
         }
 
         private UploadQualityControlTestResultInput ToUploadQualityControlTestResultInput(ObrSegment obr)
