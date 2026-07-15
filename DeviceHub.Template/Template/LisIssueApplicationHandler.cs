@@ -55,7 +55,13 @@ namespace DeviceHub.Template.Template
         {
             try
             {
-                sendMessageService.SaveIssueApplication(task.Id, _instrumentId, "", "", "", JsonSerializer.Serialize(task));
+                sendMessageService.SaveIssueApplication(
+                    task.Id,
+                    _instrumentId,
+                    task.Id.ToString(),
+                    task.SampleNo ?? string.Empty,
+                    task.Barcode ?? string.Empty,
+                    JsonSerializer.Serialize(task));
             }
             catch (Exception ex)
             {

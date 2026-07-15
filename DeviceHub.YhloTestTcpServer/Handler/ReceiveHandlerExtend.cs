@@ -252,6 +252,21 @@ namespace DeviceHub.YhloTestTcpServer.Handler
             };
             GetSampleApplyItemOutput getSampleApplyItemOutput = lisClient.GetSampleApplyItem(getSampleApplyItemInput).GetAwaiter().GetResult();
 
+            getSampleApplyItemOutput.MessageControlId = parseResult.MshSegment.MessageControlId;
+            getSampleApplyItemOutput.DeviceModel = !string.IsNullOrEmpty(parseResult.QrfSegment?.WhereSubjectFilter)
+                ? parseResult.QrfSegment!.WhereSubjectFilter
+                : parseResult.MshSegment.SendingFacility;
+            if (string.IsNullOrEmpty(getSampleApplyItemOutput.CharacterSet))
+                getSampleApplyItemOutput.CharacterSet = string.IsNullOrEmpty(parseResult.MshSegment.CharacterSet)
+                    ? "ASCII"
+                    : parseResult.MshSegment.CharacterSet;
+            if (string.IsNullOrEmpty(getSampleApplyItemOutput.QueryResponseStatus))
+            {
+                bool hasData = !string.IsNullOrEmpty(getSampleApplyItemOutput.Barcode)
+                    || getSampleApplyItemOutput.Items is { Count: > 0 };
+                getSampleApplyItemOutput.QueryResponseStatus = hasData ? "OK" : "NF";
+            }
+
             receiveMessageService.SaveSampleQuery(_instrumentId, task.Id, sampleNo, barcode,
                 JsonSerializer.Serialize(getSampleApplyItemInput), JsonSerializer.Serialize(getSampleApplyItemOutput));
         }
