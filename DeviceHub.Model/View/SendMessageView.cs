@@ -8,7 +8,7 @@ public class SendMessageView
 
     public string SendJson { get; set; }
 
-    public string SendContent { get; set; }
+    public byte[] SendContent { get; set; }
 
     public string Barcode { get; set; }
 

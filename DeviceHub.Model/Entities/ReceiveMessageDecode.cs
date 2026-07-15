@@ -20,7 +20,7 @@ public class ReceiveMessageDecode
     /// <summary>
     /// 外部编号（LIS 侧唯一标识）
     /// </summary>
-    public string ExternalNo { get; set; }
+    public string ExternalNo { get; set; } = string.Empty;
 
     /// <summary>
     /// 解码类型
@@ -30,17 +30,17 @@ public class ReceiveMessageDecode
     /// <summary>
     /// 样本号
     /// </summary>
-    public string SampleNo { get; set; }
+    public string SampleNo { get; set; } = string.Empty;
 
     /// <summary>
     /// 条形码
     /// </summary>
-    public string Barcode { get; set; }
+    public string Barcode { get; set; } = string.Empty;
 
     /// <summary>
     /// 解码结果JSON
     /// </summary>
-    public string ResultJson { get; set; }
+    public string ResultJson { get; set; } = string.Empty;
 
     /// <summary>
     /// 创建时间（Unix 毫秒时间戳）

@@ -59,7 +59,7 @@ namespace DeviceHub.YhloTestTcpServer.Handler
                 string.Join(",", resultIdList),
                 string.Join(",", sampleNoList),
                 string.Join(",", barcodeList),
-                inputList.Count == 1 ? JsonSerializer.Serialize(inputList[0]) : JsonSerializer.Serialize(inputList)).GetAwaiter();
+                inputList.Count == 1 ? JsonSerializer.Serialize(inputList[0]) : JsonSerializer.Serialize(inputList)).GetAwaiter().GetResult();
         }
 
         private UploadSpecimenTestResultInput ToUploadSpecimenTestResultInput(List<ObrSegment> obrGroup)
@@ -142,7 +142,7 @@ namespace DeviceHub.YhloTestTcpServer.Handler
                 string.Join(",", resultIdList),
                 string.Join(",", sampleNoList),
                 string.Join(",", barcodeList),
-                inputList.Count == 1 ? JsonSerializer.Serialize(inputList[0]) : JsonSerializer.Serialize(inputList)).GetAwaiter();
+                inputList.Count == 1 ? JsonSerializer.Serialize(inputList[0]) : JsonSerializer.Serialize(inputList)).GetAwaiter().GetResult();
         }
 
         private UploadQualityControlTestResultInput ToUploadQualityControlTestResultInput(ObrSegment obr)

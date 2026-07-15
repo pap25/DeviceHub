@@ -5,6 +5,7 @@ using DeviceHub.Model.Vo;
 using DeviceHub.Repository;
 using DeviceHub.Repository.Repositories;
 using DeviceHub.Utils;
+using System.Text;
 
 namespace DeviceHub.Service;
 
@@ -35,7 +36,7 @@ public class SendMessageService
             {
                 StatusName = row.Status.GetDescription(),
                 SendJson = row.SendJson,
-                SendContent = row.SendContent,
+                SendContent = Encoding.UTF8.GetString(row.SendContent),
                 Barcode = row.Barcode,
                 SampleNo = row.SampleNo,
                 CreateTime = DateUtils.FormatTime(row.CreateTime),

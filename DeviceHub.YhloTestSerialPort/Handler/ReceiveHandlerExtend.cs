@@ -28,7 +28,7 @@ namespace DeviceHub.YhloTestSerialPort.Handler
             string resultId = resp.GetData().ResultId;
 
             receiveMessageService.UpdateSuccessTestResult(task.Id, resultId, parseResult.TestOrderRecord.SampleId,
-                parseResult.TestOrderRecord.InstrumentSpecimenId, JsonSerializer.Serialize(uploadSpecimenTestResultInput)).GetAwaiter();
+                parseResult.TestOrderRecord.InstrumentSpecimenId, JsonSerializer.Serialize(uploadSpecimenTestResultInput)).GetAwaiter().GetResult();
         }
 
         private UploadSpecimenTestResultInput ToUploadSpecimenTestResultInput(ParseResult parseResult)
@@ -61,7 +61,7 @@ namespace DeviceHub.YhloTestSerialPort.Handler
 
             string resultId = resp.GetData().ResultId;
             string barcode = input.Items.Select(i => i.QcBarcode).FirstOrDefault(b => !string.IsNullOrEmpty(b)) ?? input.ItemCode;
-            receiveMessageService.UpdateSuccessTestResult(task.Id, resultId, input.ItemCode, barcode, JsonSerializer.Serialize(input)).GetAwaiter();
+            receiveMessageService.UpdateSuccessTestResult(task.Id, resultId, input.ItemCode, barcode, JsonSerializer.Serialize(input)).GetAwaiter().GetResult();
         }
 
         /// <summary>

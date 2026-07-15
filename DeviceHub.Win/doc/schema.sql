@@ -23,10 +23,10 @@ create table receive_message_large (
 create table receive_message_decode (
     id bigint not null auto_increment comment '主键ID',
     receive_message_id bigint not null comment '接收仪器消息队列表Id',
-    external_no varchar(50) not null comment '外部编号',
+    external_no varchar(500) not null comment '外部编号',
     type tinyint not null comment '类型(0:检验结果, 1:查询样本申请信息)',
-    sample_no varchar(30) not null comment '样本号',
-    barcode varchar(50) not null comment '条形码',
+    sample_no varchar(300) not null comment '样本号',
+    barcode varchar(500) not null comment '条形码',
     result_json longtext not null comment '解码结果JSON',
     create_time bigint not null comment '创建时间',
     update_time bigint not null comment '更新时间',

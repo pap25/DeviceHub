@@ -1,6 +1,7 @@
 using DeviceHub.Model.Entities;
 using DeviceHub.Model.view;
 using Microsoft.Data.Sqlite;
+using System.Text;
 
 namespace DeviceHub.Repository.Repositories;
 
@@ -328,7 +329,7 @@ public class SendMessageRepository : ISendMessageRepository
     {
         Status = (SendMessage.StatusEnum)reader.GetByte(0),
         SendJson = reader.GetString(1),
-        SendContent = reader.IsDBNull(2) ? string.Empty : Convert.ToBase64String(reader.GetFieldValue<byte[]>(2)),
+        SendContent = reader.IsDBNull(2) ? [] : reader.GetFieldValue<byte[]>(2),
         Barcode = reader.GetString(3),
         SampleNo = reader.GetString(4),
         CreateTime = reader.GetInt64(5),
