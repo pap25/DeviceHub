@@ -40,8 +40,8 @@ namespace DeviceHub.Template.Template.SerialPort
             idleCheckTimer = new Timer(
                 CheckReceiveIdleTimeout,
                 null,
-                TimeSpan.FromSeconds(5),
-                TimeSpan.FromSeconds(5));
+                TimeSpan.FromSeconds(10),
+                TimeSpan.FromSeconds(10));
 
             await Task.Run(transport.Open);
         }
