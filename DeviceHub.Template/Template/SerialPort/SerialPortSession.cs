@@ -182,10 +182,4 @@ namespace DeviceHub.Template.Template.SerialPort
         Sending,
         Receiving
     }
-
-    public interface ISenderTaskHandler
-    {
-        List<byte[]> SearchEncoderTask();
-        void Completed(List<byte[]> sendFrameList);
-    }
 }

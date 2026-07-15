@@ -128,4 +128,10 @@ namespace DeviceHub.Template.Template.SerialPort
             return result;
         }
     }
+
+    public interface ISenderTaskHandler
+    {
+        List<byte[]> SearchEncoderTask();
+        void Completed(List<byte[]> sendFrameList);
+    }
 }
