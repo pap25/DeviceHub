@@ -51,7 +51,7 @@ namespace DeviceHub.Template.Template
                 ReceiveMessage.StatusEnum.Failed,
                 errorMessage,
                 DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()).GetAwaiter().GetResult();
-            Logger.Warn(logType, $"待解码消息处理失败 id={id}: {errorMessage}");
+            Logger.Warn(logType, $"待解码消息处理失败 id={id} {errorMessage}");
         }
 
         protected abstract void ParseData(byte[] rawMessage, ReceiveMessage task);
