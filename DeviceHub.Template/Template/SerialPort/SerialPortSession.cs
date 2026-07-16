@@ -44,6 +44,7 @@ namespace DeviceHub.Template.Template.SerialPort
                 TimeSpan.FromSeconds(5));
 
             await Task.Run(transport.Open);
+            sender.Start();
         }
 
         private void Transport_DataReceived(byte[] data)
@@ -71,31 +72,38 @@ namespace DeviceHub.Template.Template.SerialPort
                 {
                     case ASTMProtocols.ENQ:
                         Logger.Info(logType, "收到 ENQ，回复ACK");
+                        if (lineState is LineState.WaitingAck or LineState.Sending)
+                        {
+                            sender.AbortCurrentTransmission();
+                        }
                         lineState = LineState.Receiving;
-                        SendUnlocked(ASTMProtocols.ACK);
+                        sender.EnqueueControl(ASTMProtocols.ACK);
                         return;
 
                     case ASTMProtocols.ACK:
                         Logger.Debug(logType, "收到 ACK");
-                        if (sender.SendFrameList.Count == 0)
-                            return;
                         if (lineState is not (LineState.WaitingAck or LineState.Sending))
                             return;
-                        lineState = LineState.Sending;
-                        sender.TrySendNextUnlocked();
+                        sender.NotifyAck();
                         return;
 
                     case ASTMProtocols.NAK:
                         Logger.Info(logType, "收到 NAK");
-                        lineState = LineState.Receiving;
+                        if (lineState is LineState.WaitingAck or LineState.Sending)
+                        {
+                            sender.NotifyNak();
+                        }
                         return;
 
                     case ASTMProtocols.EOT:
                         Logger.Info(logType, "收到 EOT，本次传输结束，清理未完成消息");
                         receiver.ResetBuffer();
-                        sender.ClearSendFrames();
+                        if (lineState is LineState.WaitingAck or LineState.Sending)
+                        {
+                            sender.AbortCurrentTransmission();
+                        }
                         lineState = LineState.Idle;
-                        sender.TrySendNextUnlocked();
+                        sender.WakeUp();
                         return;
                 }
             }
@@ -106,27 +114,56 @@ namespace DeviceHub.Template.Template.SerialPort
             lock (stateLock)
             {
                 lineState = LineState.Receiving;
-                SendUnlocked(ASTMProtocols.ACK);
+                sender.EnqueueControl(ASTMProtocols.ACK);
             }
             Logger.Debug(logType, "收到完整帧，回复ACK");
         }
 
-        public void SendUnlocked(byte data) => transport?.Send(data);
+        public void WriteToTransport(byte data) => transport?.Send(data);
 
-        public void SendFrameUnlocked(byte[] frame)
+        public void WriteToTransport(byte[] frame)
         {
             transport?.Send(frame);
             Logger.Debug(logType, $"串口发送帧: {SerialPortReceiver.Decode(frame)}");
         }
 
-        public LineState GetLineStateUnlocked() => lineState;
-
-        public void SetLineStateUnlocked(LineState state)
+        public bool TryBeginOutgoingTransmission()
         {
-            this.lineState = state;
-            if (state == LineState.WaitingAck)
+            lock (stateLock)
             {
+                if (lineState != LineState.Idle)
+                {
+                    return false;
+                }
+
+                lineState = LineState.WaitingAck;
                 lastReceiveTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                return true;
+            }
+        }
+
+        public bool TryMarkOutgoingSending()
+        {
+            lock (stateLock)
+            {
+                if (lineState != LineState.WaitingAck)
+                {
+                    return lineState == LineState.Sending;
+                }
+
+                lineState = LineState.Sending;
+                return true;
+            }
+        }
+
+        public void ReleaseOutgoingTransmission()
+        {
+            lock (stateLock)
+            {
+                if (lineState is LineState.WaitingAck or LineState.Sending)
+                {
+                    lineState = LineState.Idle;
+                }
             }
         }
 
@@ -143,14 +180,13 @@ namespace DeviceHub.Template.Template.SerialPort
                     if (now - lastReceiveTime < receiveIdleTimeoutSeconds * 1000L)
                         return;
 
-                    if (lineState != LineState.Idle)
+                    if (lineState == LineState.Receiving)
                     {
                         Logger.Info(logType, $"超过{receiveIdleTimeoutSeconds}秒未收到消息，重置为Idle并尝试发送");
-                        sender.ClearSendFrames();
+                        receiver.ResetBuffer();
+                        lineState = LineState.Idle;
+                        sender.WakeUp();
                     }
-
-                    lineState = LineState.Idle;
-                    sender.TrySendNextUnlocked();
                 }
             }
             catch (Exception ex)
@@ -163,6 +199,8 @@ namespace DeviceHub.Template.Template.SerialPort
         {
             idleCheckTimer?.Dispose();
             idleCheckTimer = null;
+
+            sender.Stop();
 
             if (transport != null)
             {
