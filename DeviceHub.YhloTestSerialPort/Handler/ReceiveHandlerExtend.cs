@@ -17,6 +17,12 @@ namespace DeviceHub.YhloTestSerialPort.Handler
                 return;
             }
 
+            if (parseResult.ResultRecordList.Count == 0)
+            {
+                MarkFailed(task.Id, "数据异常没有结果记录");
+                return;
+            }
+
             // 检验结果 1 上传到LIS 2 更新状态并记录
             UploadSpecimenTestResultInput uploadSpecimenTestResultInput = ToUploadSpecimenTestResultInput(parseResult);
             Resp<UploadSpecimenTestResultOutput> resp = lisClient.UploadSpecimenTestResult(uploadSpecimenTestResultInput).GetAwaiter().GetResult();
@@ -27,14 +33,49 @@ namespace DeviceHub.YhloTestSerialPort.Handler
             }
             string resultId = resp.GetData().ResultId;
 
-            receiveMessageService.UpdateSuccessTestResult(task.Id, resultId, parseResult.TestOrderRecord.SampleId,
-                parseResult.TestOrderRecord.InstrumentSpecimenId, JsonSerializer.Serialize(uploadSpecimenTestResultInput)).GetAwaiter().GetResult();
+            receiveMessageService.UpdateSuccessTestResult(task.Id, resultId, uploadSpecimenTestResultInput.SampleNo,
+                uploadSpecimenTestResultInput.Barcode, JsonSerializer.Serialize(uploadSpecimenTestResultInput)).GetAwaiter().GetResult();
         }
 
+        /// <summary>
+        /// ASTM 病人结果（H-12=PR）：O-3=样本编号^架号^位号，O-4=条码，R=项目结果
+        /// </summary>
         private UploadSpecimenTestResultInput ToUploadSpecimenTestResultInput(ParseResult parseResult)
         {
-            // TODO
-            return new UploadSpecimenTestResultInput();
+            TestOrderRecord order = parseResult.TestOrderRecord!;
+            string[] sampleIdParts = SplitComponent(order.SampleId);
+            string sampleNo = GetComponent(sampleIdParts, 0);
+            if (string.IsNullOrEmpty(sampleNo))
+                sampleNo = order.SampleId;
+
+            string barcode = string.IsNullOrEmpty(order.InstrumentSpecimenId)
+                ? sampleNo
+                : order.InstrumentSpecimenId;
+
+            string defaultTestTime = order.RequestedDateTime;
+            var items = new List<TestResultItem>(parseResult.ResultRecordList.Count);
+            foreach (ResultRecord result in parseResult.ResultRecordList)
+            {
+                items.Add(new TestResultItem
+                {
+                    ItemCode = result.AssayNo,
+                    ItemName = result.AssayName,
+                    ResultValue = result.MeasurementValue,
+                    Unit = result.Unit,
+                    AbnormalFlag = result.AbnormalFlag,
+                    TestTime = string.IsNullOrEmpty(result.TestCompletedDateTime)
+                        ? defaultTestTime
+                        : result.TestCompletedDateTime
+                });
+            }
+
+            return new UploadSpecimenTestResultInput
+            {
+                InstrumentId = _instrumentId,
+                SampleNo = sampleNo,
+                Barcode = barcode,
+                Items = items
+            };
         }
 
         public void UploadQualityControlTestResult(ReceiveMessage task, ParseResult parseResult)
