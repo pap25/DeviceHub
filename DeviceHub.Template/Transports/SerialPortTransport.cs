@@ -8,6 +8,9 @@ namespace DeviceHub.Template.Transports
     {
         private readonly string logType = nameof(SerialPortTransport);
         private readonly SerialPort _serialPort;
+        private CancellationTokenSource? _receiveCts;
+        private Task? _receiveTask;
+
         public event Action<byte[]>? DataReceived;
 
         public bool IsOpen => _serialPort.IsOpen;
@@ -15,8 +18,6 @@ namespace DeviceHub.Template.Transports
         public SerialPortTransport(string portName, int baudRate = 9600, Parity parity = Parity.None, int dataBits = 8, StopBits stopBits = StopBits.One)
         {
             _serialPort = new SerialPort(portName, baudRate, parity, dataBits, stopBits);
-
-            _serialPort.DataReceived += SerialPort_DataReceived;
 
             Logger.Info(logType, $"初始化串口 portName:{portName}, baudRate:{baudRate}, parity:{parity}, " +
                 $"dataBits:{dataBits}, stopBits:{stopBits}");
@@ -30,6 +31,7 @@ namespace DeviceHub.Template.Transports
             if (!_serialPort.IsOpen)
             {
                 _serialPort.Open();
+                StartReceiveLoop();
                 Logger.Info(logType, $"串口已打开: {_serialPort.PortName}");
             }
         }
@@ -39,11 +41,15 @@ namespace DeviceHub.Template.Transports
         /// </summary>
         public void Close()
         {
+            RequestReceiveLoopStop();
+
             if (_serialPort.IsOpen)
             {
                 _serialPort.Close();
                 Logger.Info(logType, $"串口已关闭: {_serialPort.PortName}");
             }
+
+            WaitReceiveLoopStopped();
         }
 
         /// <summary>
@@ -74,39 +80,101 @@ namespace DeviceHub.Template.Transports
             Send(encoding.GetBytes(message));
         }
 
-        private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        private void StartReceiveLoop()
+        {
+            if (_receiveTask is { IsCompleted: false })
+            {
+                return;
+            }
+
+            _receiveCts = new CancellationTokenSource();
+            CancellationToken token = _receiveCts.Token;
+            _receiveTask = Task.Factory.StartNew(
+                () => ReceiveLoop(token),
+                token,
+                TaskCreationOptions.LongRunning,
+                TaskScheduler.Default);
+        }
+
+        private void ReceiveLoop(CancellationToken token)
+        {
+            byte[] buffer = new byte[4096];
+
+            while (!token.IsCancellationRequested)
+            {
+                try
+                {
+                    int count = _serialPort.Read(buffer, 0, buffer.Length);
+
+                    if (count <= 0)
+                    {
+                        continue;
+                    }
+
+                    byte[] data = new byte[count];
+                    Buffer.BlockCopy(buffer, 0, data, 0, count);
+                    DataReceived?.Invoke(data);
+                }
+                catch (TimeoutException)
+                {
+                    // 保留兼容：如果外部配置了 ReadTimeout，超时后继续等待。
+                }
+                catch (InvalidOperationException) when (token.IsCancellationRequested)
+                {
+                    break;
+                }
+                catch (ObjectDisposedException) when (token.IsCancellationRequested)
+                {
+                    break;
+                }
+                catch (IOException) when (token.IsCancellationRequested)
+                {
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(logType, "串口接收循环异常", ex);
+                    break;
+                }
+            }
+        }
+
+        private void RequestReceiveLoopStop()
+        {
+            _receiveCts?.Cancel();
+        }
+
+        private void WaitReceiveLoopStopped()
         {
             try
             {
-                int length = _serialPort.BytesToRead;
-
-                if (length <= 0)
+                if (_receiveTask != null && Task.CurrentId != _receiveTask.Id)
                 {
-                    return;
+                    _receiveTask.Wait(TimeSpan.FromSeconds(2));
                 }
-
-                byte[] buffer = new byte[length];
-
-                _serialPort.Read(
-                    buffer,
-                    0,
-                    length);
-
-                DataReceived?.Invoke(buffer);
             }
-            catch (Exception ex)
+            catch (AggregateException ex)
             {
-                Logger.Error(logType, "串口DataReceived事件异常", ex);
+                Logger.Warn(logType, $"等待串口接收循环结束异常: {ex.InnerException?.Message ?? ex.Message}");
+            }
+            finally
+            {
+                _receiveCts?.Dispose();
+                _receiveCts = null;
+                _receiveTask = null;
             }
         }
 
         public void Dispose()
         {
-            _serialPort.DataReceived -= SerialPort_DataReceived;
-
             if (_serialPort.IsOpen)
             {
-                _serialPort.Close();
+                Close();
+            }
+            else
+            {
+                RequestReceiveLoopStop();
+                WaitReceiveLoopStopped();
             }
 
             _serialPort.Dispose();
