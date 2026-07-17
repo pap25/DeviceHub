@@ -1,35 +1,45 @@
-﻿using DeviceHub.Utils;
-using DeviceHub.Template.Constant;
+﻿using DeviceHub.Template.Constant;
+using DeviceHub.Utils;
 
 namespace DeviceHub.Template.Template.SerialPort
 {
-    public class SerialPortSender
+    /// <summary>
+    /// 由 <see cref="NotifyTask"/> 驱动：循环调用 <see cref="HandleTask"/>，
+    /// 执行一步发送状态机后等待；Session 收到 ACK/EOT 等时 NotifyConsume 唤起。
+    /// </summary>
+    public class SerialPortSenderV2 : INotifyTaskHandler
     {
-        private readonly string logType = nameof(SerialPortSender);
+        private readonly string logType = nameof(SerialPortSenderV2);
         private readonly SerialPortSession session;
         private readonly ISenderSerialPortTaskHandler senderTaskHandler;
 
         private List<byte[]> sendFrameList = [];
-        private int sendFrameOffset;
+        private int sendFrameOffset = 0;
 
-        public SerialPortSender(SerialPortSession session, ISenderSerialPortTaskHandler senderTaskHandler)
+        public SerialPortSenderV2(SerialPortSession session, ISenderSerialPortTaskHandler senderTaskHandler)
         {
             this.session = session;
             this.senderTaskHandler = senderTaskHandler;
         }
 
-        public List<byte[]> SendFrameList => sendFrameList;
+        internal IReadOnlyList<byte[]> SendFrameList => sendFrameList;
 
-        public void ClearSendFrames()
+        public void HandleTask()
         {
-            sendFrameList = [];
-            sendFrameOffset = 0;
+            try
+            {
+                session.ExecuteWithStateLock(HandleTaskUnlocked);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(logType, "HandleTask 异常", ex);
+            }
         }
 
         /// <summary>
-        /// 发送一个完整帧（主动向仪器下发数据）。调用方须已持有 stateLock。
+        /// 执行一步 ASTM 发送状态机。调用方须已持有 stateLock。
         /// </summary>
-        public void TrySendNextUnlocked()
+        private void HandleTaskUnlocked()
         {
             switch (session.GetLineStateUnlocked())
             {
@@ -45,6 +55,7 @@ namespace DeviceHub.Template.Template.SerialPort
                     break;
 
                 case LineState.WaitingEnqAck:
+                    // 已发 ENQ，等待对端 ACK；由 Session 收到 ACK 后改状态并 NotifyConsume
                     break;
 
                 case LineState.Sending:
@@ -53,20 +64,27 @@ namespace DeviceHub.Template.Template.SerialPort
                         byte[] frame = sendFrameList[sendFrameOffset];
                         sendFrameOffset++;
                         session.SendFrameUnlocked(frame);
+                        // 发完一帧后等待 ACK，再由 Session NotifyConsume 唤起发下一帧
                     }
                     else if (sendFrameList.Count > 0)
                     {
                         senderTaskHandler.Completed(sendFrameList);
-                        sendFrameList = [];
-                        sendFrameOffset = 0;
+                        ClearSendFrames();
                         session.SetLineStateUnlocked(LineState.Idle);
                         session.SendUnlocked(ASTMProtocols.EOT);
                     }
                     break;
 
                 case LineState.Receiving:
+                    // 对端占用线路，不发送
                     break;
             }
+        }
+
+        public void ClearSendFrames()
+        {
+            sendFrameList = [];
+            sendFrameOffset = 0;
         }
     }
 }

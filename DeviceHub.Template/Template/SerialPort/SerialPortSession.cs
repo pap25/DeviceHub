@@ -11,7 +11,8 @@ namespace DeviceHub.Template.Template.SerialPort
         private readonly string logType = nameof(SerialPortSession);
         private readonly object stateLock = new();
         private readonly SerialPortReceiver receiver;
-        private readonly SerialPortSender sender;
+        private readonly SerialPortSenderV2 sender;
+        private readonly IConsumeTask sendTask;
 
         private SerialPortTransport? transport;
         private LineState lineState = LineState.Idle;
@@ -22,8 +23,12 @@ namespace DeviceHub.Template.Template.SerialPort
         public SerialPortSession(long instrumentId, IConsumeTask receiveTask, ISenderSerialPortTaskHandler senderTaskHandler)
         {
             receiver = new SerialPortReceiver(this, instrumentId, receiveTask);
-            sender = new SerialPortSender(this, senderTaskHandler);
+            sender = new SerialPortSenderV2(this, senderTaskHandler);
+            sendTask = new NotifyTask(sender, "serial_port_send", 60 * 1000);
         }
+
+        /// <summary>供外部（如下发申请）唤起发送循环。</summary>
+        public IConsumeTask SendTask => sendTask;
 
         public async Task Start(SerialPortConfig config)
         {
@@ -43,7 +48,17 @@ namespace DeviceHub.Template.Template.SerialPort
                 TimeSpan.FromSeconds(5),
                 TimeSpan.FromSeconds(5));
 
+            sendTask.StartConsume();
             await Task.Run(transport.Open);
+        }
+
+        /// <summary>在 stateLock 下执行，供 Sender HandleTask 使用。</summary>
+        public void ExecuteWithStateLock(Action action)
+        {
+            lock (stateLock)
+            {
+                action();
+            }
         }
 
         private void Transport_DataReceived(byte[] data)
@@ -79,10 +94,10 @@ namespace DeviceHub.Template.Template.SerialPort
                         Logger.Debug(logType, "收到 ACK");
                         if (sender.SendFrameList.Count == 0)
                             return;
-                        if (lineState is not (LineState.WaitingAck or LineState.Sending))
+                        if (lineState is not (LineState.WaitingEnqAck or LineState.Sending))
                             return;
                         lineState = LineState.Sending;
-                        sender.TrySendNextUnlocked();
+                        sendTask.NotifyConsume();
                         return;
 
                     case ASTMProtocols.NAK:
@@ -95,7 +110,7 @@ namespace DeviceHub.Template.Template.SerialPort
                         receiver.ResetBuffer();
                         sender.ClearSendFrames();
                         lineState = LineState.Idle;
-                        sender.TrySendNextUnlocked();
+                        sendTask.NotifyConsume();
                         return;
                 }
             }
@@ -124,7 +139,7 @@ namespace DeviceHub.Template.Template.SerialPort
         public void SetLineStateUnlocked(LineState state)
         {
             this.lineState = state;
-            if (state == LineState.WaitingAck)
+            if (state == LineState.WaitingEnqAck)
             {
                 lastReceiveTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             }
@@ -150,7 +165,7 @@ namespace DeviceHub.Template.Template.SerialPort
                     }
 
                     lineState = LineState.Idle;
-                    sender.TrySendNextUnlocked();
+                    sendTask.NotifyConsume();
                 }
             }
             catch (Exception ex)
@@ -163,6 +178,7 @@ namespace DeviceHub.Template.Template.SerialPort
         {
             idleCheckTimer?.Dispose();
             idleCheckTimer = null;
+            sendTask.Shutdown();
 
             if (transport != null)
             {
@@ -185,7 +201,7 @@ namespace DeviceHub.Template.Template.SerialPort
     public enum LineState
     {
         Idle,
-        WaitingAck,
+        WaitingEnqAck,
         Sending,
         Receiving
     }

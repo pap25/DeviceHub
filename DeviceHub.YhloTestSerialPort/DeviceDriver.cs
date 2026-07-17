@@ -24,7 +24,7 @@ namespace DeviceHub.YhloTestSerialPort
             session = new SerialPortSession(instrumentId, receiveTask, new SendHandler(instrumentId));
             await session.Start(config);
 
-            lisIssueApplicationTask = new BatchConsumeTask<GetSampleApplyItemOutput>(new LisIssueApplicationHandler(instrumentId, null));
+            lisIssueApplicationTask = new BatchConsumeTask<GetSampleApplyItemOutput>(new LisIssueApplicationHandler(instrumentId, session.SendTask));
             lisIssueApplicationTask.StartConsume();
 
             Logger.Info(logType, $"设备驱动已启动 instrumentId={instrumentId}, port={config.PortName}");
