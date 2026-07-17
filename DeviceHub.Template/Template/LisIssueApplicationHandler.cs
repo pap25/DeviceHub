@@ -16,9 +16,9 @@ namespace DeviceHub.Template.Template
         private readonly ILisClient lisClient = LisClient.Instance;
         private readonly SendMessageService sendMessageService = SendMessageService.Instance;
         private readonly DictionaryRepository dictionaryRepository = DictionaryRepository.Instance;
-        private readonly IConsumeTask? sendHandlerTask;
+        private readonly IConsumeTask sendHandlerTask;
 
-        public LisIssueApplicationHandler(long instrumentId, IConsumeTask? sendHandlerTask)
+        public LisIssueApplicationHandler(long instrumentId, IConsumeTask sendHandlerTask)
         {
             this._instrumentId = instrumentId;
             this.sendHandlerTask = sendHandlerTask;
@@ -68,7 +68,7 @@ namespace DeviceHub.Template.Template
                 Logger.Warn(logType, $"保存LIS拉取下单申请异常 id={task.Id}: {ex.Message}");
             }
 
-            sendHandlerTask?.NotifyConsume();
+            sendHandlerTask.NotifyConsume();
         }
     }
 }
