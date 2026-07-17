@@ -15,11 +15,13 @@ namespace DeviceHub.Template.Template.Tcp
         private long _instrumentId;
 
         private TcpServerTransport transport;
+        protected Encoding MessageEncoding { get; private set; } = TextEncodings.GetEncoding(null);
         private readonly List<byte> buffer = new();
 
         public void Start(long instrumentId, TcpConfig config, IConsumeTask receiveTask)
         {
             this._instrumentId = instrumentId;
+            MessageEncoding = TextEncodings.GetEncoding(config.Encoding);
             this.transport = new(config.Host, config.Port);
             this.transport.DataReceived += Transport_DataReceived;
             this.receiveTask = receiveTask;
@@ -31,14 +33,14 @@ namespace DeviceHub.Template.Template.Tcp
         {
             try
             {
-                Logger.Debug(logType, $"TCP接收消息: {Encoding.UTF8.GetString(data)}");
+                Logger.Debug(logType, $"TCP接收消息: {MessageEncoding.GetString(data)}");
 
                 buffer.AddRange(data);
 
                 while (TryExtractMessage(out List<byte> message))
                 {
                     byte[] rawMessage = message.ToArray();
-                    Logger.Info(logType, $"TCP接收完整消息: {Encoding.UTF8.GetString(rawMessage)}");
+                    Logger.Info(logType, $"TCP接收完整消息: {MessageEncoding.GetString(rawMessage)}");
 
                     receiveMessageService.Save(_instrumentId, rawMessage).GetAwaiter().GetResult();
 
@@ -50,7 +52,7 @@ namespace DeviceHub.Template.Template.Tcp
             }
             catch (Exception ex)
             {
-                Logger.Error(logType, $"TCP接收数据处理异常: {Encoding.UTF8.GetString(data)}", ex);
+                Logger.Error(logType, $"TCP接收数据处理异常: {MessageEncoding.GetString(data)}", ex);
                 buffer.Clear();
             }
         }
@@ -62,7 +64,7 @@ namespace DeviceHub.Template.Template.Tcp
                 return;
 
             transport.SendAsync(ackMessage).GetAwaiter().GetResult();
-            Logger.Info(logType, $"TCP回复ACK: {Encoding.UTF8.GetString(ackMessage)}");
+            Logger.Info(logType, $"TCP回复ACK: {MessageEncoding.GetString(ackMessage)}");
         }
 
         protected abstract byte[]? GetReplyAckMessage(byte[] rawMessage);
@@ -76,7 +78,7 @@ namespace DeviceHub.Template.Template.Tcp
             {
                 if (buffer.Count > Constants.FourMB)
                 {
-                    Logger.Error(logType, $"接收数据没VT异常: {Encoding.UTF8.GetString(buffer.ToArray(), buffer.Count - Constants.OneMB, Constants.OneMB)}");
+                    Logger.Error(logType, $"接收数据没VT异常: {MessageEncoding.GetString(buffer.ToArray(), buffer.Count - Constants.OneMB, Constants.OneMB)}");
                     buffer.Clear();
                 }
                 return false; // 半包或垃圾前缀，继续等
@@ -90,7 +92,7 @@ namespace DeviceHub.Template.Template.Tcp
             {
                 if (buffer.Count > Constants.FourMB)
                 {
-                    Logger.Error(logType, $"接收数据没EB异常: {Encoding.UTF8.GetString(buffer.ToArray(), buffer.Count - Constants.OneMB, Constants.OneMB)}");
+                    Logger.Error(logType, $"接收数据没EB异常: {MessageEncoding.GetString(buffer.ToArray(), buffer.Count - Constants.OneMB, Constants.OneMB)}");
                     buffer.Clear();
                 }
                 return false;  // 半包，继续等

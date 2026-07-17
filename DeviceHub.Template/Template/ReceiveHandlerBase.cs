@@ -1,6 +1,7 @@
 ﻿using DeviceHub.Utils;
 using DeviceHub.Model.Entities;
 using DeviceHub.Repository.Repositories;
+using System.Text;
 
 namespace DeviceHub.Template.Template
 {
@@ -10,10 +11,12 @@ namespace DeviceHub.Template.Template
         private long _instrumentId;
         private readonly ReceiveMessageRepository receiveMessageRepository = ReceiveMessageRepository.Instance;
         private readonly ReceiveMessageLargeRepository receiveMessageLargeRepository = ReceiveMessageLargeRepository.Instance;
+        protected Encoding MessageEncoding { get; }
 
-        public ReceiveHandlerBase(long instrumentId)
+        public ReceiveHandlerBase(long instrumentId, Encoding encoding)
         {
             _instrumentId = instrumentId;
+            MessageEncoding = encoding;
         }
 
         public IEnumerable<ReceiveMessage> SearchTask()

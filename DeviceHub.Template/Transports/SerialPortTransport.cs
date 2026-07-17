@@ -73,10 +73,8 @@ namespace DeviceHub.Template.Transports
         /// <summary>
         /// 发送字符串
         /// </summary>
-        public void Send(string message, Encoding? encoding = null)
+        public void Send(string message, Encoding encoding)
         {
-            encoding ??= Encoding.ASCII;
-
             Send(encoding.GetBytes(message));
         }
 

@@ -24,12 +24,12 @@ public class ReceiveMessageService
     {
     }
 
-    public async Task<Page<ReceiveMessagePageItem>> GetPage(long instrumentId, ReceiveMessage.StatusEnum? status, ReceiveMessageDecode.TypeEnum? type,
+    public async Task<Page<ReceiveMessagePageItem>> GetPage(long instrumentId, Encoding encoding,
+        ReceiveMessage.StatusEnum? status, ReceiveMessageDecode.TypeEnum? type,
         string barcode, string sampleNo, long createTimeStart, long createTimeEnd, int pageSize, int pageIndex)
     {
         int totalCount = await receiveMessageRepository.findCount(instrumentId, status, type, barcode, sampleNo, createTimeStart, createTimeEnd);
         List<ReceiveMessageView> receiveMessageList = await receiveMessageRepository.findPageDesc(instrumentId, status, type, barcode, sampleNo, createTimeStart, createTimeEnd, pageSize, pageIndex);
-
         List<ReceiveMessagePageItem> outputList = new(receiveMessageList.Count);
         foreach (ReceiveMessageView row in receiveMessageList)
         {
@@ -38,7 +38,7 @@ public class ReceiveMessageService
                 Id = row.Id,
                 StatusName = row.Status.GetDescription(),
                 TypeName = row.Type == null ? string.Empty : row.Type.GetDescription(),
-                RawMessage = Encoding.UTF8.GetString(row.RawMessage),
+                RawMessage = encoding.GetString(row.RawMessage),
                 DecodeResult = row.ResultJson,
                 Barcode = row.Barcode,
                 SampleNo = row.SampleNo,

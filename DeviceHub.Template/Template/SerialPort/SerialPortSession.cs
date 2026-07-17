@@ -3,6 +3,7 @@ using DeviceHub.Template.Constant;
 using DeviceHub.Template.Transports;
 using DeviceHub.Utils;
 using System.IO.Ports;
+using System.Text;
 
 namespace DeviceHub.Template.Template.SerialPort
 {
@@ -10,28 +11,31 @@ namespace DeviceHub.Template.Template.SerialPort
     {
         private readonly string logType = nameof(SerialPortSession);
         private readonly object stateLock = new();
-        private readonly SerialPortReceiver receiver;
-        private readonly SerialPortSender sender;
-        private readonly IConsumeTask sendTask;
+        private SerialPortReceiver receiver = null!;
+        private SerialPortSender sender = null!;
+        private IConsumeTask sendTask = null!;
 
         private SerialPortTransport? transport;
+        private Encoding messageEncoding = null!;
         private LineState lineState = LineState.Idle;
         private long lastReceiveTime;
         private const int receiveIdleTimeoutSeconds = 20;
         private const int idleCheckIntervalMilliseconds = 5 * 1000;
 
-        public SerialPortSession(long instrumentId, IConsumeTask receiveTask, ISenderSerialPortTaskHandler senderTaskHandler)
-        {
-            receiver = new SerialPortReceiver(this, instrumentId, receiveTask);
-            sender = new SerialPortSender(this, senderTaskHandler);
-            sendTask = new NotifyTask(sender, "serial_port_send", idleCheckIntervalMilliseconds);
-        }
-
         /// <summary>供外部（如下发申请）唤起发送循环。</summary>
         public IConsumeTask SendTask => sendTask;
 
-        public async Task Start(SerialPortConfig config)
+        public async Task Start(
+            long instrumentId,
+            SerialPortConfig config,
+            IConsumeTask receiveTask,
+            ISenderSerialPortTaskHandler senderTaskHandler)
         {
+            messageEncoding = TextEncodings.GetEncoding(config.Encoding);
+            receiver = new SerialPortReceiver(this, instrumentId, receiveTask, messageEncoding);
+            sender = new SerialPortSender(this, senderTaskHandler);
+            sendTask = new NotifyTask(sender, "serial_port_send", idleCheckIntervalMilliseconds);
+
             transport = new SerialPortTransport(
                 config.PortName,
                 config.BaudRate,
@@ -126,7 +130,7 @@ namespace DeviceHub.Template.Template.SerialPort
         public void SendFrameUnlocked(byte[] frame)
         {
             transport?.Send(frame);
-            Logger.Debug(logType, $"串口发送帧: {SerialPortReceiver.Decode(frame)}");
+            Logger.Debug(logType, $"串口发送帧: {messageEncoding.GetString(frame)}");
         }
 
         public LineState GetLineStateUnlocked() => lineState;

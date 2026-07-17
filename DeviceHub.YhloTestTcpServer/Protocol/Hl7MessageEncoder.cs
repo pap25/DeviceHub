@@ -1,5 +1,6 @@
 ﻿using DeviceHub.Lis.Dto;
 using DeviceHub.Template.Constant;
+using DeviceHub.Utils;
 using System.Text;
 using static DeviceHub.YhloTestTcpServer.Protocol.Hl7MessageEntity;
 
@@ -11,7 +12,7 @@ namespace DeviceHub.YhloTestTcpServer.Protocol
         /// 根据仪器上报 MSH 生成应答：ORU→ACK^R01（MSH+MSA），QRY→QCK^Q02（MSH+MSA+ERR+QAK）。
         /// 仪器发来的 ACK 无需再应答，返回 null。
         /// </summary>
-        public static byte[]? EncoderAck(MshSegment msh)
+        public static byte[]? EncoderAck(MshSegment msh, Encoding encoding)
         {
             if (msh is null || string.IsNullOrEmpty(msh.MessageType))
                 return null;
@@ -78,31 +79,31 @@ namespace DeviceHub.YhloTestTcpServer.Protocol
                 sb.Append("QAK|SR|OK|\r");
             }
 
-            return WrapMllp(sb.ToString());
+            return WrapMllp(sb.ToString(), encoding);
         }
 
         /// <summary>
         /// 仪器向 LIS 查询样本后，LIS 应答样本申请信息（DSR^Q03，MSH-15 非 P）。
         /// </summary>
-        public static byte[] EncoderRequestApplication(GetSampleApplyItemOutput getSampleApplyItemOutput)
+        public static byte[] EncoderRequestApplication(GetSampleApplyItemOutput getSampleApplyItemOutput, Encoding encoding)
         {
             ArgumentNullException.ThrowIfNull(getSampleApplyItemOutput);
-            return EncodeDsr(getSampleApplyItemOutput, isProactiveIssue: false);
+            return EncodeDsr(getSampleApplyItemOutput, isProactiveIssue: false, encoding);
         }
 
         /// <summary>
         /// LIS 服务器主动下发样本申请信息到仪器（DSR^Q03，MSH-15=P）。
         /// </summary>
-        public static byte[] EncoderIssueApplication(GetSampleApplyItemOutput getSampleApplyItemOutput)
+        public static byte[] EncoderIssueApplication(GetSampleApplyItemOutput getSampleApplyItemOutput, Encoding encoding)
         {
             ArgumentNullException.ThrowIfNull(getSampleApplyItemOutput);
-            return EncodeDsr(getSampleApplyItemOutput, isProactiveIssue: true);
+            return EncodeDsr(getSampleApplyItemOutput, isProactiveIssue: true, encoding);
         }
 
         /// <summary>
         /// 组装 DSR^Q03：MSH + MSA + ERR + QAK + QRD + QRF + {DSP} + DSC。
         /// </summary>
-        private static byte[] EncodeDsr(GetSampleApplyItemOutput sample, bool isProactiveIssue)
+        private static byte[] EncodeDsr(GetSampleApplyItemOutput sample, bool isProactiveIssue, Encoding encoding)
         {
             string datetime = DateTime.Now.ToString("yyyyMMddHHmmss");
             string messageControlId = !string.IsNullOrEmpty(sample.MessageControlId)
@@ -166,7 +167,7 @@ namespace DeviceHub.YhloTestTcpServer.Protocol
             sb.Append('|');
             sb.Append('\r');
 
-            return WrapMllp(sb.ToString());
+            return WrapMllp(sb.ToString(), encoding);
         }
 
         private static void AppendDspSegments(StringBuilder sb, GetSampleApplyItemOutput sample)
@@ -257,9 +258,9 @@ namespace DeviceHub.YhloTestTcpServer.Protocol
             return Escape(value).Replace("^", "\\S\\", StringComparison.Ordinal);
         }
 
-        private static byte[] WrapMllp(string message)
+        private static byte[] WrapMllp(string message, Encoding encoding)
         {
-            byte[] body = Encoding.UTF8.GetBytes(message);
+            byte[] body = encoding.GetBytes(message);
             byte[] framed = new byte[body.Length + 3];
             framed[0] = HL7Protocols.VT;
             Buffer.BlockCopy(body, 0, framed, 1, body.Length);

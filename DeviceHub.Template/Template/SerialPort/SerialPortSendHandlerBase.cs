@@ -3,6 +3,7 @@ using DeviceHub.Lis.Dto;
 using DeviceHub.Model.Entities;
 using DeviceHub.Repository.Repositories;
 using DeviceHub.Service;
+using System.Text;
 using System.Text.Json;
 
 namespace DeviceHub.Template.Template.SerialPort
@@ -14,11 +15,13 @@ namespace DeviceHub.Template.Template.SerialPort
         private readonly SendMessageRepository sendMessageRepository = SendMessageRepository.Instance;
         private readonly SendMessageLargeRepository sendMessageLargeRepository = SendMessageLargeRepository.Instance;
         private readonly SendMessageService sendMessageService = SendMessageService.Instance;
+        protected Encoding MessageEncoding { get; }
         private long sendMessageId;
 
-        public SerialPortSendHandlerBase(long instrumentId)
+        public SerialPortSendHandlerBase(long instrumentId, Encoding encoding)
         {
             _instrumentId = instrumentId;
+            MessageEncoding = encoding;
         }
 
         public List<byte[]> SearchEncoderTask()

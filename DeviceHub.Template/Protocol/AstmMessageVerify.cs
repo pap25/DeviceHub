@@ -1,4 +1,5 @@
 using DeviceHub.Template.Constant;
+using DeviceHub.Utils;
 using System.Text;
 
 namespace DeviceHub.Template.Protocol;
@@ -20,7 +21,7 @@ public static class AstmMessageVerify
         public List<string> ParsedRecord { get; init; } = [];
     }
 
-    public static VerifyParseResult VerifyParse(byte[] rawMessage)
+    public static VerifyParseResult VerifyParse(byte[] rawMessage, Encoding encoding)
     {
         if (rawMessage is null || rawMessage.Length == 0)
         {
@@ -38,7 +39,7 @@ public static class AstmMessageVerify
 
         while (offset < buffer.Length)
         {
-            VerifyParseResult? frameResult = TryParseFrame(buffer, offset, out int frameLength, out string frameData);
+            VerifyParseResult? frameResult = TryParseFrame(buffer, offset, encoding, out int frameLength, out string frameData);
             if (frameResult != null)
             {
                 return frameResult;
@@ -58,6 +59,7 @@ public static class AstmMessageVerify
     private static VerifyParseResult? TryParseFrame(
         byte[] buffer,
         int offset,
+        Encoding encoding,
         out int frameLength,
         out string frameData)
     {
@@ -109,7 +111,7 @@ public static class AstmMessageVerify
             return Fail($"第{GetFrameIndex(buffer, offset)}帧校验失败");
         }
 
-        frameData = Encoding.UTF8.GetString(buffer, payloadStart, frameEndIndex - payloadStart - 1); // 把CR也去掉了
+        frameData = encoding.GetString(buffer, payloadStart, frameEndIndex - payloadStart - 1); // 把CR也去掉了
         frameLength = frameTrailerEnd - offset;
         return null;
     }

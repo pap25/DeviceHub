@@ -6,6 +6,7 @@ using DeviceHub.Template.Template;
 using DeviceHub.Template.Template.SerialPort;
 using DeviceHub.Utils;
 using DeviceHub.YhloTestSerialPort.Handler;
+using System.Text;
 
 namespace DeviceHub.YhloTestSerialPort
 {
@@ -13,16 +14,21 @@ namespace DeviceHub.YhloTestSerialPort
     {
         private readonly string logType = nameof(DeviceDriver);
         private IConsumeTask? receiveTask;
-        private SerialPortSession? session;
+        private SerialPortSession session;
         private IConsumeTask? lisIssueApplicationTask;
+
+        public DeviceDriver()
+        {
+            session = new SerialPortSession();
+        }
 
         public async Task Start(long instrumentId, SerialPortConfig config)
         {
-            receiveTask = new BatchConsumeTask<ReceiveMessage>(new ReceiveHandler(instrumentId));
+            Encoding encoding = TextEncodings.GetEncoding(config.Encoding);
+            receiveTask = new BatchConsumeTask<ReceiveMessage>(new ReceiveHandler(instrumentId, encoding));
             receiveTask.StartConsume();
 
-            session = new SerialPortSession(instrumentId, receiveTask, new SendHandler(instrumentId));
-            await session.Start(config);
+            await session.Start(instrumentId, config, receiveTask, new SendHandler(instrumentId, encoding));
 
             lisIssueApplicationTask = new BatchConsumeTask<GetSampleApplyItemOutput>(new LisIssueApplicationHandler(instrumentId, session.SendTask), "lis_issue_application", 30 * 1000);
             lisIssueApplicationTask.StartConsume();
@@ -38,7 +44,7 @@ namespace DeviceHub.YhloTestSerialPort
         public void Stop()
         {
             receiveTask?.Shutdown();
-            session?.Stop();
+            session.Stop();
             Logger.Info(logType, $"设备驱动已停止");
         }
     }

@@ -5,6 +5,7 @@ using DeviceHub.Lis.Dto;
 using DeviceHub.Lis.Impl;
 using DeviceHub.Utils;
 using DeviceHub.Win.Base;
+using System.Text;
 
 namespace DeviceHub.Win
 {
@@ -12,6 +13,7 @@ namespace DeviceHub.Win
     {
         private readonly ILisClient lisClient = LisClient.Instance;
         private int _instrumentId;
+        private Encoding _messageEncoding = TextEncodings.GetEncoding(null);
         private bool _isReady;
         private bool _isError = false;
         private ITcpDeviceDriver? tcpDeviceDriver = null;
@@ -45,6 +47,7 @@ namespace DeviceHub.Win
             this.Text += $" {instrument.InstrumentModel} {instrument.InstrumentName} {instrument.InstrumentId}"; // 窗口title
 
             DriverConfig config = await lisClient.GetDriverConfig(_instrumentId);
+            _messageEncoding = TextEncodings.GetEncoding(config.TcpConfig?.Encoding ?? config.SerialPortConfig?.Encoding);
             await initLisConfig(instrument, config, _isError);
             await initReceiveMessage();
             await initSendMessage();

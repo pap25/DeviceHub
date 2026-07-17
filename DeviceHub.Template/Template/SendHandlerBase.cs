@@ -3,6 +3,7 @@ using DeviceHub.Model.Entities;
 using DeviceHub.Repository.Repositories;
 using DeviceHub.Service;
 using DeviceHub.Utils;
+using System.Text;
 using System.Text.Json;
 
 namespace DeviceHub.Template.Template
@@ -14,10 +15,12 @@ namespace DeviceHub.Template.Template
         private readonly SendMessageRepository sendMessageRepository = SendMessageRepository.Instance;
         private readonly SendMessageLargeRepository sendMessageLargeRepository = SendMessageLargeRepository.Instance;
         private readonly SendMessageService sendMessageService = SendMessageService.Instance;
+        protected Encoding MessageEncoding { get; }
 
-        public SendHandlerBase(long instrumentId)
+        public SendHandlerBase(long instrumentId, Encoding encoding)
         {
             this._instrumentId = instrumentId;
+            MessageEncoding = encoding;
         }
 
         public IEnumerable<SendMessage> SearchTask()

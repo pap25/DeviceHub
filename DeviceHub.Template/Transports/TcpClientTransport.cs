@@ -55,10 +55,8 @@ namespace DeviceHub.Template.Transports
             await _stream.WriteAsync(data);
         }
 
-        public Task SendAsync(string message, Encoding? encoding = null)
+        public Task SendAsync(string message, Encoding encoding)
         {
-            encoding ??= Encoding.ASCII;
-
             return SendAsync(encoding.GetBytes(message));
         }
 

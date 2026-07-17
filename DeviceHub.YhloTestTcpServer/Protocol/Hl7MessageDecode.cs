@@ -1,4 +1,5 @@
 using DeviceHub.Template.Constant;
+using DeviceHub.Utils;
 using System.Text;
 using static DeviceHub.YhloTestTcpServer.Protocol.Hl7MessageEntity;
 
@@ -12,7 +13,7 @@ public static class Hl7MessageDecode
     /// <summary>
     /// 仅解析报文中的 MSH 段（用于即时 ACK）。
     /// </summary>
-    public static MshSegment? ParseMsh(byte[] rawMessage)
+    public static MshSegment? ParseMsh(byte[] rawMessage, Encoding encoding)
     {
         if (rawMessage is null || rawMessage.Length == 0)
             return null;
@@ -29,7 +30,7 @@ public static class Hl7MessageDecode
         if (end <= start)
             return null;
 
-        string text = Encoding.UTF8.GetString(rawMessage, start, end - start);
+        string text = encoding.GetString(rawMessage, start, end - start);
         foreach (string line in text.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries))
         {
             string segment = line.Trim();

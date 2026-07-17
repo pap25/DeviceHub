@@ -6,6 +6,7 @@ using DeviceHub.Template.Protocol;
 using DeviceHub.Template.Template;
 using DeviceHub.Utils;
 using DeviceHub.YhloTestTcpServer.Protocol;
+using System.Text;
 
 namespace DeviceHub.YhloTestTcpServer.Handler
 {
@@ -23,14 +24,14 @@ namespace DeviceHub.YhloTestTcpServer.Handler
             }
         }
 
-        public ReceiveHandler(long instrumentId) : base(instrumentId)
+        public ReceiveHandler(long instrumentId, Encoding encoding) : base(instrumentId, encoding)
         {
             this._instrumentId = instrumentId;
         }
 
         protected override void ParseData(byte[] rawMessage, ReceiveMessage task)
         {
-            Hl7MessageVerify.VerifyParseResult verifyResult = Hl7MessageVerify.VerifyParse(rawMessage);
+            Hl7MessageVerify.VerifyParseResult verifyResult = Hl7MessageVerify.VerifyParse(rawMessage, MessageEncoding);
             if (!verifyResult.Success)
             {
                 MarkFailed(task.Id, verifyResult.ErrorMessage);

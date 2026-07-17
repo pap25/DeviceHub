@@ -15,25 +15,27 @@ namespace DeviceHub.YhloTestSerialPort.Protocol
         /// <summary>
         /// 仪器查询后 LIS 返回样本申请信息（H-12=QA，O-26=Q）。
         /// </summary>
-        public static List<byte[]> EncoderRequestApplication(GetSampleApplyItemOutput sampleApplyItem)
+        public static List<byte[]> EncoderRequestApplication(GetSampleApplyItemOutput sampleApplyItem, Encoding encoding)
         {
             ArgumentNullException.ThrowIfNull(sampleApplyItem);
             return EncodeSampleApplication(
                 sampleApplyItem,
                 nameof(HeaderRecord.MessageType.QA),
-                "Q");
+                "Q",
+                encoding);
         }
 
         /// <summary>
         /// LIS 主动下发样本申请信息到仪器（H-12=SA，O-26=O）。
         /// </summary>
-        public static List<byte[]> EncoderIssueApplication(GetSampleApplyItemOutput sampleApplyItem)
+        public static List<byte[]> EncoderIssueApplication(GetSampleApplyItemOutput sampleApplyItem, Encoding encoding)
         {
             ArgumentNullException.ThrowIfNull(sampleApplyItem);
             return EncodeSampleApplication(
                 sampleApplyItem,
                 nameof(HeaderRecord.MessageType.SA),
-                "O");
+                "O",
+                encoding);
         }
 
         /// <summary>
@@ -42,7 +44,8 @@ namespace DeviceHub.YhloTestSerialPort.Protocol
         private static List<byte[]> EncodeSampleApplication(
             GetSampleApplyItemOutput sample,
             string processingId,
-            string reportType)
+            string reportType,
+            Encoding encoding)
         {
             string datetime = DateTime.Now.ToString("yyyyMMddHHmmss");
             string characterSet = string.IsNullOrEmpty(sample.CharacterSet) ? "ASCII" : sample.CharacterSet;
@@ -78,7 +81,7 @@ namespace DeviceHub.YhloTestSerialPort.Protocol
                 records.Add("L|1|N");
             }
 
-            return BuildFrames(records);
+            return BuildFrames(records, encoding);
         }
 
         /// <summary>
@@ -219,7 +222,7 @@ namespace DeviceHub.YhloTestSerialPort.Protocol
         /// 每条记录单独成帧：中间帧 ETX，末帧 ETB（与手册通信示例一致）。
         /// 帧格式：&lt;STX&gt;FN DATA&lt;CR&gt;&lt;ETX/ETB&gt;CS&lt;CR&gt;&lt;LF&gt;
         /// </summary>
-        private static List<byte[]> BuildFrames(List<string> records)
+        private static List<byte[]> BuildFrames(List<string> records, Encoding encoding)
         {
             var frames = new List<byte[]>(records.Count);
             for (int i = 0; i < records.Count; i++)
@@ -227,15 +230,15 @@ namespace DeviceHub.YhloTestSerialPort.Protocol
                 bool isLast = i == records.Count - 1;
                 byte frameNumber = (byte)('1' + (i % 7));
                 byte frameEnd = isLast ? ASTMProtocols.ETB : ASTMProtocols.ETX;
-                frames.Add(BuildFrame(frameNumber, records[i], frameEnd));
+                frames.Add(BuildFrame(frameNumber, records[i], frameEnd, encoding));
             }
 
             return frames;
         }
 
-        private static byte[] BuildFrame(byte frameNumber, string record, byte frameEnd)
+        private static byte[] BuildFrame(byte frameNumber, string record, byte frameEnd, Encoding encoding)
         {
-            byte[] payload = Encoding.UTF8.GetBytes(record);
+            byte[] payload = encoding.GetBytes(record);
             // STX + FN + DATA + CR + ETX/ETB + CS(2) + CR + LF
             byte[] frame = new byte[1 + 1 + payload.Length + 1 + 1 + 2 + 2];
             int offset = 0;

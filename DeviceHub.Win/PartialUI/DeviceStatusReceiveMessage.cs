@@ -67,7 +67,7 @@ namespace DeviceHub.Win
             string sampleNo = txtReceiveMessageSampleNo.Text.Trim();
             long createTimeStart = new DateTimeOffset(dtpReceiveMessageCreateTimeStart.Value.Date).ToUnixTimeMilliseconds();
             long createTimeEnd = new DateTimeOffset(dtpReceiveMessageCreateTimeEnd.Value.Date.AddDays(1).AddMilliseconds(-1)).ToUnixTimeMilliseconds();
-            Page<ReceiveMessagePageItem> page = await ReceiveMessageService.Instance.GetPage(_instrumentId, status, type, barcode, sampleNo, createTimeStart, createTimeEnd, pageSize, pageIndex);
+            Page<ReceiveMessagePageItem> page = await ReceiveMessageService.Instance.GetPage(_instrumentId, _messageEncoding, status, type, barcode, sampleNo, createTimeStart, createTimeEnd, pageSize, pageIndex);
             dgvReceiveMessage.DataSource = page.Data;
             pagerReceiveMessage.SetPageInfo(page);
         }

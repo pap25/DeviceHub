@@ -5,6 +5,7 @@ using DeviceHub.Service;
 using DeviceHub.Template.Protocol;
 using DeviceHub.Template.Template;
 using DeviceHub.YhloTestSerialPort.Protocol;
+using System.Text;
 
 namespace DeviceHub.YhloTestSerialPort.Handler
 {
@@ -14,14 +15,14 @@ namespace DeviceHub.YhloTestSerialPort.Handler
         private readonly ReceiveMessageService receiveMessageService = ReceiveMessageService.Instance;
         private readonly ILisClient lisClient = LisClient.Instance;
 
-        public ReceiveHandler(long instrumentId) : base(instrumentId)
+        public ReceiveHandler(long instrumentId, Encoding encoding) : base(instrumentId, encoding)
         {
             _instrumentId = instrumentId;
         }
 
         protected override void ParseData(byte[] rawMessage, ReceiveMessage task)
         {
-            AstmMessageVerify.VerifyParseResult verifyResult = AstmMessageVerify.VerifyParse(rawMessage);
+            AstmMessageVerify.VerifyParseResult verifyResult = AstmMessageVerify.VerifyParse(rawMessage, MessageEncoding);
             if (!verifyResult.Success)
             {
                 MarkFailed(task.Id, verifyResult.ErrorMessage);

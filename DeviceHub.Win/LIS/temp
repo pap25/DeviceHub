@@ -47,7 +47,7 @@ OBX|9|NM|BC101|CHOL|5.67|mmol/L||N|||F||5.67|20240314114758|||M1|
 
 
 仪器           LIS
-ENQ     ->     ACK                     LineState.Receiving, 发ACKFrame   ->     ACK                     LineState.Receiving, 发ACKEOT     ->     不需要任何回复          清接收缓存, 清理发送缓存, LineState.Idle, NotifyConsumeLIS            仪器ENQ     ->     ACK/NAK or 任何都可能   LineState.Idle情况下查询sendFrameList>0则发ENQ并LineState.WaitingEnqAck; 收NAK LineState.Receiving收ACK LineState.Sending, NotifyConsumeENQ LineState.ReceivingFrame LineState.ReceivingEOT LineState.IdleFrame   ->     ACK/NAK or 任何都可能   发Frame, 如果发完Completed, 清理发送缓存, LineState.Idle, 发EOTEOT     ->     ACK or 任何都可能  不做任何处理///// <summary>///// ASTM 会话状态///// </summary>//public enum SessionState//    {//        Idle,       // 空闲状态，可发起或接收新的通信//        WaitingEnqAck,//        Sending,    // 本端正在发送数据（包括 ENQ、数据帧、EOT）//        Receiving,  // 本端正在接收对端发送的数据//        Error       // 会话异常（如超时、重试次数超限或串口异常）//    }//    /// <summary>//    /// ASTM 发送状态//    /// </summary>//    public enum SendState//    {//        None,              // 当前没有发送任务//        WaitingEnqAck,     // 已发送 ENQ，等待对端 ACK//        WaitingFrameAck,   // 已发送数据帧，等待对端 ACK 或 NAK//        Retrying           // 当前正在重发数据帧//    }
+ENQ     ->     ACK                     LineState.Receiving, 发ACKFrame   ->     ACK                     LineState.Receiving, 发ACKEOT     ->     不需要任何回复          清接收缓存, 清理发送缓存, LineState.Idle, NotifyConsumeLIS            仪器ENQ     ->     ACK/NAK or 任何都可能   LineState.Idle情况下查询sendFrameList>0则发ENQ并LineState.WaitingEnqAck; 收NAK LineState.Receiving收ACK LineState.Sending, NotifyConsumeENQ LineState.ReceivingFrame LineState.ReceivingEOT LineState.IdleFrame   ->     ACK/NAK or 任何都可能   发Frame, 如果发完Completed, 清理发送缓存, LineState.Idle, 发EOTEOT     ->     ACK or 任何都可能  不做任何处理
 
 
 # 工作计划（2026.06.25~2026.08.14）
@@ -78,9 +78,6 @@ ENQ     ->     ACK                     LineState.Receiving, 发ACKFrame   ->   
 	1 写完其它流程（网口、串口）
 	2 打印日志和添加数据库日志
 	3 完整测试
-	字段加长一点 ok
-	申请下发时候要唤起 ok
-	申请下发时候串口没唤起（唤起不了）
 2. 对接调试仪器
 
 0 调试

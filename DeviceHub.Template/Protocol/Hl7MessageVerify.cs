@@ -1,4 +1,5 @@
 using DeviceHub.Template.Constant;
+using DeviceHub.Utils;
 using System.Text;
 
 namespace DeviceHub.Template.Protocol;
@@ -17,7 +18,7 @@ public static class Hl7MessageVerify
         public List<string> SegmentList { get; init; } = [];
     }
 
-    public static VerifyParseResult VerifyParse(byte[] rawMessage)
+    public static VerifyParseResult VerifyParse(byte[] rawMessage, Encoding encoding)
     {
         if (rawMessage is null || rawMessage.Length == 0)
             return Fail("报文为空");
@@ -34,7 +35,7 @@ public static class Hl7MessageVerify
         if (end <= start)
             return Fail("报文内容为空");
 
-        string text = Encoding.UTF8.GetString(rawMessage, start, end - start);
+        string text = encoding.GetString(rawMessage, start, end - start);
         List<string> segmentList = text
             .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
             .Select(s => s.Trim())

@@ -15,22 +15,24 @@ namespace DeviceHub.Template.Template.SerialPort
         private readonly ReceiveMessageService receiveMessageService = ReceiveMessageService.Instance;
 
         private readonly List<byte> buffer = new();
+        private readonly Encoding encoding;
 
         /// <summary>
         /// buffer 中下一待解析帧的起始位置（此前完整帧均已 ACK）
         /// </summary>
         private int processedOffset;
 
-        public SerialPortReceiver(SerialPortSession session, long instrumentId, IConsumeTask receiveTask)
+        public SerialPortReceiver(SerialPortSession session, long instrumentId, IConsumeTask receiveTask, Encoding encoding)
         {
             this.session = session;
             this.instrumentId = instrumentId;
             this.receiveTask = receiveTask;
+            this.encoding = encoding;
         }
 
         public void OnDataReceived(byte[] data)
         {
-            Logger.Debug(logType, $"串口接收消息: {Decode(data)}");
+            Logger.Debug(logType, $"串口接收消息: {Decode(data, encoding)}");
 
             buffer.AddRange(data);
 
@@ -198,19 +200,19 @@ namespace DeviceHub.Template.Template.SerialPort
             return -1;
         }
 
-        public static string Decode(byte[] data)
+        public static string Decode(byte[] data, Encoding encoding)
         {
-            return Encoding.UTF8.GetString(data);
+            return encoding.GetString(data);
         }
 
-        private static string Decode(List<byte> data)
+        private string Decode(List<byte> data)
         {
-            return Decode(data.ToArray());
+            return Decode(data.ToArray(), encoding);
         }
 
-        private static string Decode(List<byte> data, int startIndex, int count)
+        private string Decode(List<byte> data, int startIndex, int count)
         {
-            return count == 0 ? string.Empty : Decode(data.GetRange(startIndex, count).ToArray());
+            return count == 0 ? string.Empty : Decode(data.GetRange(startIndex, count).ToArray(), encoding);
         }
     }
 }

@@ -5,6 +5,7 @@ using DeviceHub.Model.Entities;
 using DeviceHub.Template.Template;
 using DeviceHub.Utils;
 using DeviceHub.YhloTestTcpServer.Handler;
+using System.Text;
 
 namespace DeviceHub.YhloTestTcpServer
 {
@@ -22,13 +23,14 @@ namespace DeviceHub.YhloTestTcpServer
 
         public Task Start(long instrumentId, TcpConfig config)
         {
-            ReceiveHandler receiveHandler = new(instrumentId);
+            Encoding encoding = TextEncodings.GetEncoding(config.Encoding);
+            ReceiveHandler receiveHandler = new(instrumentId, encoding);
             IConsumeTask receiveTask = new BatchConsumeTask<ReceiveMessage>(receiveHandler);
             receiveTask.StartConsume();
 
             session.Start(instrumentId, config, receiveTask);
 
-            sendTask = new BatchConsumeTask<SendMessage>(new SendHandler(instrumentId, session));
+            sendTask = new BatchConsumeTask<SendMessage>(new SendHandler(instrumentId, session, encoding));
             sendTask.StartConsume();
 
             receiveHandler.SendTask = sendTask;
