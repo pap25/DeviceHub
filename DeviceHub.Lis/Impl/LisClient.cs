@@ -49,7 +49,7 @@ namespace DeviceHub.Lis.Impl
                 {
                     string json = await File.ReadAllTextAsync(serialPortConfigFile);
                     serialPortConfig = JsonSerializer.Deserialize<SerialPortConfig>(json);
-                    serialPortConfig.Encoding = "UTF-8";
+                    serialPortConfig.Encoding = "GBK";
                 }
                 catch
                 {
