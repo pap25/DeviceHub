@@ -32,7 +32,7 @@ namespace DeviceHub.Template.Template.SerialPort
 
         public void OnDataReceived(byte[] data)
         {
-            Logger.Debug(logType, $"串口接收消息: {Decode(data, encoding)}");
+            Logger.Debug(logType, $"串口接收消息: {Decode(data)}");
 
             buffer.AddRange(data);
 
@@ -200,19 +200,19 @@ namespace DeviceHub.Template.Template.SerialPort
             return -1;
         }
 
-        public static string Decode(byte[] data, Encoding encoding)
+        public string Decode(byte[] data)
         {
             return encoding.GetString(data);
         }
 
         private string Decode(List<byte> data)
         {
-            return Decode(data.ToArray(), encoding);
+            return Decode(data.ToArray());
         }
 
         private string Decode(List<byte> data, int startIndex, int count)
         {
-            return count == 0 ? string.Empty : Decode(data.GetRange(startIndex, count).ToArray(), encoding);
+            return count == 0 ? string.Empty : Decode(data.GetRange(startIndex, count).ToArray());
         }
     }
 }
