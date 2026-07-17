@@ -74,7 +74,7 @@ ENQ     ->     ACK                     LineState.Receiving, 发ACKFrame   ->   
 	编码统一问题 ok
 	错误原因太长问题
 	
-	System.Text.Encoding.CodePages 编码
+	System.Text.Encoding.CodePages 编码 ok
 	1 写完其它流程（网口、串口）
 	2 打印日志和添加数据库日志
 	3 完整测试
