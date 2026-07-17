@@ -11,20 +11,20 @@ namespace DeviceHub.Template.Template.SerialPort
         private readonly string logType = nameof(SerialPortSession);
         private readonly object stateLock = new();
         private readonly SerialPortReceiver receiver;
-        private readonly SerialPortSenderV2 sender;
+        private readonly SerialPortSender sender;
         private readonly IConsumeTask sendTask;
 
         private SerialPortTransport? transport;
         private LineState lineState = LineState.Idle;
         private long lastReceiveTime;
-        private Timer? idleCheckTimer;
-        private const int receiveIdleTimeoutSeconds = 15;
+        private const int receiveIdleTimeoutSeconds = 20;
+        private const int idleCheckIntervalMilliseconds = 5 * 1000;
 
         public SerialPortSession(long instrumentId, IConsumeTask receiveTask, ISenderSerialPortTaskHandler senderTaskHandler)
         {
             receiver = new SerialPortReceiver(this, instrumentId, receiveTask);
-            sender = new SerialPortSenderV2(this, senderTaskHandler);
-            sendTask = new NotifyTask(sender, "serial_port_send", 60 * 1000);
+            sender = new SerialPortSender(this, senderTaskHandler);
+            sendTask = new NotifyTask(sender, "serial_port_send", idleCheckIntervalMilliseconds);
         }
 
         /// <summary>供外部（如下发申请）唤起发送循环。</summary>
@@ -42,14 +42,9 @@ namespace DeviceHub.Template.Template.SerialPort
             transport.DataReceived += Transport_DataReceived;
 
             lastReceiveTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            idleCheckTimer = new Timer(
-                CheckReceiveIdleTimeout,
-                null,
-                TimeSpan.FromSeconds(5),
-                TimeSpan.FromSeconds(5));
 
-            sendTask.StartConsume();
             await Task.Run(transport.Open);
+            sendTask.StartConsume();
         }
 
         /// <summary>在 stateLock 下执行，供 Sender HandleTask 使用。</summary>
@@ -65,7 +60,7 @@ namespace DeviceHub.Template.Template.SerialPort
         {
             try
             {
-                lastReceiveTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                Volatile.Write(ref lastReceiveTime, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
                 receiver.OnDataReceived(data);
             }
             catch (Exception ex)
@@ -141,43 +136,26 @@ namespace DeviceHub.Template.Template.SerialPort
             this.lineState = state;
             if (state == LineState.WaitingEnqAck)
             {
-                lastReceiveTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                Volatile.Write(ref lastReceiveTime, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
             }
         }
 
-        private void CheckReceiveIdleTimeout(object? state)
+        /// <summary>检查接收空闲超时。调用方须已持有 stateLock。</summary>
+        public void CheckReceiveIdleTimeoutUnlocked()
         {
-            try
-            {
-                long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-                if (now - lastReceiveTime < receiveIdleTimeoutSeconds * 1000L)
-                    return;
+            if (lineState == LineState.Idle)
+                return;
 
-                lock (stateLock)
-                {
-                    if (now - lastReceiveTime < receiveIdleTimeoutSeconds * 1000L)
-                        return;
+            long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            if (now - Volatile.Read(ref lastReceiveTime) < receiveIdleTimeoutSeconds * 1000L)
+                return;
 
-                    if (lineState != LineState.Idle)
-                    {
-                        Logger.Info(logType, $"超过{receiveIdleTimeoutSeconds}秒未收到消息，重置为Idle并尝试发送");
-                        sender.ClearSendFrames();
-                    }
-
-                    lineState = LineState.Idle;
-                    sendTask.NotifyConsume();
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(logType, "空闲超时检查异常", ex);
-            }
+            Logger.Info(logType, $"超过{receiveIdleTimeoutSeconds}秒未收到消息，重置为Idle并尝试发送");
+            lineState = LineState.Idle;
         }
 
         public void Stop()
         {
-            idleCheckTimer?.Dispose();
-            idleCheckTimer = null;
             sendTask.Shutdown();
 
             if (transport != null)
