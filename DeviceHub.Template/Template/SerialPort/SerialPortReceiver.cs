@@ -34,16 +34,23 @@ namespace DeviceHub.Template.Template.SerialPort
 
             buffer.AddRange(data);
 
-            // 提取控制字符
-            while (TryExtractControlChar(out byte controlChar))
+            // 持续交替提取控制字符和完整消息，处理同一批数据中的“帧 + EOT”等组合。
+            while (true)
             {
-                session.HandleControlChar(controlChar);
-            }
+                if (TryExtractControlChar(out byte controlChar))
+                {
+                    session.HandleControlChar(controlChar);
+                    continue;
+                }
 
-            // // 按 Terminator Record（L 记录）切分完整消息
-            while (TryExtractMessage(out List<byte> message))
-            {
-                LogCompleteMessage(message);
+                // 按 Terminator Record（L 记录）切分完整消息
+                if (TryExtractMessage(out List<byte> message))
+                {
+                    LogCompleteMessage(message);
+                    continue;
+                }
+
+                break;
             }
         }
 
