@@ -25,6 +25,6 @@ namespace DeviceHub.Utils
         /// <summary>
         /// 国内串口设备常用 GBK 编码。
         /// </summary>
-        public static Encoding Gbk => GetEncoding("GBK");
+        //public static Encoding Gbk => GetEncoding("GBK");
     }
 }

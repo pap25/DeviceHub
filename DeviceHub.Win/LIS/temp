@@ -71,7 +71,7 @@ ENQ     ->     ACK                     LineState.Receiving, 发ACKFrame   ->   
 	a. 主动推送检验申请单到仪器
 	b. 检验完成后送检验结果到LIS
 	c. 向LIS查询样本申请单信息到仪器
-	编码统一问题
+	编码统一问题 ok
 	错误原因太长问题
 	
 	System.Text.Encoding.CodePages 编码
