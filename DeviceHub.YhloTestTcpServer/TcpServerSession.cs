@@ -10,14 +10,14 @@ namespace DeviceHub.YhloTestTcpServer
 
         protected override byte[]? GetReplyAckMessage(byte[] rawMessage)
         {
-            Hl7MessageEntity.MshSegment? msh = Hl7MessageDecode.ParseMsh(rawMessage, MessageEncoding);
+            Hl7MessageEntity.MshSegment? msh = Hl7MessageDecode.ParseMsh(rawMessage, messageEncoding);
             if (msh is null)
             {
                 Logger.Warn(logType, "无法构建ACK: 报文缺少MSH段");
                 return null;
             }
 
-            return Hl7MessageEncoder.EncoderAck(msh, MessageEncoding);
+            return Hl7MessageEncoder.EncoderAck(msh, messageEncoding);
         }
     }
 }
