@@ -60,12 +60,17 @@ namespace DeviceHub.Template.Template.SerialPort
                     // 已发 ENQ，等待对端 ACK；由 Session 收到 ACK 后改状态并 NotifyConsume
                     break;
 
+                case LineState.WaitingFrameAck:
+                    // 已发数据帧，等待对端 ACK；定时唤醒时不得继续发送
+                    break;
+
                 case LineState.Sending:
                     if (sendFrameList.Count > sendFrameOffset)
                     {
                         byte[] frame = sendFrameList[sendFrameOffset];
                         session.SendFrameUnlocked(frame);
                         sendFrameOffset++;
+                        session.SetLineStateUnlocked(LineState.WaitingFrameAck);
                         // 发完一帧后等待 ACK，再由 Session NotifyConsume 唤起发下一帧
                     }
                     else if (sendFrameList.Count > 0)

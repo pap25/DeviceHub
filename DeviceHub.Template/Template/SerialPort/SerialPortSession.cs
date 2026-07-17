@@ -89,7 +89,7 @@ namespace DeviceHub.Template.Template.SerialPort
                         Logger.Debug(logType, "收到 ACK");
                         if (sender.SendFrameList.Count == 0)
                             return;
-                        if (lineState is not (LineState.WaitingEnqAck or LineState.Sending))
+                        if (lineState is not (LineState.WaitingEnqAck or LineState.WaitingFrameAck))
                             return;
                         lineState = LineState.Sending;
                         sendTask.NotifyConsume();
@@ -134,7 +134,7 @@ namespace DeviceHub.Template.Template.SerialPort
         public void SetLineStateUnlocked(LineState state)
         {
             this.lineState = state;
-            if (state == LineState.WaitingEnqAck)
+            if (state is LineState.WaitingEnqAck or LineState.WaitingFrameAck)
             {
                 Volatile.Write(ref lastReceiveTime, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
             }
@@ -180,6 +180,7 @@ namespace DeviceHub.Template.Template.SerialPort
     {
         Idle,
         WaitingEnqAck,
+        WaitingFrameAck,
         Sending,
         Receiving
     }
