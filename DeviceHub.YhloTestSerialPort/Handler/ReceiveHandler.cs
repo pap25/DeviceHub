@@ -22,7 +22,7 @@ namespace DeviceHub.YhloTestSerialPort.Handler
 
         protected override void ParseData(byte[] rawMessage, ReceiveMessage task)
         {
-            AstmMessageVerify.VerifyParseResult verifyResult = AstmMessageVerify.VerifyParse(rawMessage, MessageEncoding);
+            AstmMessageVerify.VerifyParseResult verifyResult = AstmMessageVerify.VerifyParse(rawMessage, messageEncoding);
             if (!verifyResult.Success)
             {
                 MarkFailed(task.Id, verifyResult.ErrorMessage);

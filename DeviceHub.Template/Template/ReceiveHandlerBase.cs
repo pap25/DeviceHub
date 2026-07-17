@@ -11,12 +11,12 @@ namespace DeviceHub.Template.Template
         private long _instrumentId;
         private readonly ReceiveMessageRepository receiveMessageRepository = ReceiveMessageRepository.Instance;
         private readonly ReceiveMessageLargeRepository receiveMessageLargeRepository = ReceiveMessageLargeRepository.Instance;
-        protected Encoding MessageEncoding { get; }
+        protected Encoding messageEncoding;
 
         public ReceiveHandlerBase(long instrumentId, Encoding encoding)
         {
             _instrumentId = instrumentId;
-            MessageEncoding = encoding;
+            messageEncoding = encoding;
         }
 
         public IEnumerable<ReceiveMessage> SearchTask()

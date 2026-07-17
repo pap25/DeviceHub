@@ -13,12 +13,12 @@ namespace DeviceHub.YhloTestSerialPort.Handler
 
         protected override List<byte[]> EncoderIssueApplication(GetSampleApplyItemOutput getSampleApplyItemOutput)
         {
-            return AstmMessageEncoder.EncoderIssueApplication(getSampleApplyItemOutput, MessageEncoding);
+            return AstmMessageEncoder.EncoderIssueApplication(getSampleApplyItemOutput, messageEncoding);
         }
 
         protected override List<byte[]> EncoderRequestApplication(GetSampleApplyItemOutput getSampleApplyItemOutput)
         {
-            return AstmMessageEncoder.EncoderRequestApplication(getSampleApplyItemOutput, MessageEncoding);
+            return AstmMessageEncoder.EncoderRequestApplication(getSampleApplyItemOutput, messageEncoding);
         }
     }
 }

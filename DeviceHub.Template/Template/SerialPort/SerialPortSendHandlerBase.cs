@@ -15,13 +15,13 @@ namespace DeviceHub.Template.Template.SerialPort
         private readonly SendMessageRepository sendMessageRepository = SendMessageRepository.Instance;
         private readonly SendMessageLargeRepository sendMessageLargeRepository = SendMessageLargeRepository.Instance;
         private readonly SendMessageService sendMessageService = SendMessageService.Instance;
-        protected Encoding MessageEncoding { get; }
+        protected Encoding messageEncoding;
         private long sendMessageId;
 
         public SerialPortSendHandlerBase(long instrumentId, Encoding encoding)
         {
             _instrumentId = instrumentId;
-            MessageEncoding = encoding;
+            messageEncoding = encoding;
         }
 
         public List<byte[]> SearchEncoderTask()

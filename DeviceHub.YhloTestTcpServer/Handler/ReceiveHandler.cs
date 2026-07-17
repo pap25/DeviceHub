@@ -31,7 +31,7 @@ namespace DeviceHub.YhloTestTcpServer.Handler
 
         protected override void ParseData(byte[] rawMessage, ReceiveMessage task)
         {
-            Hl7MessageVerify.VerifyParseResult verifyResult = Hl7MessageVerify.VerifyParse(rawMessage, MessageEncoding);
+            Hl7MessageVerify.VerifyParseResult verifyResult = Hl7MessageVerify.VerifyParse(rawMessage, messageEncoding);
             if (!verifyResult.Success)
             {
                 MarkFailed(task.Id, verifyResult.ErrorMessage);

@@ -15,12 +15,12 @@ namespace DeviceHub.Template.Template
         private readonly SendMessageRepository sendMessageRepository = SendMessageRepository.Instance;
         private readonly SendMessageLargeRepository sendMessageLargeRepository = SendMessageLargeRepository.Instance;
         private readonly SendMessageService sendMessageService = SendMessageService.Instance;
-        protected Encoding MessageEncoding { get; }
+        protected Encoding messageEncoding;
 
         public SendHandlerBase(long instrumentId, Encoding encoding)
         {
             this._instrumentId = instrumentId;
-            MessageEncoding = encoding;
+            messageEncoding = encoding;
         }
 
         public IEnumerable<SendMessage> SearchTask()
