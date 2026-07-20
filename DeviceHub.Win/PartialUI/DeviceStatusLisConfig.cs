@@ -85,7 +85,7 @@ namespace DeviceHub.Win
 
         private void StartCommStatusTimer()
         {
-            _commStatusTimer ??= new System.Windows.Forms.Timer { Interval = 5000 };
+            _commStatusTimer ??= new System.Windows.Forms.Timer { Interval = 3000 };
             _commStatusTimer.Tick -= CommStatusTimer_Tick;
             _commStatusTimer.Tick += CommStatusTimer_Tick;
             _commStatusTimer.Start();
