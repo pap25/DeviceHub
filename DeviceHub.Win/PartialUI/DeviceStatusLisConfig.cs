@@ -19,7 +19,7 @@ namespace DeviceHub.Win
             }
             else if (config.SerialPortConfig != null)
             {
-                ShowSerialPortConfig(config.SerialPortConfig, "已打开", Color.Green);
+                ShowSerialPortConfig(config.SerialPortConfig, serialDeviceDriver == null ? "" : serialDeviceDriver.GetLineStateName(), Color.Green);
             }
         }
 

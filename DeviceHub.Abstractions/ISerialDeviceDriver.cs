@@ -8,7 +8,7 @@ namespace DeviceHub.Abstractions
 
         void NotifyLisIssueApplication();
 
-        string GetLineState();
+        string GetLineStateName();
 
         void Stop();
     }
