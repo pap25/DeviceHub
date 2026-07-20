@@ -7,6 +7,9 @@ namespace DeviceHub.Abstractions
         Task Start(long instrumentId, SerialPortConfig serialPortConfig);
 
         void NotifyLisIssueApplication();
+
+        string GetLineState();
+
         void Stop();
     }
 }

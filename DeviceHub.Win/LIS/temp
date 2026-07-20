@@ -1,7 +1,5 @@
 1H|\^&|||FUS2000|||||HOST||P|1|20240129143056EB
-
 2Q|1||7537526924|ALL||||||||OCE
-
 3L|1|N06
 
 
@@ -47,7 +45,7 @@ OBX|9|NM|BC101|CHOL|5.67|mmol/L||N|||F||5.67|20240314114758|||M1|
 
 
 仪器           LIS
-ENQ     ->     ACK                     LineState.Receiving, 发ACKFrame   ->     ACK                     LineState.Receiving, 发ACKEOT     ->     不需要任何回复          清接收缓存, 清理发送缓存, LineState.Idle, NotifyConsumeLIS            仪器ENQ     ->     ACK/NAK or 任何都可能   LineState.Idle情况下查询sendFrameList>0则发ENQ并LineState.WaitingEnqAck; 收NAK LineState.Receiving收ACK LineState.Sending, NotifyConsumeENQ LineState.ReceivingFrame LineState.ReceivingEOT LineState.IdleFrame   ->     ACK/NAK or 任何都可能   发Frame, 如果发完Completed, 清理发送缓存, LineState.Idle, 发EOTEOT     ->     ACK or 任何都可能  不做任何处理
+ENQ     ->     ACK                     LineState.Receiving, 发ACKFrame   ->     ACK                     LineState.Receiving, 发ACKEOT     ->     不需要任何回复          清接收缓存, 清理发送缓存, LineState.Idle, NotifyConsumeLIS            仪器ENQ     ->     ACK/NAK or 任何都可能   LineState.Idle情况下查询sendFrameList>0则发ENQ并LineState.WaitingEnqAck; 收NAK LineState.Receiving收ACK LineState.Sending, NotifyConsumeENQ LineState.ReceivingFrame LineState.ReceivingEOT LineState.IdleFrame   ->     ACK/NAK or 任何都可能   发Frame, 如果发完Completed, 清理发送缓存, LineState.Idle, 发EOTEOT     ->     ACK or 任何都可能  不做任何处理门诊流程抽血流程
 
 
 # 工作计划（2026.06.25~2026.08.14）
@@ -77,7 +75,7 @@ ENQ     ->     ACK                     LineState.Receiving, 发ACKFrame   ->   
 	System.Text.Encoding.CodePages 编码 ok
 	1 写完其它流程（网口、串口）
 	2 打印日志和添加数据库日志
-	3 完整测试
+	3 完整测试	4 重新同步，还有其他小功能
 2. 对接调试仪器
 
 0 调试

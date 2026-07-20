@@ -2,6 +2,7 @@
 using DeviceHub.Template.Constant;
 using DeviceHub.Template.Transports;
 using DeviceHub.Utils;
+using System.ComponentModel;
 using System.IO.Ports;
 using System.Text;
 
@@ -182,10 +183,15 @@ namespace DeviceHub.Template.Template.SerialPort
 
     public enum LineState
     {
+        [Description("空闲")]
         Idle,
+        [Description("已发ENQ等待ACK")]
         WaitingEnqAck,
+        [Description("已发帧等待ACK")]
         WaitingFrameAck,
+        [Description("发送数据中")]
         Sending,
+        [Description("接收数据中")]
         Receiving
     }
 }
