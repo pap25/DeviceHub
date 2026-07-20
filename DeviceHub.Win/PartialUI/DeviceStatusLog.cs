@@ -1,46 +1,103 @@
-using DeviceHub.Abstractions.Dto;
-using DeviceHub.Model.Entities;
-using DeviceHub.Model.Vo;
-using DeviceHub.Service;
-using DeviceHub.Win.DeviceHubControl;
+using DeviceHub.Utils;
 
 namespace DeviceHub.Win
 {
     public partial class DeviceStatus
     {
-        private async Task initLog()
+        private System.Windows.Forms.Timer? _logTimer;
+        private DateTime? _lastLogRefreshTime;
+
+        private static readonly int[] LogLineOptions = { 50, 100, 200, 500, 1000 };
+        private static readonly int[] LogIntervalOptions = { 3, 5, 10, 30, 60 };
+
+        private static readonly string[] LogLevelFilterOptions = { "全部", "DEBUG", "INFO", "WARN", "ERROR" };
+
+        private int LogLines => cboLogLines.SelectedIndex >= 0 ? LogLineOptions[cboLogLines.SelectedIndex] : LogLineOptions[1];
+        private int? LogIntervalSeconds => cboLogInterval.SelectedIndex > 0 ? LogIntervalOptions[cboLogInterval.SelectedIndex - 1] : null;
+        private string? LogLevelFilter => cboLogLevelFilter.SelectedIndex > 0 ? LogLevelFilterOptions[cboLogLevelFilter.SelectedIndex] : null;
+
+        private Task initLog()
         {
-            BindEnumComboBox<ClientLog.LevelEnum>(cboLogLevel, true);
-            BindEnumComboBox<ClientLog.TypeEnum>(cboLogType, true);
-            dtpLogCreateTimeStart.Value = DateTime.Today;
-            dtpLogCreateTimeEnd.Value = DateTime.Today;
+            cboLogLines.Items.AddRange(LogLineOptions.Select(n => (object)$"{n}行").ToArray());
+            cboLogLines.SelectedIndex = 1; // 默认 100 行
+
+            cboLogInterval.Items.Add("不刷新");
+            cboLogInterval.Items.AddRange(LogIntervalOptions.Select(s => (object)$"{s}秒").ToArray());
+            cboLogInterval.SelectedIndex = 0; // 默认不自动刷新
+
+            cboLogLevelFilter.Items.AddRange(LogLevelFilterOptions.Cast<object>().ToArray());
+            cboLogLevelFilter.SelectedIndex = 0; // 默认全部
+
+            cboLogInterval.SelectedIndexChanged += (_, _) => ApplyLogTimer();
+
+            return Task.CompletedTask;
         }
 
-        private async Task RefreshLog()
+        private Task RefreshLog()
         {
-            await LoadLogPage(pagerLog.PageSize, pagerLog.PageIndex);
+            RefreshLogContent();
+            ApplyLogTimer();
+            return Task.CompletedTask;
         }
 
-        private async void btnLogQuery_Click(object sender, EventArgs e)
+        private void btnLogQuery_Click(object sender, EventArgs e)
         {
-            await LoadLogPage(pagerLog.PageSize, 1);
+            RefreshLogContent();
         }
 
-        private async void PagerLog_PageChanged(object? sender, PagerChangedEventArgs e)
+        private void RefreshLogContent()
         {
-            await LoadLogPage(e.PageSize, e.PageIndex);
+            var lines = Logger.ReadLastLines(LogLines, level: LogLevelFilter);
+            rtbLog.Text = string.Join(Environment.NewLine, lines);
+            _lastLogRefreshTime = DateTime.Now;
+            UpdateLogRefreshStatus();
         }
 
-        private async Task LoadLogPage(int pageSize, int pageIndex)
+        private void ApplyLogTimer()
         {
-            ClientLog.LevelEnum? level = GetSelectedEnum<ClientLog.LevelEnum>(cboLogLevel);
-            ClientLog.TypeEnum? type = GetSelectedEnum<ClientLog.TypeEnum>(cboLogType);
-            string message = txtLogMessage.Text.Trim();
-            long createTimeStart = new DateTimeOffset(dtpLogCreateTimeStart.Value.Date).ToUnixTimeMilliseconds();
-            long createTimeEnd = new DateTimeOffset(dtpLogCreateTimeEnd.Value.Date.AddDays(1).AddMilliseconds(-1)).ToUnixTimeMilliseconds();
-            Page<ClientLogPageItem> page = await ClientLogService.Instance.GetPage(level, type, message, createTimeStart, createTimeEnd, pageSize, pageIndex);
-            dgvLog.DataSource = page.Data;
-            pagerLog.SetPageInfo(page);
+            if (LogIntervalSeconds == null)
+            {
+                StopLogTimer();
+                UpdateLogRefreshStatus();
+                return;
+            }
+
+            RestartLogTimer();
+        }
+
+        private void RestartLogTimer()
+        {
+            if (LogIntervalSeconds == null)
+                return;
+
+            _logTimer ??= new System.Windows.Forms.Timer();
+            _logTimer.Tick -= LogTimer_Tick;
+            _logTimer.Tick += LogTimer_Tick;
+            _logTimer.Interval = LogIntervalSeconds.Value * 1000;
+            _logTimer.Start();
+            UpdateLogRefreshStatus();
+        }
+
+        private void UpdateLogRefreshStatus()
+        {
+            lblLogAutoRefresh.Text = _lastLogRefreshTime == null
+                ? ""
+                : $"最后刷新: {_lastLogRefreshTime:yyyy-MM-dd HH:mm:ss}";
+        }
+
+        private void StopLogTimer()
+        {
+            if (_logTimer == null) return;
+            _logTimer.Stop();
+            _logTimer.Tick -= LogTimer_Tick;
+            _logTimer.Dispose();
+            _logTimer = null;
+        }
+
+        private void LogTimer_Tick(object? sender, EventArgs e)
+        {
+            if (tabControl1.SelectedTab != tabLog) return;
+            RefreshLogContent();
         }
     }
 }

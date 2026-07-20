@@ -25,8 +25,7 @@ namespace DeviceHub.Win
             pagerInstrumentItemMapping.PageChanged += PagerInstrumentItemMapping_PageChanged;
             pagerReceiveMessage.PageChanged += PagerReceiveMessage_PageChanged;
             pagerSendMessage.PageChanged += PagerSendMessage_PageChanged;
-            pagerLog.PageChanged += PagerLog_PageChanged;
-            FormClosed += (_, _) => StopCommStatusTimer();
+            FormClosed += (_, _) => { StopCommStatusTimer(); StopLogTimer(); };
         }
 
         private async void DeviceStatus_Shown(object sender, EventArgs e)
