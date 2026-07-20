@@ -49,7 +49,7 @@ namespace DeviceHub.Lis.Impl
                 {
                     string json = await File.ReadAllTextAsync(serialPortConfigFile);
                     serialPortConfig = JsonSerializer.Deserialize<SerialPortConfig>(json);
-                    serialPortConfig.Encoding = "GBK";
+                    //serialPortConfig.Encoding = "GBK";
                 }
                 catch
                 {
@@ -63,7 +63,7 @@ namespace DeviceHub.Lis.Impl
                 {
                     string json = await File.ReadAllTextAsync(tcpConfigFile);
                     tcpConfig = JsonSerializer.Deserialize<TcpConfig>(json);
-                    tcpConfig.Encoding = "UTF-8";
+                    //tcpConfig.Encoding = "UTF-8";
                     tcpConfig.Host = "0.0.0.0";
                 }
                 catch
