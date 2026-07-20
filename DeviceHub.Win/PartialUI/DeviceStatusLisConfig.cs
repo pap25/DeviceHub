@@ -9,6 +9,9 @@ namespace DeviceHub.Win
     public partial class DeviceStatus
     {
         private GroupBox? grpLisConfigAuthInfo;
+        private Label? _lblSerialStatus;
+        private Label? _lblTcpClientEndpoint;
+        private System.Windows.Forms.Timer? _commStatusTimer;
 
         private void initDriverConfig(DriverConfig config)
         {
@@ -64,6 +67,9 @@ namespace DeviceHub.Win
 
         private void ClearCommConfigGroups()
         {
+            _lblSerialStatus = null;
+            _lblTcpClientEndpoint = null;
+
             for (int i = pnlLisConfigLeft.Controls.Count - 1; i >= 0; i--)
             {
                 Control control = pnlLisConfigLeft.Controls[i];
@@ -74,6 +80,49 @@ namespace DeviceHub.Win
 
                 pnlLisConfigLeft.Controls.Remove(control);
                 control.Dispose();
+            }
+        }
+
+        private void StartCommStatusTimer()
+        {
+            _commStatusTimer ??= new System.Windows.Forms.Timer { Interval = 5000 };
+            _commStatusTimer.Tick -= CommStatusTimer_Tick;
+            _commStatusTimer.Tick += CommStatusTimer_Tick;
+            _commStatusTimer.Start();
+            UpdateCommStatusDisplay();
+        }
+
+        private void StopCommStatusTimer()
+        {
+            if (_commStatusTimer == null)
+            {
+                return;
+            }
+
+            _commStatusTimer.Stop();
+            _commStatusTimer.Tick -= CommStatusTimer_Tick;
+        }
+
+        private void CommStatusTimer_Tick(object? sender, EventArgs e)
+        {
+            UpdateCommStatusDisplay();
+        }
+
+        private void UpdateCommStatusDisplay()
+        {
+            if (tabControl1.SelectedTab != tabLisConfig)
+            {
+                return;
+            }
+
+            if (_lblSerialStatus != null && serialDeviceDriver != null)
+            {
+                _lblSerialStatus.Text = serialDeviceDriver.GetLineStateName();
+            }
+
+            if (_lblTcpClientEndpoint != null && tcpDeviceDriver != null)
+            {
+                _lblTcpClientEndpoint.Text = tcpDeviceDriver.GetClientRemoteEndPoint();
             }
         }
 
@@ -117,8 +166,9 @@ namespace DeviceHub.Win
                 ("连接模式", "服务端（Server）", null),
                 ("编码方式", tcpConfig.Encoding ?? string.Empty, null),
                 ("状态", status, statusColor),
-                ("已连客户端", tcpDeviceDriver!=null?tcpDeviceDriver.GetClientRemoteEndPoint():string.Empty, null),
-            ]);
+                ("已连客户端", tcpDeviceDriver != null ? tcpDeviceDriver.GetClientRemoteEndPoint() : string.Empty, null),
+            ],
+            trackClientEndpoint: true);
         }
 
         private void ShowSerialPortConfig(SerialPortConfig serialPortConfig, string status, Color statusColor)
@@ -132,17 +182,18 @@ namespace DeviceHub.Win
                 ("停止位", ((StopBits)serialPortConfig.StopBits).ToString(), null),
                 ("编码方式", serialPortConfig.Encoding ?? string.Empty, null),
                 ("状态", status, statusColor),
-            ]);
+            ],
+            trackStatus: true);
         }
 
-        private void CreateCommConfigGroup(string title, (string label, string value, Color? valueColor)[] fields)
+        private void CreateCommConfigGroup(string title, (string label, string value, Color? valueColor)[] fields, bool trackStatus = false, bool trackClientEndpoint = false)
         {
             int top = grpLisConfigAuthInfo != null ? grpLisConfigAuthInfo.Bottom + 6 : 6;
-            var grp = CreateConfigGroup(title, new Point(3, top), fields);
+            var grp = CreateConfigGroup(title, new Point(3, top), fields, trackStatus, trackClientEndpoint);
             pnlLisConfigLeft.Controls.Add(grp);
         }
 
-        private static GroupBox CreateConfigGroup(string title, Point location, (string label, string value, Color? valueColor)[] fields)
+        private GroupBox CreateConfigGroup(string title, Point location, (string label, string value, Color? valueColor)[] fields, bool trackStatus = false, bool trackClientEndpoint = false)
         {
             const int labelX = 20;
             const int valueX = 100;
@@ -182,6 +233,15 @@ namespace DeviceHub.Win
 
                 grp.Controls.Add(lblName);
                 grp.Controls.Add(lblValue);
+
+                if (trackStatus && label == "状态")
+                {
+                    _lblSerialStatus = lblValue;
+                }
+                else if (trackClientEndpoint && label == "已连客户端")
+                {
+                    _lblTcpClientEndpoint = lblValue;
+                }
             }
 
             return grp;

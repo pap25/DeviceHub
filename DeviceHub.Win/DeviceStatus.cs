@@ -26,6 +26,7 @@ namespace DeviceHub.Win
             pagerReceiveMessage.PageChanged += PagerReceiveMessage_PageChanged;
             pagerSendMessage.PageChanged += PagerSendMessage_PageChanged;
             pagerLog.PageChanged += PagerLog_PageChanged;
+            FormClosed += (_, _) => StopCommStatusTimer();
         }
 
         private async void DeviceStatus_Shown(object sender, EventArgs e)
@@ -71,6 +72,8 @@ namespace DeviceHub.Win
                     MessageBox.Show($"LIS上没有配置这仪器连接方式instrumentId: {_instrumentId}");
                     return;
                 }
+
+                StartCommStatusTimer();
             }
             catch (Exception ex)
             {
