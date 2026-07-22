@@ -68,8 +68,8 @@ public interface ISendMessageRepository
         CancellationToken cancellationToken = default);
 
     Task<int> findCount(long instrumentId, SendMessage.StatusEnum? status, SendMessage.TypeEnum? type,
-        string barcode, string sampleNo, long createTimeStart, long createTimeEnd, CancellationToken cancellationToken = default);
+        string barcode, string sampleNo, string externalNo, long createTimeStart, long createTimeEnd, CancellationToken cancellationToken = default);
 
     Task<List<SendMessageView>> findPageDesc(long instrumentId, SendMessage.StatusEnum? status, SendMessage.TypeEnum? type,
-        string barcode, string sampleNo, long createTimeStart, long createTimeEnd, int pageSize, int pageIndex, CancellationToken cancellationToken = default);
+        string barcode, string sampleNo, string externalNo, long createTimeStart, long createTimeEnd, int pageSize, int pageIndex, CancellationToken cancellationToken = default);
 }

@@ -6,6 +6,8 @@ public class SendMessageView
 {
     public long Id { get; set; }
 
+    public string ExternalNo { get; set; }
+
     public SendMessage.StatusEnum Status { get; set; }
 
     public string SendJson { get; set; }

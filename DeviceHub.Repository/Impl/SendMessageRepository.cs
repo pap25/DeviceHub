@@ -269,9 +269,9 @@ public class SendMessageRepository : ISendMessageRepository
             cancellationToken);
 
     public async Task<int> findCount(long instrumentId, SendMessage.StatusEnum? status, SendMessage.TypeEnum? type,
-        string barcode, string sampleNo, long createTimeStart, long createTimeEnd, CancellationToken cancellationToken = default)
+        string barcode, string sampleNo, string externalNo, long createTimeStart, long createTimeEnd, CancellationToken cancellationToken = default)
     {
-        var (whereClause, parameters) = BuildWhereConditions(instrumentId, status, type, barcode, sampleNo, createTimeStart, createTimeEnd);
+        var (whereClause, parameters) = BuildWhereConditions(instrumentId, status, type, barcode, sampleNo, externalNo, createTimeStart, createTimeEnd);
         var sql = $"""
             SELECT COUNT(*)
             FROM send_message a
@@ -283,14 +283,14 @@ public class SendMessageRepository : ISendMessageRepository
     }
 
     public async Task<List<SendMessageView>> findPageDesc(long instrumentId, SendMessage.StatusEnum? status, SendMessage.TypeEnum? type,
-        string barcode, string sampleNo, long createTimeStart, long createTimeEnd, int pageSize, int pageIndex, CancellationToken cancellationToken = default)
+        string barcode, string sampleNo, string externalNo, long createTimeStart, long createTimeEnd, int pageSize, int pageIndex, CancellationToken cancellationToken = default)
     {
-        var (whereClause, parameters) = BuildWhereConditions(instrumentId, status, type, barcode, sampleNo, createTimeStart, createTimeEnd);
+        var (whereClause, parameters) = BuildWhereConditions(instrumentId, status, type, barcode, sampleNo, externalNo, createTimeStart, createTimeEnd);
         parameters.Add(DbHelper.Param("@page_size", pageSize));
         parameters.Add(DbHelper.Param("@offset", Math.Max(0, (pageIndex - 1) * pageSize)));
 
         var sql = $"""
-            SELECT a.id, a.status, b.send_json, c.send_content, a.barcode, a.sample_no, a.create_time, a.error_message
+            SELECT a.id, a.external_no, a.status, b.send_json, c.send_content, a.barcode, a.sample_no, a.create_time, a.error_message
             FROM send_message a
             INNER JOIN send_message_large b ON a.id = b.send_message_id
             LEFT JOIN send_message_encoder c ON a.id = c.send_message_id
@@ -308,6 +308,7 @@ public class SendMessageRepository : ISendMessageRepository
         SendMessage.TypeEnum? type,
         string barcode,
         string sampleNo,
+        string externalNo,
         long createTimeStart,
         long createTimeEnd)
     {
@@ -349,6 +350,12 @@ public class SendMessageRepository : ISendMessageRepository
             parameters.Add(DbHelper.Param("@sample_no", sampleNo));
         }
 
+        if (!string.IsNullOrWhiteSpace(externalNo))
+        {
+            conditions.Add("a.external_no LIKE @external_no");
+            parameters.Add(DbHelper.Param("@external_no", $"%{externalNo}%"));
+        }
+
         return ("WHERE " + string.Join(" AND ", conditions), parameters);
     }
 
@@ -372,12 +379,13 @@ public class SendMessageRepository : ISendMessageRepository
     private static SendMessageView MapView(SqliteDataReader reader) => new()
     {
         Id = reader.GetInt64(0),
-        Status = (SendMessage.StatusEnum)reader.GetByte(1),
-        SendJson = reader.GetString(2),
-        SendContent = reader.IsDBNull(3) ? [] : reader.GetFieldValue<byte[]>(3),
-        Barcode = reader.GetString(4),
-        SampleNo = reader.GetString(5),
-        CreateTime = reader.GetInt64(6),
-        ErrorMessage = reader.GetString(7)
+        ExternalNo = reader.GetString(1),
+        Status = (SendMessage.StatusEnum)reader.GetByte(2),
+        SendJson = reader.GetString(3),
+        SendContent = reader.IsDBNull(4) ? [] : reader.GetFieldValue<byte[]>(4),
+        Barcode = reader.GetString(5),
+        SampleNo = reader.GetString(6),
+        CreateTime = reader.GetInt64(7),
+        ErrorMessage = reader.GetString(8)
     };
 }

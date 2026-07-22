@@ -25,16 +25,17 @@ public class SendMessageService
 
     public async Task<Page<SendMessagePageItem>> GetPage(long instrumentId, Encoding encoding,
         SendMessage.StatusEnum? status, SendMessage.TypeEnum? type,
-        string barcode, string sampleNo, long createTimeStart, long createTimeEnd, int pageSize, int pageIndex)
+        string barcode, string sampleNo, string externalNo, long createTimeStart, long createTimeEnd, int pageSize, int pageIndex)
     {
-        int totalCount = await sendMessageRepository.findCount(instrumentId, status, type, barcode, sampleNo, createTimeStart, createTimeEnd);
-        List<SendMessageView> sendMessageList = await sendMessageRepository.findPageDesc(instrumentId, status, type, barcode, sampleNo, createTimeStart, createTimeEnd, pageSize, pageIndex);
+        int totalCount = await sendMessageRepository.findCount(instrumentId, status, type, barcode, sampleNo, externalNo, createTimeStart, createTimeEnd);
+        List<SendMessageView> sendMessageList = await sendMessageRepository.findPageDesc(instrumentId, status, type, barcode, sampleNo, externalNo, createTimeStart, createTimeEnd, pageSize, pageIndex);
         List<SendMessagePageItem> outputList = new(sendMessageList.Count);
         foreach (SendMessageView row in sendMessageList)
         {
             outputList.Add(new()
             {
                 Id = row.Id,
+                ExternalNo = row.ExternalNo,
                 StatusName = row.Status.GetDescription(),
                 SendJson = row.SendJson,
                 SendContent = encoding.GetString(row.SendContent),

@@ -38,9 +38,10 @@ namespace DeviceHub.Win
             SendMessage.TypeEnum? type = GetSelectedEnum<SendMessage.TypeEnum>(cboSendMessageType);
             string barcode = txtSendMessageBarcode.Text.Trim();
             string sampleNo = txtSendMessageSampleNo.Text.Trim();
+            string externalNo = txtSendMessageExternalNo.Text.Trim();
             long createTimeStart = new DateTimeOffset(dtpSendMessageCreateTimeStart.Value.Date).ToUnixTimeMilliseconds();
             long createTimeEnd = new DateTimeOffset(dtpSendMessageCreateTimeEnd.Value.Date.AddDays(1).AddMilliseconds(-1)).ToUnixTimeMilliseconds();
-            Page<SendMessagePageItem> page = await SendMessageService.Instance.GetPage(_instrumentId, _messageEncoding, status, type, barcode, sampleNo, createTimeStart, createTimeEnd, pageSize, pageIndex);
+            Page<SendMessagePageItem> page = await SendMessageService.Instance.GetPage(_instrumentId, _messageEncoding, status, type, barcode, sampleNo, externalNo, createTimeStart, createTimeEnd, pageSize, pageIndex);
             dgvSendMessage.DataSource = page.Data;
             pagerSendMessage.SetPageInfo(page);
         }
