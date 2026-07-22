@@ -103,6 +103,44 @@ public class ReceiveMessageRepository : IReceiveMessageRepository
         return rows > 0;
     }
 
+    public async Task<int> UpdateStatusAndErrorMessageAndUpdateTimeByIds(
+        IReadOnlyList<long> ids,
+        ReceiveMessage.StatusEnum status,
+        string errorMessage,
+        long updateTime,
+        CancellationToken cancellationToken = default)
+    {
+        if (ids.Count == 0)
+        {
+            return 0;
+        }
+
+        var parameters = new List<SqliteParameter>(ids.Count + 3)
+        {
+            DbHelper.Param("@status", (byte)status),
+            DbHelper.Param("@error_message", errorMessage),
+            DbHelper.Param("@update_time", updateTime)
+        };
+
+        var idParams = new string[ids.Count];
+        for (int i = 0; i < ids.Count; i++)
+        {
+            string paramName = $"@id{i}";
+            idParams[i] = paramName;
+            parameters.Add(DbHelper.Param(paramName, ids[i]));
+        }
+
+        string sql = $"""
+            UPDATE receive_message
+            SET status = @status,
+                error_message = @error_message,
+                update_time = @update_time
+            WHERE id IN ({string.Join(", ", idParams)});
+            """;
+
+        return await DbHelper.ExecuteNonQueryAsync(sql, parameters.ToArray(), cancellationToken);
+    }
+
     public Task<bool> UpdateStatusAndUpdateTimeById(
         long id,
         ReceiveMessage.StatusEnum status,

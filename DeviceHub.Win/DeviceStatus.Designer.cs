@@ -41,7 +41,7 @@
             dgvReceiveMessage = new DataGridView();
             pagerReceiveMessage = new DeviceHub.Win.DeviceHubControl.PagerControl();
             pnlReceiveMessageQuery = new Panel();
-            button1 = new Button();
+            btnReceiveMessageReDecodeSyncLis = new Button();
             lblReceiveMessageStatus = new Label();
             cboReceiveMessageStatus = new ComboBox();
             lblReceiveMessageType = new Label();
@@ -245,7 +245,7 @@
             // 
             // pnlReceiveMessageQuery
             // 
-            pnlReceiveMessageQuery.Controls.Add(button1);
+            pnlReceiveMessageQuery.Controls.Add(btnReceiveMessageReDecodeSyncLis);
             pnlReceiveMessageQuery.Controls.Add(lblReceiveMessageStatus);
             pnlReceiveMessageQuery.Controls.Add(cboReceiveMessageStatus);
             pnlReceiveMessageQuery.Controls.Add(lblReceiveMessageType);
@@ -265,14 +265,15 @@
             pnlReceiveMessageQuery.Size = new Size(1336, 44);
             pnlReceiveMessageQuery.TabIndex = 0;
             // 
-            // button1
+            // btnReceiveMessageReDecodeSyncLis
             // 
-            button1.Location = new Point(1169, 10);
-            button1.Name = "button1";
-            button1.Size = new Size(132, 26);
-            button1.TabIndex = 13;
-            button1.Text = "重新解码并同步LIS";
-            button1.UseVisualStyleBackColor = true;
+            btnReceiveMessageReDecodeSyncLis.Location = new Point(1169, 10);
+            btnReceiveMessageReDecodeSyncLis.Name = "btnReceiveMessageReDecodeSyncLis";
+            btnReceiveMessageReDecodeSyncLis.Size = new Size(132, 26);
+            btnReceiveMessageReDecodeSyncLis.TabIndex = 13;
+            btnReceiveMessageReDecodeSyncLis.Text = "重新解码并同步LIS";
+            btnReceiveMessageReDecodeSyncLis.UseVisualStyleBackColor = true;
+            btnReceiveMessageReDecodeSyncLis.Click += btnReceiveMessageReDecodeSyncLis_Click;
             // 
             // lblReceiveMessageStatus
             // 
@@ -885,7 +886,7 @@
         private Button btnReceiveMessageQuery;
         private DataGridView dgvReceiveMessage;
         private DeviceHubControl.PagerControl pagerReceiveMessage;
-        private Button button1;
+        private Button btnReceiveMessageReDecodeSyncLis;
         private Panel pnlSendMessageQuery;
         private Label lblSendMessageStatus;
         private ComboBox cboSendMessageStatus;

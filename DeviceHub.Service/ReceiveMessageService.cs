@@ -82,6 +82,20 @@ public class ReceiveMessageService
         });
     }
 
+    public async Task UpdateStatusToPending(IReadOnlyList<long> ids)
+    {
+        if (ids.Count == 0)
+        {
+            return;
+        }
+
+        await receiveMessageRepository.UpdateStatusAndErrorMessageAndUpdateTimeByIds(
+            ids,
+            ReceiveMessage.StatusEnum.Pending,
+            string.Empty,
+            DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+    }
+
     public async Task UpdateSuccessTestResult(long id, string externalNo, string sampleNo, string barcode, string resultJson)
     {
         // 更新 receive_message 新增 receive_message_decode

@@ -2,11 +2,9 @@
 
 namespace DeviceHub.Abstractions
 {
-    public interface ISerialDeviceDriver
+    public interface ISerialDeviceDriver : IDeviceDriver
     {
         Task Start(long instrumentId, SerialPortConfig serialPortConfig);
-
-        void NotifyLisIssueApplication();
 
         string GetLineStateName();
 

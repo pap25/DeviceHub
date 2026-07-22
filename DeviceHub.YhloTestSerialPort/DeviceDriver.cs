@@ -41,6 +41,11 @@ namespace DeviceHub.YhloTestSerialPort
             lisIssueApplicationTask?.NotifyConsume();
         }
 
+        public void NotifyReceiveTask()
+        {
+            receiveTask?.NotifyConsume();
+        }
+
         public string GetLineStateName()
         {
             return EnumExtensions.GetDescription(session.GetLineStateUnlocked());

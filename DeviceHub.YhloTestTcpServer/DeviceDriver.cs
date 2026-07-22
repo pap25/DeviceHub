@@ -13,6 +13,7 @@ namespace DeviceHub.YhloTestTcpServer
     {
         private readonly string logType = nameof(DeviceDriver);
         private readonly TcpServerSession session;
+        private IConsumeTask? receiveTask;
         private IConsumeTask? sendTask;
         private IConsumeTask? lisIssueApplicationTask;
 
@@ -25,7 +26,7 @@ namespace DeviceHub.YhloTestTcpServer
         {
             Encoding encoding = TextEncodings.GetEncoding(config.Encoding);
             ReceiveHandler receiveHandler = new(instrumentId, encoding);
-            IConsumeTask receiveTask = new BatchConsumeTask<ReceiveMessage>(receiveHandler);
+            receiveTask = new BatchConsumeTask<ReceiveMessage>(receiveHandler);
             receiveTask.StartConsume();
 
             session.Start(instrumentId, config, receiveTask);
@@ -46,6 +47,11 @@ namespace DeviceHub.YhloTestTcpServer
         public void NotifyLisIssueApplication()
         {
             lisIssueApplicationTask?.NotifyConsume();
+        }
+
+        public void NotifyReceiveTask()
+        {
+            receiveTask?.NotifyConsume();
         }
 
         public string GetClientRemoteEndPoint()

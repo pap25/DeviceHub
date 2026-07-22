@@ -2,13 +2,12 @@
 
 namespace DeviceHub.Abstractions
 {
-    public interface ITcpDeviceDriver
+    public interface ITcpDeviceDriver : IDeviceDriver
     {
         Task Start(long instrumentId, TcpConfig tcpConfig);
 
-        void NotifyLisIssueApplication();
-
         string GetClientRemoteEndPoint();
+
         void Stop();
     }
 }

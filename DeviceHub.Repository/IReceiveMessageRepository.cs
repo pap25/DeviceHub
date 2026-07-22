@@ -19,6 +19,13 @@ public interface IReceiveMessageRepository
         long updateTime,
         CancellationToken cancellationToken = default);
 
+    Task<int> UpdateStatusAndErrorMessageAndUpdateTimeByIds(
+        IReadOnlyList<long> ids,
+        ReceiveMessage.StatusEnum status,
+        string errorMessage,
+        long updateTime,
+        CancellationToken cancellationToken = default);
+
     Task<bool> UpdateStatusAndUpdateTimeById(
         long id,
         ReceiveMessage.StatusEnum status,

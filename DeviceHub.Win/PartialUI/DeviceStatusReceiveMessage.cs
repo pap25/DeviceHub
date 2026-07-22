@@ -54,6 +54,41 @@ namespace DeviceHub.Win
             await LoadReceiveMessagePage(pagerReceiveMessage.PageSize, 1);
         }
 
+        private async void btnReceiveMessageReDecodeSyncLis_Click(object sender, EventArgs e)
+        {
+            dgvReceiveMessage.EndEdit();
+            List<long> ids = [];
+            foreach (DataGridViewRow row in dgvReceiveMessage.Rows)
+            {
+                if (row.Cells[colReceiveMessageSelect.Index].Value is not true)
+                {
+                    continue;
+                }
+
+                if (row.DataBoundItem is ReceiveMessagePageItem item)
+                {
+                    ids.Add(item.Id);
+                }
+            }
+
+            if (ids.Count == 0)
+            {
+                MessageBox.Show("请选择要重新同步数据");
+                return;
+            }
+
+            await ReceiveMessageService.Instance.UpdateStatusToPending(ids);
+            await RefreshReceiveMessage();
+            if (tcpDeviceDriver != null)
+            {
+                tcpDeviceDriver.NotifyReceiveTask();
+            }
+            else if (serialDeviceDriver != null)
+            {
+                serialDeviceDriver.NotifyReceiveTask();
+            }
+        }
+
         private async void PagerReceiveMessage_PageChanged(object? sender, PagerChangedEventArgs e)
         {
             await LoadReceiveMessagePage(e.PageSize, e.PageIndex);
@@ -70,6 +105,7 @@ namespace DeviceHub.Win
             Page<ReceiveMessagePageItem> page = await ReceiveMessageService.Instance.GetPage(_instrumentId, _messageEncoding, status, type, barcode, sampleNo, createTimeStart, createTimeEnd, pageSize, pageIndex);
             dgvReceiveMessage.DataSource = page.Data;
             pagerReceiveMessage.SetPageInfo(page);
+            colReceiveMessageSelect.HeaderText = "全选";
         }
     }
 }
