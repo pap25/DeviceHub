@@ -49,10 +49,11 @@ namespace DeviceHub.Template.Template
 
         protected void MarkFailed(long id, string errorMessage)
         {
+            string dbErrorMessage = errorMessage.Length > 500 ? errorMessage[..500] : errorMessage;
             receiveMessageRepository.UpdateStatusAndErrorMessageAndUpdateTimeById(
                 id,
                 ReceiveMessage.StatusEnum.Failed,
-                errorMessage,
+                dbErrorMessage,
                 DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()).GetAwaiter().GetResult();
             Logger.Warn(logType, $"待解码消息处理失败 id={id} {errorMessage}");
         }

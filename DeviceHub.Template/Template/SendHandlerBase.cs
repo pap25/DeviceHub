@@ -87,10 +87,11 @@ namespace DeviceHub.Template.Template
 
         private void MarkFailed(long id, string errorMessage)
         {
+            string dbErrorMessage = errorMessage.Length > 500 ? errorMessage[..500] : errorMessage;
             sendMessageRepository.UpdateStatusAndErrorMessageAndUpdateTimeById(
                 id,
                 SendMessage.StatusEnum.Failed,
-                errorMessage,
+                dbErrorMessage,
                 DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()).GetAwaiter().GetResult();
             Logger.Warn(logType, $"待发送消息处理失败 id={id}: {errorMessage}");
         }
