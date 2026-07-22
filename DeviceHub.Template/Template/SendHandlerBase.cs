@@ -55,7 +55,7 @@ namespace DeviceHub.Template.Template
                         byte[] rawMessage = EncoderRequestApplicationSend(getSampleApplyItemOutput);
 
                         sendMessageService.UpdateSuccessRequestApplication(task.Id, rawMessage).GetAwaiter().GetResult();
-                        Logger.Debug(logType, $"待发送请求查询申请信息处理成功 id={task.Id}");
+                        Logger.Debug(logType, $"待发送请求查询申请信息处理成功 id:{task.Id}");
                         break;
                     case SendMessage.TypeEnum.IssueApplication:
                         getSampleApplyItemOutput = JsonSerializer.Deserialize<GetSampleApplyItemOutput>(receiveMessageLarge.SendJson);
@@ -68,7 +68,7 @@ namespace DeviceHub.Template.Template
                         rawMessage = EncoderIssueApplicationSend(getSampleApplyItemOutput);
 
                         sendMessageService.UpdateSuccessRequestApplication(task.Id, rawMessage).GetAwaiter().GetResult();
-                        Logger.Debug(logType, $"待发送LIS下发申请信息处理成功 id={task.Id}");
+                        Logger.Debug(logType, $"待发送LIS下发申请信息处理成功 id:{task.Id}");
                         break;
                     default:
                         MarkFailed(task.Id, "不支持的类型 " + task.Type);
@@ -93,7 +93,7 @@ namespace DeviceHub.Template.Template
                 SendMessage.StatusEnum.Failed,
                 dbErrorMessage,
                 DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()).GetAwaiter().GetResult();
-            Logger.Warn(logType, $"待发送消息处理失败 id={id}: {errorMessage}");
+            Logger.Warn(logType, $"待发送消息处理失败 id:{id}: {errorMessage}");
         }
     }
 }

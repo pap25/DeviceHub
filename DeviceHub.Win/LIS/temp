@@ -70,7 +70,7 @@ ENQ     ->     ACK                     LineState.Receiving, 发ACKFrame   ->   
 	b. 检验完成后送检验结果到LIS
 	c. 向LIS查询样本申请单信息到仪器
 	编码统一问题 ok
-	错误原因太长问题
+	错误原因太长问题 ok
 	
 	System.Text.Encoding.CodePages 编码 ok
 	1 写完其它流程（网口、串口）

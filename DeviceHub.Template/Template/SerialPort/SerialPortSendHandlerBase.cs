@@ -35,7 +35,7 @@ namespace DeviceHub.Template.Template.SerialPort
                 }
                 catch (Exception ex)
                 {
-                    Logger.Warn(logType, $"查询DB send_message 异常 instrumentId={_instrumentId}: {ex.Message}");
+                    Logger.Warn(logType, $"查询DB send_message 异常 instrumentId:{_instrumentId}: {ex.Message}");
                 }
                 if (task == null)
                 {
@@ -100,7 +100,7 @@ namespace DeviceHub.Template.Template.SerialPort
                 SendMessage.StatusEnum.Failed,
                 dbErrorMessage,
                 DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()).GetAwaiter().GetResult();
-            Logger.Warn(logType, $"待发送消息处理失败 id={id}: {errorMessage}");
+            Logger.Warn(logType, $"待发送消息处理失败 id:{id}: {errorMessage}");
         }
 
         public void Completed(List<byte[]> sendFrameList)
@@ -111,7 +111,7 @@ namespace DeviceHub.Template.Template.SerialPort
             }
             catch (Exception ex)
             {
-                Logger.Error(logType, $"消息发送完成回写异常 id={sendMessageId}", ex);
+                Logger.Error(logType, $"消息发送完成回写异常 id:{sendMessageId}", ex);
             }
         }
 

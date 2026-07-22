@@ -46,7 +46,7 @@ namespace DeviceHub.Template.Template
             }
             catch (Exception ex)
             {
-                Logger.Warn(logType, $"到LIS拉取下单申请异常 instrumentId={_instrumentId}: {ex.Message}");
+                Logger.Warn(logType, $"到LIS拉取下单申请异常 instrumentId:{_instrumentId}: {ex.Message}");
                 return [];
             }
         }
@@ -65,7 +65,7 @@ namespace DeviceHub.Template.Template
             }
             catch (Exception ex)
             {
-                Logger.Warn(logType, $"保存LIS拉取下单申请异常 id={task.Id}: {ex.Message}");
+                Logger.Warn(logType, $"保存LIS拉取下单申请异常 id:{task.Id}: {ex.Message}");
             }
 
             sendHandlerTask.NotifyConsume();

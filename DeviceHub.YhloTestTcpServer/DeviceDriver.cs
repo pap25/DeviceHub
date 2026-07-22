@@ -38,7 +38,7 @@ namespace DeviceHub.YhloTestTcpServer
             lisIssueApplicationTask = new BatchConsumeTask<GetSampleApplyItemOutput>(new LisIssueApplicationHandler(instrumentId, sendTask), "lis_issue_application", 30 * 1000);
             lisIssueApplicationTask.StartConsume();
 
-            Logger.Info(logType, $"设备驱动已启动 instrumentId={instrumentId}, host={config.Host}, port={config.Port}");
+            Logger.Info(logType, $"设备驱动已启动 instrumentId:{instrumentId}, host:{config.Host}, port:{config.Port}");
 
             return Task.CompletedTask;
         }

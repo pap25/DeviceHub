@@ -33,7 +33,7 @@ namespace DeviceHub.YhloTestSerialPort
             lisIssueApplicationTask = new BatchConsumeTask<GetSampleApplyItemOutput>(new LisIssueApplicationHandler(instrumentId, session.SendTask), "lis_issue_application", 30 * 1000);
             lisIssueApplicationTask.StartConsume();
 
-            Logger.Info(logType, $"设备驱动已启动 instrumentId={instrumentId}, port={config.PortName}");
+            Logger.Info(logType, $"设备驱动已启动 instrumentId:{instrumentId}, port:{config.PortName}");
         }
 
         public void NotifyLisIssueApplication()
