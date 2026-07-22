@@ -1,4 +1,5 @@
 using DeviceHub.Model.Entities;
+using Microsoft.Data.Sqlite;
 
 namespace DeviceHub.Repository;
 
@@ -8,6 +9,12 @@ namespace DeviceHub.Repository;
 public interface ISendMessageEncoderRepository
 {
     Task<long> Insert(SendMessageEncoder entity, CancellationToken cancellationToken = default);
+
+    Task<long> Insert(
+        SendMessageEncoder entity,
+        SqliteConnection? connection,
+        SqliteTransaction? transaction,
+        CancellationToken cancellationToken = default);
 
     Task<bool> Update(SendMessageEncoder entity, CancellationToken cancellationToken = default);
 

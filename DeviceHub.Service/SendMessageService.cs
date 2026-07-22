@@ -14,10 +14,10 @@ public class SendMessageService
     private static readonly SendMessageService _instance = new();
     public static SendMessageService Instance => _instance;
 
-    private readonly SendMessageRepository sendMessageRepository = SendMessageRepository.Instance;
-    private readonly SendMessageEncoderRepository sendMessageEncoderRepository = SendMessageEncoderRepository.Instance;
-    private readonly SendMessageLargeRepository sendMessageLargeRepository = SendMessageLargeRepository.Instance;
-    private readonly DictionaryRepository dictionaryRepository = DictionaryRepository.Instance;
+    private readonly ISendMessageRepository sendMessageRepository = SendMessageRepository.Instance;
+    private readonly ISendMessageEncoderRepository sendMessageEncoderRepository = SendMessageEncoderRepository.Instance;
+    private readonly ISendMessageLargeRepository sendMessageLargeRepository = SendMessageLargeRepository.Instance;
+    private readonly IDictionaryRepository dictionaryRepository = DictionaryRepository.Instance;
 
     private SendMessageService()
     {

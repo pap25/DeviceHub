@@ -1,4 +1,5 @@
 using DeviceHub.Model.Entities;
+using Microsoft.Data.Sqlite;
 
 namespace DeviceHub.Repository;
 
@@ -8,6 +9,12 @@ namespace DeviceHub.Repository;
 public interface ISendMessageLargeRepository
 {
     Task<bool> Insert(SendMessageLarge entity, CancellationToken cancellationToken = default);
+
+    Task<bool> Insert(
+        SendMessageLarge entity,
+        SqliteConnection? connection,
+        SqliteTransaction? transaction,
+        CancellationToken cancellationToken = default);
 
     Task<bool> Update(SendMessageLarge entity, CancellationToken cancellationToken = default);
 

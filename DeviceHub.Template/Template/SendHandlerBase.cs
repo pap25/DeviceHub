@@ -1,5 +1,6 @@
 ﻿using DeviceHub.Lis.Dto;
 using DeviceHub.Model.Entities;
+using DeviceHub.Repository;
 using DeviceHub.Repository.Repositories;
 using DeviceHub.Service;
 using DeviceHub.Utils;
@@ -12,8 +13,8 @@ namespace DeviceHub.Template.Template
     {
         private readonly string logType = nameof(SendHandlerBase);
         private long _instrumentId;
-        private readonly SendMessageRepository sendMessageRepository = SendMessageRepository.Instance;
-        private readonly SendMessageLargeRepository sendMessageLargeRepository = SendMessageLargeRepository.Instance;
+        private readonly ISendMessageRepository sendMessageRepository = SendMessageRepository.Instance;
+        private readonly ISendMessageLargeRepository sendMessageLargeRepository = SendMessageLargeRepository.Instance;
         private readonly SendMessageService sendMessageService = SendMessageService.Instance;
         protected Encoding messageEncoding;
 

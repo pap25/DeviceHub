@@ -8,8 +8,8 @@ namespace DeviceHub.Repository.Repositories;
 /// </summary>
 public class SendMessageEncoderRepository : ISendMessageEncoderRepository
 {
-    private static readonly SendMessageEncoderRepository _instance = new();
-    public static SendMessageEncoderRepository Instance => _instance;
+    private static readonly ISendMessageEncoderRepository _instance = new SendMessageEncoderRepository();
+    public static ISendMessageEncoderRepository Instance => _instance;
     private SendMessageEncoderRepository()
     {
     }

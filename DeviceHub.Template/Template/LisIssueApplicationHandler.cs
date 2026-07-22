@@ -1,10 +1,11 @@
-﻿using DeviceHub.Utils;
-using DeviceHub.Lis;
+﻿using DeviceHub.Lis;
 using DeviceHub.Lis.Dto;
 using DeviceHub.Lis.Impl;
 using DeviceHub.Model.Entities;
+using DeviceHub.Repository;
 using DeviceHub.Repository.Repositories;
 using DeviceHub.Service;
+using DeviceHub.Utils;
 using System.Text.Json;
 
 namespace DeviceHub.Template.Template
@@ -15,7 +16,7 @@ namespace DeviceHub.Template.Template
         private long _instrumentId;
         private readonly ILisClient lisClient = LisClient.Instance;
         private readonly SendMessageService sendMessageService = SendMessageService.Instance;
-        private readonly DictionaryRepository dictionaryRepository = DictionaryRepository.Instance;
+        private readonly IDictionaryRepository dictionaryRepository = DictionaryRepository.Instance;
         private readonly IConsumeTask sendHandlerTask;
 
         public LisIssueApplicationHandler(long instrumentId, IConsumeTask sendHandlerTask)

@@ -1,4 +1,5 @@
 using DeviceHub.Model.Entities;
+using Microsoft.Data.Sqlite;
 
 namespace DeviceHub.Repository;
 
@@ -9,7 +10,19 @@ public interface IReceiveMessageDecodeRepository
 {
     Task<long> Insert(ReceiveMessageDecode entity, CancellationToken cancellationToken = default);
 
+    Task<long> Insert(
+        ReceiveMessageDecode entity,
+        SqliteConnection? connection,
+        SqliteTransaction? transaction,
+        CancellationToken cancellationToken = default);
+
     Task InsertForUpdateByReceiveMessageId(ReceiveMessageDecode entity, CancellationToken cancellationToken = default);
+
+    Task InsertForUpdateByReceiveMessageId(
+        ReceiveMessageDecode entity,
+        SqliteConnection? connection,
+        SqliteTransaction? transaction,
+        CancellationToken cancellationToken = default);
 
     Task<bool> Update(ReceiveMessageDecode entity, CancellationToken cancellationToken = default);
 

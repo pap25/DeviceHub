@@ -7,8 +7,8 @@ namespace DeviceHub.Repository.Repositories;
 /// </summary>
 public class DictionaryRepository : IDictionaryRepository
 {
-    private static readonly DictionaryRepository _instance = new();
-    public static DictionaryRepository Instance => _instance;
+    private static readonly IDictionaryRepository _instance = new DictionaryRepository();
+    public static IDictionaryRepository Instance => _instance;
 
     private DictionaryRepository()
     {

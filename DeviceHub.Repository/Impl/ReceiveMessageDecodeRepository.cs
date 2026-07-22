@@ -8,8 +8,8 @@ namespace DeviceHub.Repository.Repositories;
 /// </summary>
 public class ReceiveMessageDecodeRepository : IReceiveMessageDecodeRepository
 {
-    private static readonly ReceiveMessageDecodeRepository _instance = new();
-    public static ReceiveMessageDecodeRepository Instance => _instance;
+    private static readonly IReceiveMessageDecodeRepository _instance = new ReceiveMessageDecodeRepository();
+    public static IReceiveMessageDecodeRepository Instance => _instance;
     private ReceiveMessageDecodeRepository()
     {
     }

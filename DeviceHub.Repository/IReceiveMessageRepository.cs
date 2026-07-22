@@ -1,5 +1,6 @@
 using DeviceHub.Model.Entities;
 using DeviceHub.Model.view;
+using Microsoft.Data.Sqlite;
 
 namespace DeviceHub.Repository;
 
@@ -9,6 +10,12 @@ namespace DeviceHub.Repository;
 public interface IReceiveMessageRepository
 {
     Task<long> Insert(ReceiveMessage entity, CancellationToken cancellationToken = default);
+
+    Task<long> Insert(
+        ReceiveMessage entity,
+        SqliteConnection? connection,
+        SqliteTransaction? transaction,
+        CancellationToken cancellationToken = default);
 
     Task<bool> Update(ReceiveMessage entity, CancellationToken cancellationToken = default);
 
@@ -30,6 +37,14 @@ public interface IReceiveMessageRepository
         long id,
         ReceiveMessage.StatusEnum status,
         long updateTime,
+        CancellationToken cancellationToken = default);
+
+    Task<bool> UpdateStatusAndUpdateTimeById(
+        long id,
+        ReceiveMessage.StatusEnum status,
+        long updateTime,
+        SqliteConnection? connection,
+        SqliteTransaction? transaction,
         CancellationToken cancellationToken = default);
 
     Task<bool> DeleteById(long id, CancellationToken cancellationToken = default);

@@ -1,6 +1,7 @@
-﻿using DeviceHub.Utils;
-using DeviceHub.Model.Entities;
+﻿using DeviceHub.Model.Entities;
+using DeviceHub.Repository;
 using DeviceHub.Repository.Repositories;
+using DeviceHub.Utils;
 using System.Text;
 
 namespace DeviceHub.Template.Template
@@ -9,8 +10,8 @@ namespace DeviceHub.Template.Template
     {
         private readonly string logType = nameof(ReceiveHandlerBase);
         private long _instrumentId;
-        private readonly ReceiveMessageRepository receiveMessageRepository = ReceiveMessageRepository.Instance;
-        private readonly ReceiveMessageLargeRepository receiveMessageLargeRepository = ReceiveMessageLargeRepository.Instance;
+        private readonly IReceiveMessageRepository receiveMessageRepository = ReceiveMessageRepository.Instance;
+        private readonly IReceiveMessageLargeRepository receiveMessageLargeRepository = ReceiveMessageLargeRepository.Instance;
         protected Encoding messageEncoding;
 
         public ReceiveHandlerBase(long instrumentId, Encoding encoding)

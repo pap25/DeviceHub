@@ -14,11 +14,11 @@ public class ReceiveMessageService
     private static readonly ReceiveMessageService _instance = new();
     public static ReceiveMessageService Instance => _instance;
 
-    private readonly ReceiveMessageRepository receiveMessageRepository = ReceiveMessageRepository.Instance;
-    private readonly ReceiveMessageLargeRepository receiveMessageLargeRepository = ReceiveMessageLargeRepository.Instance;
-    private readonly ReceiveMessageDecodeRepository receiveMessageDecodeRepository = ReceiveMessageDecodeRepository.Instance;
-    private readonly SendMessageRepository sendMessageRepository = SendMessageRepository.Instance;
-    private readonly SendMessageLargeRepository sendMessageLargeRepository = SendMessageLargeRepository.Instance;
+    private readonly IReceiveMessageRepository receiveMessageRepository = ReceiveMessageRepository.Instance;
+    private readonly IReceiveMessageLargeRepository receiveMessageLargeRepository = ReceiveMessageLargeRepository.Instance;
+    private readonly IReceiveMessageDecodeRepository receiveMessageDecodeRepository = ReceiveMessageDecodeRepository.Instance;
+    private readonly ISendMessageRepository sendMessageRepository = SendMessageRepository.Instance;
+    private readonly ISendMessageLargeRepository sendMessageLargeRepository = SendMessageLargeRepository.Instance;
 
     private ReceiveMessageService()
     {

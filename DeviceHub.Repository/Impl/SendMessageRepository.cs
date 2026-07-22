@@ -1,7 +1,6 @@
 using DeviceHub.Model.Entities;
 using DeviceHub.Model.view;
 using Microsoft.Data.Sqlite;
-using System.Text;
 
 namespace DeviceHub.Repository.Repositories;
 
@@ -10,8 +9,8 @@ namespace DeviceHub.Repository.Repositories;
 /// </summary>
 public class SendMessageRepository : ISendMessageRepository
 {
-    private static readonly SendMessageRepository _instance = new();
-    public static SendMessageRepository Instance => _instance;
+    private static readonly ISendMessageRepository _instance = new SendMessageRepository();
+    public static ISendMessageRepository Instance => _instance;
     private SendMessageRepository()
     {
     }

@@ -8,8 +8,8 @@ namespace DeviceHub.Repository.Repositories;
 /// </summary>
 public class SendMessageLargeRepository : ISendMessageLargeRepository
 {
-    private static readonly SendMessageLargeRepository _instance = new();
-    public static SendMessageLargeRepository Instance => _instance;
+    private static readonly ISendMessageLargeRepository _instance = new SendMessageLargeRepository();
+    public static ISendMessageLargeRepository Instance => _instance;
     private SendMessageLargeRepository()
     {
     }
