@@ -16,6 +16,14 @@ public interface ISendMessageLargeRepository
         SqliteTransaction? transaction,
         CancellationToken cancellationToken = default);
 
+    Task InsertForUpdateBySendMessageId(SendMessageLarge entity, CancellationToken cancellationToken = default);
+
+    Task InsertForUpdateBySendMessageId(
+        SendMessageLarge entity,
+        SqliteConnection? connection,
+        SqliteTransaction? transaction,
+        CancellationToken cancellationToken = default);
+
     Task<bool> Update(SendMessageLarge entity, CancellationToken cancellationToken = default);
 
     Task<bool> DeleteBySendMessageId(long sendMessageId, CancellationToken cancellationToken = default);

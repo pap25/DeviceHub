@@ -17,6 +17,14 @@ public interface ISendMessageRepository
         SqliteTransaction? transaction,
         CancellationToken cancellationToken = default);
 
+    Task<long> InsertForUpdateByExternalNo(SendMessage entity, CancellationToken cancellationToken = default);
+
+    Task<long> InsertForUpdateByExternalNo(
+        SendMessage entity,
+        SqliteConnection? connection,
+        SqliteTransaction? transaction,
+        CancellationToken cancellationToken = default);
+
     Task<bool> Update(SendMessage entity, CancellationToken cancellationToken = default);
 
     Task<bool> UpdateStatusAndErrorMessageAndUpdateTimeById(

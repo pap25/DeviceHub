@@ -63,13 +63,13 @@ namespace DeviceHub.Template.Template
                     task.SampleNo ?? string.Empty,
                     task.Barcode ?? string.Empty,
                     JsonSerializer.Serialize(task));
+
+                sendHandlerTask.NotifyConsume();
             }
             catch (Exception ex)
             {
                 Logger.Warn(logType, $"保存LIS拉取下单申请异常 id:{task.Id}: {ex.Message}");
             }
-
-            sendHandlerTask.NotifyConsume();
         }
     }
 }

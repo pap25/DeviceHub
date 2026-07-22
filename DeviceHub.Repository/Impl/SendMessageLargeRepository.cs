@@ -41,6 +41,37 @@ public class SendMessageLargeRepository : ISendMessageLargeRepository
         return rows > 0;
     }
 
+    public Task InsertForUpdateBySendMessageId(SendMessageLarge entity, CancellationToken cancellationToken = default) =>
+        InsertForUpdateBySendMessageId(entity, null, null, cancellationToken);
+
+    public async Task InsertForUpdateBySendMessageId(
+        SendMessageLarge entity,
+        SqliteConnection? connection,
+        SqliteTransaction? transaction,
+        CancellationToken cancellationToken = default)
+    {
+        const string sql = """
+            INSERT INTO send_message_large (send_message_id, send_json)
+            VALUES (@send_message_id, @send_json)
+            ON CONFLICT(send_message_id) DO UPDATE SET
+                send_json = excluded.send_json;
+            """;
+
+        var parameters = new SqliteParameter[]
+        {
+            DbHelper.Param("@send_message_id", entity.SendMessageId),
+            DbHelper.Param("@send_json", entity.SendJson)
+        };
+
+        if (connection is not null && transaction is not null)
+        {
+            await DbHelper.ExecuteNonQueryAsync(connection, transaction, sql, parameters, cancellationToken);
+            return;
+        }
+
+        await DbHelper.ExecuteNonQueryAsync(sql, parameters, cancellationToken);
+    }
+
     public async Task<bool> Update(SendMessageLarge entity, CancellationToken cancellationToken = default)
     {
         const string sql = """

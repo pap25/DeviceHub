@@ -120,7 +120,7 @@ public class ReceiveMessageService
 
     public void SaveSampleQuery(long instrumentId, long receiveMessageId, string sampleNo, string barcode, string decodeResultJson, string sendJson)
     {
-        string externalNo = Convert.ToString(receiveMessageId);
+        string externalNo = SendMessage.RequestApplicationPrefix + receiveMessageId;
         long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         ReceiveMessageDecode receiveMessageDecode = new()
         {
@@ -155,11 +155,11 @@ public class ReceiveMessageService
         DbHelper.ExecuteInTransactionAsync(async (connection, transaction) =>
         {
             await receiveMessageRepository.UpdateStatusAndUpdateTimeById(receiveMessageId, ReceiveMessage.StatusEnum.Success, now, connection, transaction);
-            await receiveMessageDecodeRepository.Insert(receiveMessageDecode, connection, transaction);
-            long sendMessageId = await sendMessageRepository.Insert(sendMessage, connection, transaction);
+            await receiveMessageDecodeRepository.InsertForUpdateByReceiveMessageId(receiveMessageDecode, connection, transaction);
+            long sendMessageId = await sendMessageRepository.InsertForUpdateByExternalNo(sendMessage, connection, transaction);
 
             sendMessageLarge.SendMessageId = sendMessageId;
-            await sendMessageLargeRepository.Insert(sendMessageLarge, connection, transaction);
+            await sendMessageLargeRepository.InsertForUpdateBySendMessageId(sendMessageLarge, connection, transaction);
         }).GetAwaiter().GetResult();
     }
 }

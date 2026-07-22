@@ -94,4 +94,6 @@ public class SendMessage
         [Description("处理失败")]
         Failed = 2
     }
+
+    public const string RequestApplicationPrefix = "QA_";
 }
