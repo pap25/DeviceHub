@@ -67,15 +67,6 @@ create table send_message_encoder (
     unique key uk_send_message_id(send_message_id)
 ) engine=innodb default charset=utf8mb4 comment '发送仪器消息编码记录';
 
-create table client_log (
-    id bigint not null auto_increment comment '主键ID',
-    type tinyint not null comment '日志类型(0:LIS接口，1:仪器通信，2:本地数据库)',
-    level tinyint not null comment '状态(0:普通，1:警告，2:异常)',
-    message varchar(5000) not null comment '日志内容',
-    create_time bigint not null comment '创建时间',
-    primary key(id)
-) engine=innodb default charset=utf8mb4 comment '仪器通信日志表';
-
 create table dictionary (
     ckey varchar(100) not null comment '配置key(LisIssueApplicationLastId)',
     value varchar(100) not null comment '配置值',

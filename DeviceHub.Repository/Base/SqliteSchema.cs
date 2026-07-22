@@ -67,14 +67,6 @@ internal static class SqliteSchema
             UNIQUE(send_message_id)
         );
 
-        CREATE TABLE IF NOT EXISTS client_log (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            type INTEGER NOT NULL,
-            level INTEGER NOT NULL,
-            message TEXT NOT NULL,
-            create_time INTEGER NOT NULL
-        );
-
         CREATE TABLE IF NOT EXISTS dictionary (
             ckey TEXT PRIMARY KEY,
             value TEXT NOT NULL

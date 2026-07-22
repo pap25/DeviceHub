@@ -36,7 +36,6 @@
 - send_message：发送消息队列
 - send_message_large：发送 JSON 内容
 - send_message_encoder：发送报文记录
-- client_log：客户端日志
 
 业务场景：
 这是一个 LIS 与检验仪器通信客户端：

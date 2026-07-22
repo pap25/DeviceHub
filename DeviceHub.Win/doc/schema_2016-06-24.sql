@@ -159,12 +159,3 @@ create table instrument_runtime (
     key idx_instrument_id(instrument_id)
 ) engine=innodb default charset=utf8mb4 comment '仪器运行状态表';
 **/
-
-create table client_log (
-    id bigint not null auto_increment comment '主键ID',
-    type tinyint not null comment '日志类型',
-    level tinyint not null comment '状态(0:普通，1:警告，2:异常)',
-    message longtext not null comment '日志内容',
-    create_time bigint not null comment '创建时间',
-    primary key(id)
-) engine=innodb default charset=utf8mb4 comment '仪器通信日志表';
