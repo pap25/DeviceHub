@@ -102,7 +102,7 @@ public class SendMessageService
             sendMessageLarge.SendMessageId = sendMessageId;
             await sendMessageLargeRepository.Insert(sendMessageLarge, connection, transaction);
 
-            await dictionaryRepository.UpsertValue(DataDictionary.Keys.LisIssueApplicationLastId, lastId.ToString(), connection, transaction);
+            await dictionaryRepository.UpdateValueByCkey(DataDictionary.Keys.LisIssueApplicationLastId, lastId.ToString(), connection, transaction);
         }).GetAwaiter().GetResult();
     }
 }

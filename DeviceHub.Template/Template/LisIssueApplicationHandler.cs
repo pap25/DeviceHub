@@ -37,7 +37,7 @@ namespace DeviceHub.Template.Template
                 }
                 else
                 {
-                    dictionaryRepository.UpsertValue(DataDictionary.Keys.LisIssueApplicationLastId, "0").GetAwaiter().GetResult();
+                    dictionaryRepository.Insert(DataDictionary.Keys.LisIssueApplicationLastId, "0").GetAwaiter().GetResult();
                 }
 
                 List<GetSampleApplyItemOutput> list = lisClient.GetSampleApplyList(_instrumentId, lastId, 20).GetAwaiter().GetResult();

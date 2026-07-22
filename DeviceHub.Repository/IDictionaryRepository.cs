@@ -9,12 +9,17 @@ public interface IDictionaryRepository
 {
     Task<string?> GetValueByCkey(string ckey, CancellationToken cancellationToken = default);
 
-    Task UpsertValue(
+    Task Insert(
         string ckey,
         string value,
         CancellationToken cancellationToken = default);
 
-    Task UpsertValue(
+    Task UpdateValueByCkey(
+        string ckey,
+        string value,
+        CancellationToken cancellationToken = default);
+
+    Task UpdateValueByCkey(
         string ckey,
         string value,
         SqliteConnection connection,

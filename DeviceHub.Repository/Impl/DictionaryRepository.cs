@@ -21,12 +21,11 @@ public class DictionaryRepository : IDictionaryRepository
             [DbHelper.Param("@ckey", ckey)],
             cancellationToken);
 
-    public Task UpsertValue(string ckey, string value, CancellationToken cancellationToken = default)
+    public Task Insert(string ckey, string value, CancellationToken cancellationToken = default)
     {
         const string sql = """
             INSERT INTO dictionary (ckey, value)
-            VALUES (@ckey, @value)
-            ON CONFLICT(ckey) DO UPDATE SET value = excluded.value;
+            VALUES (@ckey, @value);
             """;
 
         return DbHelper.ExecuteNonQueryAsync(
@@ -38,7 +37,24 @@ public class DictionaryRepository : IDictionaryRepository
             cancellationToken);
     }
 
-    public Task UpsertValue(
+    public Task UpdateValueByCkey(string ckey, string value, CancellationToken cancellationToken = default)
+    {
+        const string sql = """
+            UPDATE dictionary
+            SET value = @value
+            WHERE ckey = @ckey;
+            """;
+
+        return DbHelper.ExecuteNonQueryAsync(
+            sql,
+            [
+                DbHelper.Param("@ckey", ckey),
+                DbHelper.Param("@value", value)
+            ],
+            cancellationToken);
+    }
+
+    public Task UpdateValueByCkey(
         string ckey,
         string value,
         SqliteConnection connection,
@@ -46,9 +62,9 @@ public class DictionaryRepository : IDictionaryRepository
         CancellationToken cancellationToken = default)
     {
         const string sql = """
-            INSERT INTO dictionary (ckey, value)
-            VALUES (@ckey, @value)
-            ON CONFLICT(ckey) DO UPDATE SET value = excluded.value;
+            UPDATE dictionary
+            SET value = @value
+            WHERE ckey = @ckey;
             """;
 
         return DbHelper.ExecuteNonQueryAsync(
