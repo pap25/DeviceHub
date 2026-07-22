@@ -74,8 +74,8 @@ ENQ     ->     ACK                     LineState.Receiving, 发ACKFrame   ->   
 	
 	System.Text.Encoding.CodePages 编码 ok
 	1 写完其它流程（网口、串口）
-	2 打印日志和添加数据库日志
-	3 完整测试	4 重新同步，还有其他小功能
+	2 打印日志和添加数据库日志 ok
+	3 完整测试	4 重新同步 ok
 2. 对接调试仪器
 
 0 调试
