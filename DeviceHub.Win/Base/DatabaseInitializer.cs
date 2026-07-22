@@ -19,6 +19,7 @@ internal static class DatabaseInitializer
         var connectionString = AppConfig.DatabaseConnectionString;
         DbHelper.Configure(connectionString);
 
+        Logger.Info(nameof(DatabaseInitializer), "=================== 程序启动 ===================");
         Logger.Info(nameof(DatabaseInitializer), $"初始化数据库: {connectionString}");
         await DbHelper.InitializeAsync(cancellationToken);
         Logger.Info(nameof(DatabaseInitializer), "数据库表结构初始化完成");
