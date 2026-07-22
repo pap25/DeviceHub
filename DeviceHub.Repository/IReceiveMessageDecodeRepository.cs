@@ -9,6 +9,8 @@ public interface IReceiveMessageDecodeRepository
 {
     Task<long> Insert(ReceiveMessageDecode entity, CancellationToken cancellationToken = default);
 
+    Task InsertForUpdateByReceiveMessageId(ReceiveMessageDecode entity, CancellationToken cancellationToken = default);
+
     Task<bool> Update(ReceiveMessageDecode entity, CancellationToken cancellationToken = default);
 
     Task<bool> DeleteById(long id, CancellationToken cancellationToken = default);

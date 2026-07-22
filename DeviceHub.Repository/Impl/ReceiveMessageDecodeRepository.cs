@@ -50,6 +50,48 @@ public class ReceiveMessageDecodeRepository : IReceiveMessageDecodeRepository
         return await DbHelper.ExecuteScalarAsync<long>(sql, parameters, cancellationToken);
     }
 
+    public Task InsertForUpdateByReceiveMessageId(ReceiveMessageDecode entity, CancellationToken cancellationToken = default) =>
+        InsertForUpdateByReceiveMessageId(entity, null, null, cancellationToken);
+
+    public async Task InsertForUpdateByReceiveMessageId(
+        ReceiveMessageDecode entity,
+        SqliteConnection? connection,
+        SqliteTransaction? transaction,
+        CancellationToken cancellationToken = default)
+    {
+        const string sql = """
+            INSERT INTO receive_message_decode (receive_message_id, external_no, type, sample_no, barcode, result_json, create_time, update_time)
+            VALUES (@receive_message_id, @external_no, @type, @sample_no, @barcode, @result_json, @create_time, @update_time)
+            ON CONFLICT(receive_message_id) DO UPDATE SET
+                external_no = excluded.external_no,
+                type = excluded.type,
+                sample_no = excluded.sample_no,
+                barcode = excluded.barcode,
+                result_json = excluded.result_json,
+                update_time = excluded.update_time;
+            """;
+
+        var parameters = new SqliteParameter[]
+        {
+            DbHelper.Param("@receive_message_id", entity.ReceiveMessageId),
+            DbHelper.Param("@external_no", entity.ExternalNo),
+            DbHelper.Param("@type", (byte)entity.Type),
+            DbHelper.Param("@sample_no", entity.SampleNo),
+            DbHelper.Param("@barcode", entity.Barcode),
+            DbHelper.Param("@result_json", entity.ResultJson),
+            DbHelper.Param("@create_time", entity.CreateTime),
+            DbHelper.Param("@update_time", entity.UpdateTime)
+        };
+
+        if (connection is not null && transaction is not null)
+        {
+            await DbHelper.ExecuteNonQueryAsync(connection, transaction, sql, parameters, cancellationToken);
+            return;
+        }
+
+        await DbHelper.ExecuteNonQueryAsync(sql, parameters, cancellationToken);
+    }
+
     public async Task<bool> Update(ReceiveMessageDecode entity, CancellationToken cancellationToken = default)
     {
         const string sql = """

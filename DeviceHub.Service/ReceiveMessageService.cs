@@ -98,8 +98,6 @@ public class ReceiveMessageService
 
     public async Task UpdateSuccessTestResult(long id, string externalNo, string sampleNo, string barcode, string resultJson)
     {
-        // 更新 receive_message 新增 receive_message_decode
-
         long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         ReceiveMessageDecode receiveMessageDecode = new()
         {
@@ -116,7 +114,7 @@ public class ReceiveMessageService
         await DbHelper.ExecuteInTransactionAsync(async (connection, transaction) =>
         {
             await receiveMessageRepository.UpdateStatusAndUpdateTimeById(id, ReceiveMessage.StatusEnum.Success, now, connection, transaction);
-            await receiveMessageDecodeRepository.Insert(receiveMessageDecode, connection, transaction);
+            await receiveMessageDecodeRepository.InsertForUpdateByReceiveMessageId(receiveMessageDecode, connection, transaction);
         });
     }
 
